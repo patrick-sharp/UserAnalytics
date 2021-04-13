@@ -1,4 +1,4 @@
-# Status report for <week>
+# Week 3
 
 ## Team Report
 
