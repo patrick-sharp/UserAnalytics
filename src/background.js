@@ -32,6 +32,17 @@ chrome.runtime.onInstalled.addListener(async () => {
 });
 
 
+// print url to service worker (for debugging)
+function printUrlChange(webURL) {
+  if (webURL == "") {   // new Tab
+    return;
+  }
+  const url = new URL(webURL)
+  console.log(url.hostname);
+}
+
+
+// will be invoked when active tab is changed (including creating a new tab)
 chrome.tabs.onActivated.addListener(function(activeInfo) {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 
@@ -40,8 +51,16 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
     var activeTab = tabs[0];
     var activeTabId = activeTab.id; // or do whatever you need
 
-    const url = new URL(activeTab.url)
-    console.log(url.hostname);
-
+    printUrlChange(activeTab.url);
   });
 });
+
+
+// will be invoked when the current active tab changes new url
+chrome.tabs.onUpdated.addListener((tabId, change, tab) => {
+  if (tab.active && change.url) {
+    printUrlChange(change.url);
+  }
+});
+
+

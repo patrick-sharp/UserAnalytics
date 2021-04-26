@@ -1,5 +1,5 @@
-// check the current active url every 2 seconds
-window.setInterval(checkBrowserFocus, 2000);  
+// check the current active url every 1 second
+window.setInterval(checkBrowserFocus, 1000);  
 
 function checkBrowserFocus(){
   chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
