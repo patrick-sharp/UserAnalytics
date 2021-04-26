@@ -32,17 +32,81 @@ chrome.runtime.onInstalled.addListener(async () => {
 });
 
 
-// print url to service worker (for debugging)
-function printUrlChange(webURL) {
+
+/**********************************************************************
+ * 
+ * Main Code starts here!
+ * 
+ **********************************************************************/
+
+/***************************************
+ * global variables
+ ***************************************/
+var lastActiveTab = null        // the last active domain
+var lastTimeStamp = Date.now(); // the last recoreded timestamp
+let urlTimeMap = new Map();     // maps from url to time.
+
+var debugMode = true;           // print message to console (service worker)
+
+/***************************************
+ * Maintenance Functions
+ ***************************************/
+// sets the last domain key to the domain and current timestamp
+function setLastDomain(domain) {
+  lastActiveTab = domain
+  lastTimeStamp = Date.now();
+}
+
+
+// calculates the time between now and the last domain timestamp
+// adds this to the domain time spent
+// calls setLastDomain to update the last domain with the new domain
+// adds the domain to list of domains for day (domain+date key)
+function domainChanged(domain) {
+  if (domain == lastActiveTab) { // newtab or nothing changed!
+    return;
+  }
+  if (domain == null) {          // on startup
+    setLastDomain(domain);
+    return;
+  }
+
+  // calculate time
+  const second = Math.floor((Date.now() - lastTimeStamp)/1000);
+
+  // add to map
+  if (!urlTimeMap.has(lastActiveTab)) {
+    urlTimeMap.set(lastActiveTab, 0);
+  }
+  urlTimeMap.set(lastActiveTab, urlTimeMap.get(lastActiveTab) + second);
+
+  // update figures
+  setLastDomain(domain);
+
+  // debug print
+  if (debugMode) {
+    console.log("\n");
+    console.log(urlTimeMap);
+    console.log("Current tab: " + lastActiveTab);
+    console.log("last timestamp: " + lastTimeStamp);
+  }
+}
+
+// called by invoke functions for domainchanged
+function handleUrlChange(webURL) {
   if (webURL == "") {   // new Tab
     return;
   }
   const url = new URL(webURL)
-  console.log(url.hostname);
+  // console.log(url.hostname);
+  domainChanged(url.hostname)
 }
 
 
-// will be invoked when active tab is changed (including creating a new tab)
+/***************************************
+ * Invokers: will be called by chrome
+ ***************************************/
+// invoked when active tab is changed (including creating a new tab)
 chrome.tabs.onActivated.addListener(function(activeInfo) {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 
@@ -51,15 +115,15 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
     var activeTab = tabs[0];
     var activeTabId = activeTab.id; // or do whatever you need
 
-    printUrlChange(activeTab.url);
+    handleUrlChange(activeTab.url)
   });
 });
 
 
-// will be invoked when the current active tab changes new url
+// invoked when the current active tab changes new url
 chrome.tabs.onUpdated.addListener((tabId, change, tab) => {
   if (tab.active && change.url) {
-    printUrlChange(change.url);
+    handleUrlChange(change.url)
   }
 });
 
