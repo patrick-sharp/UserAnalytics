@@ -44,7 +44,7 @@ chrome.runtime.onInstalled.addListener(async () => {
  ***************************************/
 var lastActiveTab = null        // the last active domain
 var lastTimeStamp = Date.now(); // the last recoreded timestamp
-let urlTimeMap = new Map();     // maps from url to time.
+let urlTimeMap = new Map();     // maps from domain to time (seconds).
 
 var debugMode = true;           // print message to console (service worker)
 
@@ -91,6 +91,7 @@ function domainChanged(domain) {
     console.log("last timestamp: " + lastTimeStamp);
   }
 }
+
 
 // called by invoke functions for domainchanged
 function handleUrlChange(webURL) {
