@@ -49,7 +49,8 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
     var activeTab = tabs[0];
     var activeTabId = activeTab.id; // or do whatever you need
 
-    console.log(activeTab.url);
+    const url = new URL(activeTab.url)
+    console.log(url.hostname);
 
   });
 });
