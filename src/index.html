@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+    <script src='Chart.js'></script>
+	<head>
+		<meta charset="UTF-8">
+        <link rel="stylesheet" href="style.css">
+        <script src="functions.js"></script>
+		<title></title>
+	</head>
+	<body>
+        <div id="setting_panel" class="sidenav">
+            <div id="setting_title">Settings</div>
+            <div id="setting_content">
+                <div class="setting_list">
+                    <p id="tracking">Turn off Tracking</p>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div id="block_list" class="setting_list">Block List</div>
+                <textarea id="block_list_input" hidden></textarea>
+                <div id="export_list_button" class="setting_list">Export Block List</div>
+                <div id="clear_list_button" class="setting_list">Clear Block List</div>
+            </div>
+            <footer class="footer">
+                <p>Created with Love & Care</p>
+                <p>User Analytics</p>
+            </footer>
+        </div>
+        <button id="setting" onclick="openSettingPanel()" >
+            <img id="setting_icon" src="images/setting_icon.png">
+        </button>
+        <div id="main">
+                
+        
+        <!-- <div id='daily' style="margin: 10px; height: 42%; width: 42%; background-color: #F9F9F9; border-radius: 20px;">
+            <canvas id="myChart" style="padding: 10px 10px 10px 10px;" \>
+            <script>
+                var ctx = document.getElementById("myChart");
+                var myChart = new Chart(ctx, {
+                                        type: 'bar',
+                                        data: {
+                                            labels: Array.from({length: 7}, (_, i) => i + 1),
+                                            datasets: [
+                                                {
+                                                data: [{x: 1, y: 24}, {x: 1, y: 10}],
+                                                backgroundColor: ['#CFF0C4', '#5AC43B'],
+                                                borderRadius: 16,
+                                                barThickness: 24,
+                                                grouped: false
+                                            }, {
+                                                data: [{x: 2, y: 24}, {x: 2, y: 8}],
+                                                backgroundColor: ['#CFF0C4', '#5AC43B'],
+                                                borderRadius: 16,
+                                                barThickness: 24,
+                                                grouped: false
+                                            }, {
+                                                data: [{x: 3, y: 24}, {x: 3, y: 12}],
+                                                backgroundColor: ['#CFF0C4', '#5AC43B'],
+                                                borderRadius: 16,
+                                                barThickness: 24,
+                                                grouped: false
+                                            }, {
+                                                data: [{x: 4, y: 24}, {x: 4, y: 6}],
+                                                backgroundColor: ['#CFF0C4', '#5AC43B'],
+                                                borderRadius: 16,
+                                                barThickness: 24,
+                                                grouped: false
+                                            }, {
+                                                data: [{x: 5, y: 24}, {x: 5, y: 16}],
+                                                backgroundColor: ['#CFF0C4', '#5AC43B'],
+                                                borderRadius: 16,
+                                                barThickness: 24,
+                                                grouped: false
+                                            }, {
+                                                data: [{x: 6, y: 24}, {x: 6, y: 4}],
+                                                backgroundColor: ['#CFF0C4', '#5AC43B'],
+                                                borderRadius: 16,
+                                                barThickness: 24,
+                                                grouped: false
+                                            }, {
+                                                data: [{x: 7, y: 24}, {x: 7, y: 16}],
+                                                backgroundColor: ['#CFF0C4', '#5AC43B'],
+                                                borderRadius: 16,
+                                                barThickness: 24,
+                                                grouped: false
+                                            }
+
+                                        ]
+                                        },
+                                        options: {
+                                            plugins: {
+                                                legend: {
+                                                    display: false
+                                                }
+                                            },
+                                            events: [],
+                                            scales: {
+                                                y: {
+                                                    beginAtZero: true,
+                                                    max: 24,
+                                                    grid: {
+                                                        display: false,
+                                                        drawBorder: true,
+                                                        drawOnChartArea: true,
+                                                        drawTicks: false,
+                                                    },
+                                                    ticks: {
+                                                        callback: function(value, index, values) {
+                                                            return value + "H"
+                                                        }
+                                                    }
+                                                },
+                                                x: {
+                                                    grid: {
+                                                        display: false,
+                                                        drawBorder: true,
+                                                        drawOnChartArea: true,
+                                                        drawTicks: false,
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    });
+            </script>
+        </div> -->
+        </div>
+	</body>
+</html>
