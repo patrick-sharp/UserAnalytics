@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <script src='Chart.js'></script>
+	<head>
+		<meta charset="UTF-8">
+        <link rel="stylesheet" href="style.css">
+		<title>UserAnalyrics Dashboard</title>
+	</head>
+	<body>
+        <div id="setting_panel" class="sidenav">
+            <div id="setting_title">Settings</div>
+            <div id="setting_content">
+                <div class="setting_list">
+                    <p id="tracking">Turn off Tracking</p>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div id="block_list" class="setting_list">Block List</div>
+                <textarea id="block_list_input" hidden></textarea>
+                <div id="export_list_button" class="setting_list">Export Block List</div>
+                <div id="clear_list_button" class="setting_list">Clear Block List</div>
+            </div>
+            <footer class="footer">
+                <p>Created with Love & Care</p>
+                <p>User Analytics</p>
+            </footer>
+        </div>
+        <button id="setting">
+            <img id="setting_icon" src="images/setting_icon.png">
+        </button>
+        <div id="main">
+                
+        <div id='daily' style="margin: 10px; height: 42%; width: 42%; background-color: #F9F9F9; border-radius: 20px;">
+            <canvas id="myChart" style="padding: 10px 10px 10px 10px;" \>
+        </div>
+        </div>
+        <script src="dashboard.js"></script>
+	</body>
+</html>
