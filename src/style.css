@@ -174,3 +174,20 @@ border-radius: 50%;
     margin-left: 50px;
     color: #ccc;
 }
+
+#date_selector {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#date_selector button {
+    height: 37px; 
+    width: 104px; 
+    font-size: 24px; 
+    border: 0;
+    background-color: var(--background-color);
+    margin-top: 10px;
+    font: 400;
+    font-family: 'Poppins', sans-serif; /* not sure why we have to specify here*/
+}

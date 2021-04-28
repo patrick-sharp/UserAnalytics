@@ -14,6 +14,38 @@ function closeSettingPanel() {
 document.getElementById("setting").addEventListener("click", openSettingPanel);
 document.getElementById("setting_close_button").addEventListener("click", closeSettingPanel);
 
+// generate date selection buttons
+const dates = ['Daily', 'Weekly'];
+window.onload = function() {
+    dates.forEach(date => {
+        var button = document.createElement("button");
+        button.id = date;
+        button.innerHTML = date;
+    
+        // var a = document.body.appendChild(button);
+        button.addEventListener('click', updateButtonStyle)
+        document.getElementById('date_selector').appendChild(button);
+    })
+
+    document.getElementById("Daily").click()
+};
+
+function updateButtonStyle(event) {
+    console.log(event.target.id);
+    var button = document.getElementById(event.target.id)
+    button.style.borderRadius = '10px';
+    button.style.color = '#5AC43B'
+    button.style.backgroundColor = '#DCFFCF'
+    button.style.border = '1px solid #5AC43B'
+    button.style.boxSizing = 'border-box'
+
+    let i = dates.filter(d => d != event.target.id)[0];
+    document.getElementById(i).removeAttribute('style');
+}
+
+
+
+
 // Render the graph
 var ctx = document.getElementById("myChart");
 var myChart = new Chart(ctx, {

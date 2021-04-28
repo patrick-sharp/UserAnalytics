@@ -5,6 +5,8 @@
 		<meta charset="UTF-8">
         <link rel="stylesheet" href="style.css">
 		<title>UserAnalyrics Dashboard</title>
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 	</head>
 	<body>
         <div id="setting_panel" class="sidenav">
@@ -32,7 +34,10 @@
             <img id="setting_icon" src="images/setting_icon.png">
         </button>
         <div id="main">
-            
+            <div id="stats_view">
+                <div id="stats_container"></div>
+                <div id="date_selector"></div>
+            </div>
             <div id='daily' style="margin: 10px; height: 42%; width: 42%; background-color: #F9F9F9; border-radius: 20px;">
                 <canvas id="myChart" style="padding: 10px 10px 10px 10px;" \>
             </div>
