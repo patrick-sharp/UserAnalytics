@@ -1,0 +1,162 @@
+body {
+    background-color: #F2F0EB;
+    font-family: 'Poppins', sans-serif;
+}
+
+button {
+    height: 30px;
+    width: 30px;
+    outline: none;
+    margin: 10px;
+    border: none;
+    border-radius: 2px;
+  }
+  
+  button.current {
+    box-shadow: 0 0 0 2px white,
+                0 0 0 4px black;
+  }
+
+.sidenav {
+    height: 100%; 
+    width: 00; 
+    position: fixed; 
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #F2F0EB;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 60px; 
+    transition: 0.5s;
+    box-shadow: 8px 8px 40px rgba(0, 0, 0, 0.2);
+}
+
+.setting_list {
+    display: flex;
+    background-color: #F9F9F9;
+    margin-top: 20px;
+    min-height: 54px;
+    vertical-align: middle;
+    align-items: center;
+    padding-left: 20px;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 400;
+}
+
+.footer {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 160px;
+    width: 100%;
+    overflow: hidden;
+    margin: auto;
+    text-align: center;
+    font-weight: 500;
+    font-size: 18px;
+    font-style: italic;
+}
+
+/* The switch - the box around the slider */
+.switch {
+    display: inline-block;
+    position: relative;
+    width: 60px;
+    height: 34px;
+    margin-left: 70%; /* this is not correct!!!*/
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+opacity: 0;
+width: 0;
+height: 0;
+}
+
+/* The slider */
+.slider {
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: #ccc;
+-webkit-transition: .4s;
+transition: .4s;
+}
+
+.slider:before {
+position: absolute;
+content: "";
+height: 26px;
+width: 26px;
+left: 4px;
+bottom: 4px;
+background-color: white;
+-webkit-transition: .4s;
+transition: .4s;
+}
+
+input:checked + .slider {
+background-color: #5AE12A;
+}
+
+input:focus + .slider {
+box-shadow: 0 0 1px #5AE12A;
+}
+
+input:checked + .slider:before {
+-webkit-transform: translateX(26px);
+-ms-transform: translateX(26px);
+transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+border-radius: 34px;
+}
+
+.slider.round:before {
+border-radius: 50%;
+}
+
+#main {
+    background-color: #F2F0EB;
+}
+
+#setting {
+    width: 64px;
+    height: 64px;
+    margin-left: 36px;
+    margin-top: 36px;
+    background: #F9F9F9;
+    filter: drop-shadow(4px 4px 10px rgba(0, 0, 0, 0.2));
+    border-color: #F9F9F9;
+    border-style: none;
+    border-radius: 32px;
+}
+
+#setting_icon {
+    position: relative;
+    width: 80%;
+    vertical-align: middle;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#setting_title {
+    font-weight: 600;
+    font-size: 48px;
+    margin-left: 40px;
+    margin-top: 20px;
+}
+
+#setting_content {
+    display: flexbox;
+    margin-left: 50px;
+    margin-right: 50px;
+}

@@ -1,7 +1,7 @@
 {
-  "name": "Hello, World!",
+  "name": "User Analytics",
   "version": "1.0",
-  "description": "Build an Extension!",
+  "description": "Track and analyze your Google Chrome usage.",
   "manifest_version": 3,
   "background": {
     "service_worker": "background.js"
@@ -30,6 +30,5 @@
       },
       "description": "Opens popup.html"
     }
-  },
-  "options_page": "options.html"
+  }
 }
