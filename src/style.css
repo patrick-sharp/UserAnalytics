@@ -1,5 +1,11 @@
+:root {
+    --background-color: #F2F0EB;
+    --container-background-color: #F9F9F9;
+    --chart-green: #5AE12A
+}
+
 body {
-    background-color: #F2F0EB;
+    background-color: var(--background-color);
     font-family: 'Poppins', sans-serif;
 }
 
@@ -12,10 +18,10 @@ button {
     border-radius: 2px;
   }
   
-  button.current {
+button.current {
     box-shadow: 0 0 0 2px white,
                 0 0 0 4px black;
-  }
+}
 
 .sidenav {
     height: 100%; 
@@ -24,7 +30,7 @@ button {
     z-index: 1;
     top: 0;
     left: 0;
-    background-color: #F2F0EB;
+    background-color: var(--background-color);
     border-top-right-radius: 20px;
     border-bottom-right-radius: 20px;
     overflow-x: hidden; /* Disable horizontal scroll */
@@ -38,7 +44,6 @@ button {
     background-color: #F9F9F9;
     margin-top: 20px;
     min-height: 54px;
-    vertical-align: middle;
     align-items: center;
     padding-left: 20px;
     border-radius: 12px;
@@ -96,17 +101,17 @@ height: 26px;
 width: 26px;
 left: 4px;
 bottom: 4px;
-background-color: white;
+background-color: var(--container-background-color);
 -webkit-transition: .4s;
 transition: .4s;
 }
 
 input:checked + .slider {
-background-color: #5AE12A;
+background-color: var(--chart-green);
 }
 
 input:focus + .slider {
-box-shadow: 0 0 1px #5AE12A;
+box-shadow: 0 0 1px var(--chart-green);
 }
 
 input:checked + .slider:before {
@@ -129,11 +134,11 @@ border-radius: 50%;
 }
 
 #setting {
-    width: 64px;
-    height: 64px;
+    width: 48px;
+    height: 48px;
     margin-left: 36px;
     margin-top: 36px;
-    background: #F9F9F9;
+    background: var(--container-background-color);
     filter: drop-shadow(4px 4px 10px rgba(0, 0, 0, 0.2));
     border-color: #F9F9F9;
     border-style: none;
@@ -150,7 +155,7 @@ border-radius: 50%;
 
 #setting_title {
     font-weight: 600;
-    font-size: 48px;
+    font-size: 40px;
     margin-left: 40px;
     margin-top: 20px;
 }
@@ -159,4 +164,13 @@ border-radius: 50%;
     display: flexbox;
     margin-left: 50px;
     margin-right: 50px;
+}
+
+#setting_close_button {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+    color: #ccc;
 }
