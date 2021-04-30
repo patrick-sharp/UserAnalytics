@@ -34,12 +34,18 @@
             <img id="setting_icon" src="images/setting_icon.png">
         </button>
         <div id="main">
-            <div id="stats_view">
-                <div id="stats_container"></div>
-                <div id="date_selector"></div>
+            <div id="main_stats">
+                <div id="display">
+                    <div id="left_container"></div>
+                    <span id="separator"></span>
+                    <div id="right_container"></div>
+                </div>
+                <div>
+                    <div id="selector"></div>
+                </div>
             </div>
-            <div id='daily' style="margin: 10px; height: 42%; width: 42%; background-color: #F9F9F9; border-radius: 20px;">
-                <canvas id="myChart" style="padding: 10px 10px 10px 10px;" \>
+            <div id='daily' style="height: 42%;width: 650px; background-color: #F9F9F9; border-radius: 20px;margin-top: 30px;">
+                <canvas id="myChart" style="padding-top: 10px; padding-left: 10px; padding-right: 10px; padding-bottom: 10px;">
             </div>
         </div>
         <script src="dashboard.js"></script>
