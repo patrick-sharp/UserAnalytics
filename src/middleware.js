@@ -24,10 +24,10 @@ function setLastDomain(domain) {
  * @input: domain is a string that represents the host name in url
  */ 
 function domainChanged(domain) {
-  if (domain == lastActiveTab) { // newtab or nothing changed!
+  if (domain == null || domain == lastActiveTab) {  // newtab or nothing changed!
     return;
   }
-  if (domain == null) {          // on startup
+  if (lastActiveTab == null) {                      // on startup
     setLastDomain(domain);
     return;
   }
