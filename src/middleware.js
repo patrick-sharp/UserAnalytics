@@ -3,24 +3,26 @@
  ***************************************/
 var lastActiveTab = null        // the last active domain
 var lastTimeStamp = Date.now(); // the last recoreded timestamp
-let urlTimeMap = new Map();     // maps from domain to time (seconds).
-
-var debugMode = true;           // print message to console (service worker)
+let urlTimeMap = new Map();     // maps from date_domain(i.e. "5/1/2021_www.google.com") to time (seconds).
+const debugMode = true;         // print message to console (service worker)
 
 /***************************************
  * Middleware Functions
  ***************************************/
-// sets the last domain key to the domain and current timestamp
+/*
+ * sets the last domain key to the domain and current timestamp
+ * @input: domain is a string that represents the host name in url
+ */
 function setLastDomain(domain) {
   lastActiveTab = domain
   lastTimeStamp = Date.now();
 }
 
 
-// calculates the time between now and the last domain timestamp
-// adds this to the domain time spent
-// calls setLastDomain to update the last domain with the new domain
-// adds the domain to list of domains for day (domain+date key)
+/* 
+ * calculates the time and add to the domain spent
+ * @input: domain is a string that represents the host name in url
+ */ 
 function domainChanged(domain) {
   if (domain == lastActiveTab) { // newtab or nothing changed!
     return;
@@ -32,12 +34,14 @@ function domainChanged(domain) {
 
   // calculate time
   const second = Math.floor((Date.now() - lastTimeStamp)/1000);
+  const date = new Date(Date.now()).toLocaleDateString();
 
   // add to map
-  if (!urlTimeMap.has(lastActiveTab)) {
-    urlTimeMap.set(lastActiveTab, 0);
+  const keyName = date + "_" + lastActiveTab;
+  if (!urlTimeMap.has(keyName)) {
+    urlTimeMap.set(keyName, 0);
   }
-  urlTimeMap.set(lastActiveTab, urlTimeMap.get(lastActiveTab) + second);
+  urlTimeMap.set(keyName, urlTimeMap.get(keyName) + second);
 
   // update figures
   setLastDomain(domain);
@@ -47,12 +51,15 @@ function domainChanged(domain) {
     console.log("\n");
     console.log(urlTimeMap);
     console.log("Current tab: " + lastActiveTab);
-    console.log("last timestamp: " + lastTimeStamp);
+    console.log("last timestamp: " + new Date(lastTimeStamp).toLocaleDateString());
   }
 }
 
 
-// called by invoke functions for domainchanged
+/* 
+ * called by invoke functions in chrome when domain is changed
+ * @input: weburl is a string that represents the full url of a webside
+ */
 function handleUrlChange(webURL) {
   if (webURL == "") {   // new Tab
     return;
@@ -61,3 +68,12 @@ function handleUrlChange(webURL) {
   // console.log(url.hostname);
   domainChanged(url.hostname)
 }
+
+
+/***************************************
+ * Access Functions for frontend
+ ***************************************/
+
+
+
+
