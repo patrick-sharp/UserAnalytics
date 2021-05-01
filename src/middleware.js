@@ -13,7 +13,7 @@ const debugMode = true;         // print message to console (service worker)
  * sets the last domain key to the domain and current timestamp
  * @input: domain is a string that represents the host name in url
  */
-function setLastDomain(domain) {
+export function setLastDomain(domain) {
   lastActiveTab = domain
   lastTimeStamp = Date.now();
 }
@@ -23,7 +23,7 @@ function setLastDomain(domain) {
  * calculates the time and add to the domain spent
  * @input: domain is a string that represents the host name in url
  */ 
-function domainChanged(domain) {
+export function domainChanged(domain) {
   if (domain == null || domain == lastActiveTab) {  // newtab or nothing changed!
     return;
   }
@@ -60,7 +60,7 @@ function domainChanged(domain) {
  * called by invoke functions in chrome when domain is changed
  * @input: weburl is a string that represents the full url of a webside
  */
-function handleUrlChange(webURL) {
+export function handleUrlChange(webURL) {
   if (webURL == "") {   // new Tab
     return;
   }
@@ -76,7 +76,7 @@ function handleUrlChange(webURL) {
 /*
  * clean and reset data
  */
-function cleanUsage() {
+export function cleanUsage() {
   lastActiveTab = null        
   lastTimeStamp = Date.now();
   dateUrlTimeMap.clear();
@@ -89,7 +89,7 @@ function cleanUsage() {
  * @input: date is a formatted string in the form "month/day/year"(i.e. 4/30/2021).
  * @return: a set of domains, might be empty
  */
-function getDomainsForDay(date) {
+export function getDomainsForDay(date) {
   const returnSet = new Set();
   for (const [key, value] of dateUrlTimeMap.entries()) {
     const str = key.split("_", 2);
@@ -112,7 +112,7 @@ function getDomainsForDay(date) {
  *    the time spent on the domain on the given date. (in seconds)
  *    0 if the domain is never visited on that date.
  */
-function getTimeForDay(date, domain) {
+export function getTimeForDay(date, domain) {
   const keyName = date + "_" + domain;
   if (!dateUrlTimeMap.has(keyName)) {
     return 0;
@@ -130,7 +130,7 @@ function getTimeForDay(date, domain) {
  *    the time spent on the domain on the given dates. (in seconds)
  *    0 if the domain is never visited.
  */
-function getTimeForWeek(dates, domain) {
+export function getTimeForWeek(dates, domain) {
   var totalTime = 0;
   dates.forEach(function(date, index, array) {
     totalTime += getTimeForDay(date, domain)
@@ -145,7 +145,7 @@ function getTimeForWeek(dates, domain) {
 /*
  * Add elements to map. If already exists, append time
  */
-function addElement(date, domain, seconds) {
+export function addElement(date, domain, seconds) {
   const keyName = date + "_" + domain;
   if (!dateUrlTimeMap.has(keyName)) {
     dateUrlTimeMap.set(keyName, 0);
@@ -157,7 +157,7 @@ function addElement(date, domain, seconds) {
  * Remove elements from the map
  * Return true if successful, false otherwise
  */
-function removeElement(date, domain) {
+export function removeElement(date, domain) {
   const keyName = date + "_" + domain;
   return dateUrlTimeMap.delete(keyName);
 }
@@ -165,6 +165,6 @@ function removeElement(date, domain) {
 /*
  * Get a copy of the map
  */
-function getMap() {
+export function getMap() {
   return new Map(dateUrlTimeMap);
 }
