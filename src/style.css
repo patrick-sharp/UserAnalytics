@@ -133,6 +133,7 @@ border-radius: 50%;
     background-color: #F2F0EB;
     margin-left: 150px;
     margin-top: 10px;
+    margin-right: 150px;
 }
 
 #setting {
@@ -219,6 +220,55 @@ border-radius: 50%;
     border-radius: 15px;
 }
 
+#daily {
+    width: 50%; 
+    background-color: #F9F9F9; 
+    border-radius: 20px;
+    margin-top: 30px;
+}
+
+#daily #activity_container {
+    display:ruby-base;
+}
+
+#activity_container #spacer {
+    margin-left: 55%;
+}
+
+#daily #date_range {
+    background: #DCFFCF;
+    border: 1px solid #5AC43B;
+    box-sizing: border-box;
+    border-radius: 5px;
+    color: #5AC43B;
+    font-size: 18px;
+}
+
+#daily #activity_title {
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 27px;
+    margin-left: 40px;
+    margin-top: 30px;
+}
+
+#stats_view {
+    display: flex;
+    flex-direction: row;
+    height: 42%; 
+}
+
+#stats_view #spacer {
+    width: 5%;
+}
+
+#daily canvas {
+    margin-top: 5%;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 10px;
+}
+
 #display div {
     width: 50%;
     border-radius: 15px;
@@ -284,4 +334,45 @@ border-radius: 50%;
     display: flex;
     flex-direction: row;
     align-items: center;
+}
+
+#timesheet .timesheet_row {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+    background-color: var(--container-background-color);
+    border-radius: 18px;
+    height: 70px;
+}
+
+#timesheet img {
+    margin-left: 20px;
+}
+
+#timesheet_container_title {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 36px;
+    margin-top: 50px;
+}
+
+#timesheet .timesheet_row #title {
+    margin-left: 40px;
+    font-weight: normal;
+    font-size: 20px;
+    line-height: 36px;
+}
+#timesheet .timesheet_row #spacer {
+    margin-left: 70%;
+}
+
+#timesheet .timesheet_row  #time {
+    margin-right: 20px;
+}
+
+#timesheet .timesheet_row  #time .numbers {
+    font-size: 24px;
+    line-height: 36px;
+    font-weight: 700;
 }

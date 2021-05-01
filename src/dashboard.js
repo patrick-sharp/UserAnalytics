@@ -1,3 +1,27 @@
+// generate date selection buttons
+const dates = ['Daily', 'Weekly'];
+
+let timesheet_data = [
+    {
+        icon:'a',
+        title:'b',
+        times:'c',
+    },
+    {
+        icon:'a',
+        title:'d',
+        times:'e',
+    },
+    {
+        icon:'a',
+        title:'f',
+        times:'g',
+    }
+]
+
+let date_range_selection = ['Last 7 Days', 'Last 14 Days', 'Last Month'];
+
+
 function openSettingPanel() {
     document.getElementById("setting_panel").style.width = "50%";
     // document.getElementById("main").style.marginLeft = "50%";
@@ -14,8 +38,6 @@ function closeSettingPanel() {
 document.getElementById("setting").addEventListener("click", openSettingPanel);
 document.getElementById("setting_close_button").addEventListener("click", closeSettingPanel);
 
-// generate date selection buttons
-const dates = ['Daily', 'Weekly'];
 window.onload = function() {
     var display = document.getElementById("display");
     var left_container = document.getElementById('left_container');
@@ -43,6 +65,33 @@ window.onload = function() {
     })
 
     document.getElementById("Daily").click()
+
+    var timesheet = document.getElementById('timesheet');
+
+    timesheet_data.forEach(function(value, _index, _arr){
+        console.log(value);
+        // var row = document.createElement('div');
+        var row = document.createElement('div');
+        row.className = 'timesheet_row';
+        var img = document.createElement('img');
+        img.src = 'images/timer.png'
+        var title = document.createElement('span');
+        title.id = 'title';
+        title.innerHTML = 'youtube.com';
+        var spacer = document.createElement('span');
+        spacer.id = 'spacer';
+        var time = document.createElement('span');
+        time.id = 'time';
+        time.innerHTML = '10H28MIN'.replace(/\d+/g, function(v){
+            return "<span class='numbers'>" + v + "</span>";
+        });
+    
+        row.appendChild(img);
+        row.appendChild(title);
+        row.appendChild(spacer);
+        row.appendChild(time);
+    
+        timesheet.appendChild(row);})
 };
 
 function updateButtonStyle(event) {
@@ -119,6 +168,15 @@ function updateButtonStyle(event) {
 
 
 // Render the graph
+range_selector = document.getElementById('date_range');
+date_range_selection.forEach(function(value) {
+    var option = document.createElement('option');
+    option.text = value;
+    option.value = value;
+    // option.style.lineHeight = '27px';
+    option.style.width = 'fit';
+    range_selector.appendChild(option);
+})
 var ctx = document.getElementById("myChart");
 var myChart = new Chart(ctx, {
                         type: 'bar',

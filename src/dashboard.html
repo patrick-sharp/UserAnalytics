@@ -6,6 +6,7 @@
         <link rel="stylesheet" href="style.css">
 		<title>UserAnalyrics Dashboard</title>
         <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 	</head>
 	<body>
@@ -44,8 +45,23 @@
                     <div id="selector"></div>
                 </div>
             </div>
-            <div id='daily' style="height: 42%;width: 650px; background-color: #F9F9F9; border-radius: 20px;margin-top: 30px;">
-                <canvas id="myChart" style="padding-top: 10px; padding-left: 10px; padding-right: 10px; padding-bottom: 10px;">
+            <div id="stats_view">
+                <div id='daily'>
+                    <div id="activity_container">
+                        <div id="activity_title">Activity</div>
+                        <span id="spacer"></span>
+                        <select name="range" id="date_range"></select>
+                    </div>
+                    <canvas id="myChart"></canvas>
+                </div>
+                <span id="spacer"></span>
+                <div id="daily">
+                    <canvas id="myChart"></canvas>
+                </div>
+            </div>
+            <div id="timesheet_container">
+                <p id="timesheet_container_title">Timesheet</p>
+                <div id="timesheet"></div>
             </div>
         </div>
         <script src="dashboard.js"></script>
