@@ -124,7 +124,7 @@ function getTimeForDay(date, domain) {
 /*
  * get time spent on the domain for a given week
  * @input:
- *    dates is an array for date in the form of string "month/day/year"(i.e. 4/30/2021).
+ *    dates is an array for date in the form of string "month/day/year"(i.e. ["4/30/2021", "5/1/2021"]).
  *    domain is a string that represents the url of a website(i.e. www.google.com)
  * @return:
  *    the time spent on the domain on the given dates. (in seconds)
@@ -139,3 +139,32 @@ function getTimeForWeek(dates, domain) {
 }
 
 
+/******************************************************************************
+ * Util functions (can be used for testing, delete before publishing)
+ ******************************************************************************/
+/*
+ * Add elements to map. If already exists, append time
+ */
+function addElement(date, domain, seconds) {
+  const keyName = date + "_" + domain;
+  if (!dateUrlTimeMap.has(keyName)) {
+    dateUrlTimeMap.set(keyName, 0);
+  }
+  dateUrlTimeMap.set(keyName, dateUrlTimeMap.get(keyName) + seconds);
+}
+
+/*
+ * Remove elements from the map
+ * Return true if successful, false otherwise
+ */
+function removeElement(date, domain) {
+  const keyName = date + "_" + domain;
+  return dateUrlTimeMap.delete(keyName);
+}
+
+/*
+ * Get a copy of the map
+ */
+function getMap() {
+  return new Map(dateUrlTimeMap);
+}
