@@ -228,7 +228,10 @@ border-radius: 50%;
 }
 
 #daily #activity_container {
-    display:ruby-base;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: center;
 }
 
 #activity_container #spacer {
@@ -242,14 +245,16 @@ border-radius: 50%;
     border-radius: 5px;
     color: #5AC43B;
     font-size: 18px;
+    margin-top: 24px;
+    margin-right: 15px;
 }
 
 #daily #activity_title {
     font-weight: bold;
-    font-size: 18px;
+    font-size: 24px;
     line-height: 27px;
     margin-left: 40px;
-    margin-top: 30px;
+    margin-top: 24px;
 }
 
 #stats_view {
