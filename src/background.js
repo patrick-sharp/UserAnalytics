@@ -1,10 +1,8 @@
-// try {
-//   importScripts('./middleware.js');
-// } catch (e) {
-//   console.error(e);
-// }
-
-import { handleUrlChange } from './middleware';
+try {
+  importScripts('./middleware.js');
+} catch (e) {
+  console.error(e);
+}
 
 // Extension event listeners are a little different from the patterns you may have seen in DOM or
 // Node.js APIs. The below event listener registration can be broken in to 4 distinct parts:
