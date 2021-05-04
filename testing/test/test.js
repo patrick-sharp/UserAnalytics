@@ -2,7 +2,7 @@
 //   setLastDomain 
 // }
 // from '../src/middleware.js';
-const { setLastDomain } = require('../src/middleware.js');
+const { setLastDomain } = require('../../src/middleware.js');
 
 // var assert = require('assert');
 // describe('Array', function() {
