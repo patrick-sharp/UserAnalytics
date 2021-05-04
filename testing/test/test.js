@@ -1,7 +1,8 @@
-import {
-  setLastDomain 
-}
-from '../src/middleware.js';
+// import {
+//   setLastDomain 
+// }
+// from '../src/middleware.js';
+const { setLastDomain } = require('../src/middleware.js');
 
 // var assert = require('assert');
 // describe('Array', function() {
