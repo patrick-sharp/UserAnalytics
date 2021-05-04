@@ -20,9 +20,6 @@ const testFunctions = [
       && TESTING_localStorage['lastDomain'].openedTime <= Date.now()
     );
   },
-  function test3() {
-    return false;
-  }
 ];
 
 // Run all the tests and print a message about whether they passed or failed.
