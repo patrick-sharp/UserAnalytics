@@ -273,3 +273,57 @@ function removeElement(date, domain) {
 function getMap() {
   //return new Map(dateUrlTimeMap);
 }
+
+// So node can import, but the file doesn't throw error when imported with importScripts in background.js
+if (typeof exports !== 'undefined') {
+  exports.setLastDomain = setLastDomain;
+  exports.domainChanged = domainChanged;
+  exports.cleanUsage = cleanUsage;
+  exports.clearChromeStorage = clearChromeStorage;
+  exports.getDomainsForDay = getDomainsForDay;
+  exports.getTimeForDay = getTimeForDay;
+  exports.getTimeForWeek = getTimeForWeek;
+  exports.addElement = addElement;
+  exports.removeElement = removeElement;
+  exports.getMap = getMap;
+  exports.handleUrlChange = handleUrlChange;
+}
+
+// create a mock of the chrome API that works similarly to the real one so we can test it.
+// If we're running these tests with node, chrome will be undefined. That means we can 
+// define a mock api that mimics the function of the parts of the chrome API we use.
+if (typeof chrome === 'undefined') {
+  // this serves as a mock of the key-value storage of chrome's localstorage
+  var TESTING_localStorage = {};
+  var chrome = {
+    // the only methods we call are chrome.storage.sync.get, and chrome.storage.sync.set.
+    // We implement mocks of those functions here.
+    storage: {
+      sync: {
+        set: function(arg, callback) {
+          if (typeof arg === 'object') {
+            const key = Object.keys(arg)[0]
+            TESTING_localStorage[key] = arg[key];
+          } else {
+            throw 'Error: arg is not object';
+          }
+          callback();
+        },
+        get: function(arg, callback) {
+          if (Array.isArray(arg)) {
+            const key = arg[0];
+            const result = TESTING_localStorage[key] ?? {};
+            callback(result);
+          // TODO: implement object arg for this function
+          // } else if (typeof arg === 'object') {
+          //   const key = Object.keys
+          } else {
+            throw 'Error: arg is not array or object';
+          }
+        }
+      }
+    },
+  }
+  exports.chrome = chrome;
+  exports.TESTING_localStorage = TESTING_localStorage;
+}

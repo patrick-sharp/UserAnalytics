@@ -10,4 +10,4 @@ description: 'Use Node to run the tests for our javascript code'
 #     description: 'number of tests that passed divided by the total number of tests'
 runs:
   using: 'node12'
-  main: 'testing/test/test.js'
+  main: 'test/test.js'
