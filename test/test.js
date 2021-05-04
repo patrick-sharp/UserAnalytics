@@ -19,6 +19,9 @@ const testFunctions = [
       && TESTING_localStorage['lastDomain'].domain === 'bing.com'
       && TESTING_localStorage['lastDomain'].openedTime <= Date.now()
     );
+  },
+  function test3() {
+    return false;
   }
 ];
 
