@@ -9,5 +9,5 @@ description: 'Use Node to run the tests for our javascript code'
 #   result: # id of output
 #     description: 'number of tests that passed divided by the total number of tests'
 runs:
-  using: 'node15'
+  using: 'node12'
   main: 'test/test.js'

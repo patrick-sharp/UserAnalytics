@@ -312,7 +312,7 @@ if (typeof chrome === 'undefined') {
         get: function(arg, callback) {
           if (Array.isArray(arg)) {
             const key = arg[0];
-            const result = TESTING_localStorage[key] ?? {};
+            const result = TESTING_localStorage[key] === undefined ? {} : TESTING_localStorage[key];
             callback(result);
           // TODO: implement object arg for this function
           // } else if (typeof arg === 'object') {
