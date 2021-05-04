@@ -56,6 +56,7 @@ function setLastDomain(domain) {
  * @input: domain is a string that represents the host name in url
  */ 
 function domainChanged(domain) {
+  // default object if lastDomain key does not exist
   let defaultLastDomainObj = { 
     lastDomain: {
       domain: 'null',
@@ -76,13 +77,13 @@ function domainChanged(domain) {
       return;
     }
 
-    // calculate time
+    // calculate time spent on tab
     const timeSpentOnDomain = ((Date.now() - data['openedTime'] - data['totalInactiveTime']) / 1000);
     const dateString = new Date(Date.now()).toLocaleDateString();
 
     const keyName = dateString + "_" + lastDomain;
 
-    // set default time to 0 is domain has no time spent
+    // set default time to 0 if domain has no time spent
     let defaultValue = { time: 0 };
     chrome.storage.sync.get({[keyName]: defaultValue}, function(data) {
       let newTimeObj = {[keyName]: {time: data[keyName].time + timeSpentOnDomain}};
@@ -109,7 +110,7 @@ function domainChanged(domain) {
       });
     });
 
-    // update figures
+    // update the last domain
     setLastDomain(domain);
   });
 }
@@ -151,6 +152,9 @@ function cleanUsage() {
   });
 }
 
+/*
+ * clean out chrome storage
+ */
 function clearChromeStorage() {
   chrome.storage.sync.clear(function () {
     console.log('cleared chrome storage');
@@ -190,19 +194,22 @@ async function getDomainsForDay(date) {
  *    0 if the domain is never visited on that date.
  */
 async function getTimeForDay(date, domain) {
-  chrome.storage.sync.get(null, function(items) {
-    console.log(JSON.stringify(items));
-    var allKeys = Object.keys(items);
-    console.log(allKeys);
-    for (key of allKeys) {
-      chrome.storage.sync.get([key], function(val) {
-        console.log(JSON.stringify(val));
-      });
-    }
-  });
+  // prints out the total time spent on each domain
+  if (debugMode) {
+    chrome.storage.sync.get(null, function(items) {
+      console.log(JSON.stringify(items));
+      var allKeys = Object.keys(items);
+      console.log(allKeys);
+      for (key of allKeys) {
+        chrome.storage.sync.get([key], function(val) {
+          console.log(JSON.stringify(val));
+        });
+      }
+    });
+  }
   let timeForDomainDayKey = date + "_" + domain;
 
-  // make the chrome storage call synchronous
+  // make the chrome storage call synchronously
   var p = new Promise(function(resolve, reject){
     chrome.storage.sync.get({[timeForDomainDayKey]: {time: 0}}, function(data) {
       resolve(data[timeForDomainDayKey].time);
@@ -242,6 +249,7 @@ function getTimeForWeek(dates, domain) {
 /*
  * Add elements to map. If already exists, append time
  */
+//TODO complete these now that we are using sync
 function addElement(date, domain, seconds) {
   //const keyName = date + "_" + domain;
   //if (!dateUrlTimeMap.has(keyName)) {
