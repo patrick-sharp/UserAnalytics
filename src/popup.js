@@ -2,13 +2,13 @@
 document.addEventListener('DOMContentLoaded', function () {
   var links = document.getElementsByTagName("a");
   for (var i = 0; i < links.length; i++) {
-      (function () {
-          var ln = links[i];
-          var location = ln.href;
-          ln.onclick = function () {
-              chrome.tabs.create({active: true, url: location});
-          };
-      })();
+    (function () {
+      var ln = links[i];
+      var location = ln.href;
+      ln.onclick = function () {
+        chrome.tabs.create({active: true, url: location});
+      };
+    })();
   }
 });
 
@@ -17,9 +17,11 @@ window.setInterval(checkBrowserFocus, 1000);
 
 function checkBrowserFocus(){
   chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
-    const url = new URL(tabs[0].url)
-    document.getElementById("url").innerHTML = "Currently Visiting: " + url.hostname
-});
+    if (tabs[0]) {
+      const url = new URL(tabs[0].url)
+      document.getElementById("url").innerHTML = "Currently Visiting: " + url.hostname
+    }
+  });
 }
 
 
