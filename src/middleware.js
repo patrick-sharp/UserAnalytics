@@ -23,7 +23,7 @@ const debugMode = true;         // print message to console (service worker)
     value: {
       domains: list of domains visited that day
     }
-*/
+    */
 
 /******************************************************************************
  * Middleware Functions
@@ -32,13 +32,19 @@ const debugMode = true;         // print message to console (service worker)
  * sets the last domain key to the domain and current timestamp
  * @input: domain is a string that represents the host name in url
  */
-export function setLastDomain(domain) {
-  chrome.storage.sync.get('lastDomain', function(data) {
-    data['domain'] = domain;
-    data['openedTime'] = Date.now();
-    chrome.storage.sync.set(data, function() {
+function setLastDomain(domain) {
+  chrome.storage.sync.get(['lastDomain'], function(data) {
+    let lastDomainObj = { 
+      lastDomain: {
+        domain: domain,
+        openedTime: Date.now(),
+        lastInactiveTime: data['lastInactiveTime'],
+        totalInactiveTime: data['totalInactiveTime'] ? data['totalInactiveTime'] : 0
+      }
+    };
+    chrome.storage.sync.set(lastDomainObj, function() {
       if (debugMode) {
-        console.log('Last domain set');
+        console.log('Last domain set to: ' + domain);
       }
     });
   });
@@ -49,8 +55,18 @@ export function setLastDomain(domain) {
  * calculates the time and add to the domain spent
  * @input: domain is a string that represents the host name in url
  */ 
-export function domainChanged(domain) {
-  chrome.storage.sync.get('lastDomain', function(data) {
+function domainChanged(domain) {
+  let defaultLastDomainObj = { 
+    lastDomain: {
+      domain: 'null',
+      openedTime: Date.now(),
+      lastInactiveTime: 0,
+      totalInactiveTime: 0
+    }
+  };
+  chrome.storage.sync.get({['lastDomain']: defaultLastDomainObj}, function(data) {
+    data = data.lastDomain;
+
     let lastDomain = data['domain'];
     if (domain == null || domain == lastDomain) {  // newtab or nothing changed!
       return;
@@ -64,16 +80,15 @@ export function domainChanged(domain) {
     const timeSpentOnDomain = ((Date.now() - data['openedTime'] - data['totalInactiveTime']) / 1000);
     const dateString = new Date(Date.now()).toLocaleDateString();
 
-    const keyName = dateString + "_" + lastActiveTab;
+    const keyName = dateString + "_" + lastDomain;
 
     // set default time to 0 is domain has no time spent
     let defaultValue = { time: 0 };
     chrome.storage.sync.get({[keyName]: defaultValue}, function(data) {
-      // data.time will be either the stored value, or defaultValue if nothing is set
-      chrome.storage.sync.set({[keyName]: data.time + timeSpentOnDomain}, function() {
-        // The value is now stored, so you don't have to do this again
+      let newTimeObj = {[keyName]: {time: data[keyName].time + timeSpentOnDomain}};
+      chrome.storage.sync.set(newTimeObj, function() {
         if (debugMode) {
-          console.log('user spent ' + timeSpentOnDomain + ' seconds on ' + domain);
+          console.log('user spent ' + timeSpentOnDomain + ' seconds on ' + lastDomain);
         }
       });
     });
@@ -82,15 +97,15 @@ export function domainChanged(domain) {
     let domainsForDayKey = 'domains_for_' + dateString;
     defaultValue = { domains: [] };
     chrome.storage.sync.get({[domainsForDayKey]: defaultValue}, function(data) {
-      // could we make this a Set?
-      if (!data.includes(domain)) {
-        data.domains.add(domain);
-      }
-      chrome.storage.sync.set({[domainsForDayKey]: data.domains}, function() {
-        // The value is now stored, so you don't have to do this again
+      data = data[domainsForDayKey] 
+      // TODO could we make this a Set?
+      if (!data.domains.includes(domain)) {
+        data.domains.push(domain);
         if (debugMode) {
           console.log('added ' + domain + ' to list of domains for ' + dateString);
         }
+      }
+      chrome.storage.sync.set({[domainsForDayKey]: {domains: data.domains}}, function() {
       });
     });
 
@@ -104,13 +119,13 @@ export function domainChanged(domain) {
  * called by invoke functions in chrome when domain is changed
  * @input: weburl is a string that represents the full url of a webside
  */
-export function handleUrlChange(webURL) {
+function handleUrlChange(webURL) {
   if (webURL == "") {   // new Tab
     return;
   }
   const url = new URL(webURL);
   if (debugMode) {
-    console.log('url was changed, hostname is: ' + hostname);
+    console.log('url was changed, hostname is: ' + url.hostname);
   }
   domainChanged(url.hostname);
 }
@@ -122,17 +137,23 @@ export function handleUrlChange(webURL) {
 /*
  * clean and reset data
  */
-export function cleanUsage() {
-  chrome.storage.sync.get('lastDomain', function(data) {
+function cleanUsage() {
+  chrome.storage.sync.get(['lastDomain'], function(data) {
     data['domain'] = null;
     data['openedTime'] = Date.now();
     data['lastInactiveTime'] = null;
     data['totalInactiveTime'] = 0;
-    chrome.storage.sync.set(data, function() {
+    chrome.storage.sync.get(['lastDomain'], function(data) {
       if (debugMode) {
         console.log('LastDomain key reset');
       }
     });
+  });
+}
+
+function clearChromeStorage() {
+  chrome.storage.sync.clear(function () {
+    console.log('cleared chrome storage');
   });
 }
 
@@ -143,7 +164,7 @@ export function cleanUsage() {
  * @input: date is a formatted string in the form "month/day/year"(i.e. 4/30/2021).
  * @return: a set of domains, might be empty
  */
-export function getDomainsForDay(date) {
+async function getDomainsForDay(date) {
   // get domains for a given day
   let domainsForDayKey = 'domains_for_' + dateString;
 
@@ -168,17 +189,31 @@ export function getDomainsForDay(date) {
  *    the time spent on the domain on the given date. (in seconds)
  *    0 if the domain is never visited on that date.
  */
-export function getTimeForDay(date, domain) {
-  let timeForDomainDay = date + "_" + domain;
+async function getTimeForDay(date, domain) {
+  chrome.storage.sync.get(null, function(items) {
+    console.log(JSON.stringify(items));
+    var allKeys = Object.keys(items);
+    console.log(allKeys);
+    for (key of allKeys) {
+      chrome.storage.sync.get([key], function(val) {
+        console.log(JSON.stringify(val));
+      });
+    }
+  });
+  let timeForDomainDayKey = date + "_" + domain;
 
   // make the chrome storage call synchronous
   var p = new Promise(function(resolve, reject){
-    chrome.storage.sync.get([timeForDomainDay], function(data) {
-      resolve(data.time);
+    chrome.storage.sync.get({[timeForDomainDayKey]: {time: 0}}, function(data) {
+      resolve(data[timeForDomainDayKey].time);
     });
   });
 
   const timeForDomain = await p;
+  if (debugMode) {
+    console.log('time for ' + domain + ' on ' + date);
+  }
+
   return timeForDomain;
 }
 
@@ -192,7 +227,7 @@ export function getTimeForDay(date, domain) {
  *    the time spent on the domain on the given dates. (in seconds)
  *    0 if the domain is never visited.
  */
-export function getTimeForWeek(dates, domain) {
+function getTimeForWeek(dates, domain) {
   var totalTime = 0;
   dates.forEach(function(date, index, array) {
     totalTime += getTimeForDay(date, domain)
@@ -207,7 +242,7 @@ export function getTimeForWeek(dates, domain) {
 /*
  * Add elements to map. If already exists, append time
  */
-export function addElement(date, domain, seconds) {
+function addElement(date, domain, seconds) {
   //const keyName = date + "_" + domain;
   //if (!dateUrlTimeMap.has(keyName)) {
   //  dateUrlTimeMap.set(keyName, 0);
@@ -219,7 +254,7 @@ export function addElement(date, domain, seconds) {
  * Remove elements from the map
  * Return true if successful, false otherwise
  */
-export function removeElement(date, domain) {
+function removeElement(date, domain) {
   //const keyName = date + "_" + domain;
   //return dateUrlTimeMap.delete(keyName);
 }
@@ -227,6 +262,6 @@ export function removeElement(date, domain) {
 /*
  * Get a copy of the map
  */
-export function getMap() {
+function getMap() {
   //return new Map(dateUrlTimeMap);
 }
