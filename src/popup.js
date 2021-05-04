@@ -1,3 +1,5 @@
+import { domainChanged } from  "./middleware.js";
+
 // enables <a> html tags to redirect into new tab
 document.addEventListener('DOMContentLoaded', function () {
   var links = document.getElementsByTagName("a");
