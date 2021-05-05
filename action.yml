@@ -1,0 +1,13 @@
+name: 'Test action'
+description: 'Use Node to run the tests for our javascript code'
+# inputs:
+#   who-to-greet:  # id of input
+#     description: 'Who to greet'
+#     required: true
+#     default: 'World'
+# outputs:
+#   result: # id of output
+#     description: 'number of tests that passed divided by the total number of tests'
+runs:
+  using: 'node12'
+  main: 'test/test.js'
