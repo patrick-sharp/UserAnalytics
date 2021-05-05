@@ -1,3 +1,27 @@
+// generate date selection buttons
+const dates = ['Daily', 'Weekly'];
+
+let timesheet_data = [
+    {
+        icon:'a',
+        title:'b',
+        times:'c',
+    },
+    {
+        icon:'a',
+        title:'d',
+        times:'e',
+    },
+    {
+        icon:'a',
+        title:'f',
+        times:'g',
+    }
+]
+
+let date_range_selection = ['Last 7 Days', 'Last 14 Days', 'Last Month'];
+
+
 function openSettingPanel() {
     document.getElementById("setting_panel").style.width = "50%";
     // document.getElementById("main").style.marginLeft = "50%";
@@ -14,9 +38,147 @@ function closeSettingPanel() {
 document.getElementById("setting").addEventListener("click", openSettingPanel);
 document.getElementById("setting_close_button").addEventListener("click", closeSettingPanel);
 
+window.onload = function() {
+    var display = document.getElementById("display");
+    var left_container = document.getElementById('left_container');
+    let left_content = generateStatistics("Total Time");
+    left_container.appendChild(left_content);
+
+    // var separator = document.
+
+    var right_container = document.getElementById('right_container');
+    let right_content = generateStatistics("Most Frequent");
+    right_container.appendChild(right_content);
+
+    // display.appendChild(left_container);
+    // display.appendChild(right_container);
+
+    dates.forEach(date => {
+        var button = document.createElement("button");
+        button.id = date;
+        button.innerHTML = date;
+    
+        // var a = document.body.appendChild(button);
+        button.addEventListener('click', updateButtonStyle)
+        let a = document.getElementById('selector');
+        a.appendChild(button);
+    })
+
+    document.getElementById("Daily").click()
+
+    var timesheet = document.getElementById('timesheet');
+
+    timesheet_data.forEach(function(value, _index, _arr){
+        console.log(value);
+        // var row = document.createElement('div');
+        var row = document.createElement('div');
+        row.className = 'timesheet_row';
+        var img = document.createElement('img');
+        img.src = 'images/timer.png'
+        var title = document.createElement('span');
+        title.id = 'title';
+        title.innerHTML = 'youtube.com';
+        var spacer = document.createElement('span');
+        spacer.id = 'spacer';
+        var time = document.createElement('span');
+        time.id = 'time';
+        time.innerHTML = '10H28MIN'.replace(/\d+/g, function(v){
+            return "<span class='numbers'>" + v + "</span>";
+        });
+    
+        row.appendChild(img);
+        row.appendChild(title);
+        row.appendChild(spacer);
+        row.appendChild(time);
+    
+        timesheet.appendChild(row);})
+};
+
+function updateButtonStyle(event) {
+    console.log(event.target.id);
+    var button = document.getElementById(event.target.id)
+    button.style.borderRadius = '10px';
+    button.style.color = '#5AC43B'
+    button.style.backgroundColor = '#DCFFCF'
+    button.style.border = '1px solid #5AC43B'
+    button.style.boxSizing = 'border-box'
+
+    let i = dates.filter(d => d != event.target.id)[0];
+    document.getElementById(i).removeAttribute('style');
+}
+
+function generateStatistics(titleString) {
+
+    let container = document.createElement('div');
+    container.id = 'stats_container';
+    container.style.marginLeft = '52px';
+    container.style.marginTop = '17px';
+
+
+    let title = document.createElement('p');
+    title.id = 'title';
+
+    let content_container = document.createElement('div');
+    content_container.id = 'content_container';
+
+    let icon = document.createElement('img')
+    let timeContainer = document.createElement('div');
+    timeContainer.id = "time_container";
+    let time = document.createElement('div');
+    let comparison = document.createElement('span');
+    comparison.id = 'comparison';
+
+    title.innerHTML = titleString;
+    title.style.fontSize = '24px';
+    title.style.color = '#000000'
+    icon.src = 'images/timer.png'
+    time.innerHTML = (5 + 'H' + 24 + 'MIN').replace(/\d+/g, function(v){
+        return "<span class='numbers'>" + v + "</span>";
+    });
+
+    comparison.innerHTML = ('+' + 5 + 'min' + ' compared to yesterday').replace(/(\+|\-)\d+(min)/, function(v) {
+        return (v.includes('+') ? "<span class='comp_plus'>" : "<span class='comp_minus'>")  + v + "</span>";});
+
+    timeContainer.appendChild(time);
+    timeContainer.appendChild(comparison);
+
+    content_container.appendChild(icon);
+    content_container.appendChild(timeContainer);
+
+    container.appendChild(title);
+    container.appendChild(content_container);
+
+    return container;
+}
+
+function updateButtonStyle(event) {
+    console.log(event.target.id);
+    var button = document.getElementById(event.target.id)
+    button.style.borderRadius = '10px';
+    button.style.color = '#5AC43B'
+    button.style.backgroundColor = '#DCFFCF'
+    button.style.border = '1px solid #5AC43B'
+    button.style.boxSizing = 'border-box'
+
+    let i = dates.filter(d => d != event.target.id)[0];
+    document.getElementById(i).removeAttribute('style');
+}
+
+
+
+
 // Render the graph
-var ctx = document.getElementById("myChart");
-var myChart = new Chart(ctx, {
+range_selector = document.getElementById('date_range');
+date_range_selection.forEach(function(value) {
+    var option = document.createElement('option');
+    option.text = value;
+    option.value = value;
+    // option.style.lineHeight = '27px';
+    option.style.width = 'fit';
+    range_selector.appendChild(option);
+})
+var ctx_line = document.getElementById("lineChart");
+var lineChart = new Chart(ctx_line, {
                         type: 'bar',
                         data: {
                             labels: Array.from({length: 7}, (_, i) => i + 1),
@@ -101,3 +263,33 @@ var myChart = new Chart(ctx, {
                             }
                         }
                     });
+
+const labels = ['Red', 'Orange', 'Yellow', 'Green', 'Blue'];
+var ctx_polar = document.getElementById('polarChart');
+var polarChart = new Chart(ctx_polar, {
+    type: 'polarArea',
+    data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Dataset 1',
+            data: [1,2,3,4,5],
+            backgroundColor: [
+                '#EAD367',
+                '#D3705A',
+                '#D8E8E2',
+                '#C4D293',
+                '#37554C'
+            ]
+          }
+        ]
+      },
+    options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false,
+          }
+        }
+    }
+});

@@ -5,6 +5,9 @@
 		<meta charset="UTF-8">
         <link rel="stylesheet" href="style.css">
 		<title>UserAnalytics Dashboard</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <!-- <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet"> -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 	</head>
 	<body>
         <div id="setting_panel" class="sidenav">
@@ -32,11 +35,42 @@
             <img id="setting_icon" src="images/setting_icon.png">
         </button>
         <div id="main">
-            
-            <div id='daily' style="margin: 10px; height: 42%; width: 42%; background-color: #F9F9F9; border-radius: 20px;">
-                <canvas id="myChart" style="padding: 10px 10px 10px 10px;" \>
+            <div id="main_stats">
+                <div id="display">
+                    <div id="left_container"></div>
+                    <span id="separator"></span>
+                    <div id="right_container"></div>
+                </div>
+                <div>
+                    <div id="selector"></div>
+                </div>
+            </div>
+            <div id="stats_view">
+                <div id='data_chart'>
+                    <div id="activity_container">
+                        <div id="activity_title">Activity</div>
+                        <span id="spacer"></span>
+                        <select name="range" id="date_range"></select>
+                    </div>
+                    <canvas id="lineChart" class="chart"></canvas>
+                </div>
+                <span id="spacer"></span>
+                <div id="data_chart">
+                    <canvas id="polarChart" class="chart"></canvas>
+                </div>
+            </div>
+            <div id="timesheet_container">
+                <p id="timesheet_container_title">Timesheet</p>
+                <div id="timesheet"></div>
+            </div>
+            <div>
+                <footer id="footer">
+                    <p>Created with Love & Care</p>
+                    <p>User Analytics</p>
+                </footer>
             </div>
         </div>
+        
         <script src="dashboard.js"></script>
         <script src="dashboard_test.js"></script>
 	</body>
