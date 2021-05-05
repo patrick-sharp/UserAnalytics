@@ -6,7 +6,7 @@
         <link rel="stylesheet" href="style.css">
 		<title>UserAnalyrics Dashboard</title>
         <link rel="preconnect" href="https://fonts.gstatic.com">
-        <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+        <!-- <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet"> -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 	</head>
 	<body>
@@ -46,17 +46,17 @@
                 </div>
             </div>
             <div id="stats_view">
-                <div id='daily'>
+                <div id='data_chart'>
                     <div id="activity_container">
                         <div id="activity_title">Activity</div>
                         <span id="spacer"></span>
                         <select name="range" id="date_range"></select>
                     </div>
-                    <canvas id="myChart"></canvas>
+                    <canvas id="lineChart" class="chart"></canvas>
                 </div>
                 <span id="spacer"></span>
-                <div id="daily">
-                    <canvas id="myChart"></canvas>
+                <div id="data_chart">
+                    <canvas id="polarChart" class="chart"></canvas>
                 </div>
             </div>
             <div id="timesheet_container">

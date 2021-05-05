@@ -177,8 +177,8 @@ date_range_selection.forEach(function(value) {
     option.style.width = 'fit';
     range_selector.appendChild(option);
 })
-var ctx = document.getElementById("myChart");
-var myChart = new Chart(ctx, {
+var ctx_line = document.getElementById("lineChart");
+var lineChart = new Chart(ctx_line, {
                         type: 'bar',
                         data: {
                             labels: Array.from({length: 7}, (_, i) => i + 1),
@@ -263,3 +263,33 @@ var myChart = new Chart(ctx, {
                             }
                         }
                     });
+
+const labels = ['Red', 'Orange', 'Yellow', 'Green', 'Blue'];
+var ctx_polar = document.getElementById('polarChart');
+var polarChart = new Chart(ctx_polar, {
+    type: 'polarArea',
+    data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Dataset 1',
+            data: [1,2,3,4,5],
+            backgroundColor: [
+                '#EAD367',
+                '#D3705A',
+                '#D8E8E2',
+                '#C4D293',
+                '#37554C'
+            ]
+          }
+        ]
+      },
+    options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false,
+          }
+        }
+    }
+});
