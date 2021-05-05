@@ -63,6 +63,19 @@ button.current {
     font-weight: 500;
     font-size: 18px;
     font-style: italic;
+    color: #9A9A9A;
+}
+
+#footer {
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    font-weight: 500;
+    font-size: 18px;
+    font-style: italic;
+    color: #9A9A9A;
+    margin-top: 150px;
 }
 
 /* The switch - the box around the slider */
