@@ -1,4 +1,17 @@
+// fetch('./category.json').then(response => response.json()).then(obj => console.log(obj))
+
 // enables <a> html tags to redirect into new tab
+// const category = chrome.runtime.getURL("category.json");;
+// console.log();
+
+// window.onload = function() {
+//   let dashboardButton = document.getElementById('dashboard');
+//   dashboardButton.addEventListener('click', function() {
+//     window.location.href = './dashboard.html'
+//   });
+// };
+
+
 document.addEventListener('DOMContentLoaded', function () {
   var links = document.getElementsByTagName("a");
   for (var i = 0; i < links.length; i++) {
@@ -23,5 +36,3 @@ function checkBrowserFocus(){
     }
   });
 }
-
-

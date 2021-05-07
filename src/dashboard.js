@@ -1,4 +1,5 @@
-// generate date selection buttons
+// generate date selection button\
+
 const dates = ['Daily', 'Weekly'];
 
 let timesheet_data = [
@@ -21,7 +22,6 @@ let timesheet_data = [
 
 let date_range_selection = ['Last 7 Days', 'Last 14 Days', 'Last Month'];
 
-
 function openSettingPanel() {
     document.getElementById("setting_panel").style.width = "50%";
     // document.getElementById("main").style.marginLeft = "50%";
@@ -39,7 +39,6 @@ document.getElementById("setting").addEventListener("click", openSettingPanel);
 document.getElementById("setting_close_button").addEventListener("click", closeSettingPanel);
 
 window.onload = function() {
-    var display = document.getElementById("display");
     var left_container = document.getElementById('left_container');
     let left_content = generateStatistics("Total Time");
     left_container.appendChild(left_content);
