@@ -1,0 +1,33 @@
+{
+    "Entertainment": [
+        "netflix.com",
+        "hulu.com",
+        "youtube.com",
+        "twitch.com",
+        "disneyplus.com",
+        "hbo.com",
+        "hbomax.com"
+    ],
+    "Social": [
+        "facebook.com",
+        "discord.com",
+        "instagram.com",
+        "quora",
+        "reddit.com"
+    ],
+    "Reading": [
+        "google.com",
+        "yahoo.com",
+        "nytimes.com",
+        "cnn.com",
+        "foxnews.com",
+        "washingtonpost.com",
+        "theverge.com",
+        "vox.com"
+    ],
+    "Productivity": [
+        "stackoverflow.com",
+        "github.com"
+    ],
+    "Other":[]
+}

@@ -1,12 +1,23 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="button.css">
+    <link rel="stylesheet" href="popup.css">
   </head>
   <body>
-    <h1> UserAnalytics </h1>
-    <a href="dashboard.html">Goto Dashboard</a>
+    <div>
+      <textarea id="url_editor"></textarea>
+      <div id="function_group">
+        <p id="func_1">Add URL Above To</p>
+        <select id='category_selector' style="margin-left: 10px; margin-right: 10px;">
+        </select>
+      </div>
+    </div>
+    <hr id="spacer"></hr>
+    <div id="dashboard">
+      <a href="dashboard.html" style="color: black; text-decoration: none;">Go to Dashboard</a>
+    </div>
     <p id="url"></p>
     <script src="popup.js"></script>
+    <script src="middleware.js"></script>
   </body>
 </html>
