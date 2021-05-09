@@ -20,7 +20,7 @@ let timesheet_data = [
     }
 ]
 
-let date_range_selection = ['Last 7 Days', 'Last 14 Days', 'Last Month'];
+let date_range_selection = ['Last 7 Days', 'Last 14 Days'];
 
 function openSettingPanel() {
     document.getElementById("setting_panel").style.width = "50%";

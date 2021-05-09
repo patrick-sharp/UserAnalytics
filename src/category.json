@@ -1,20 +1,33 @@
 {
     "Entertainment": [
-
+        "netflix.com",
+        "hulu.com",
+        "youtube.com",
+        "twitch.com",
+        "disneyplus.com",
+        "hbo.com",
+        "hbomax.com"
     ],
-    "Social Networking": [
-
+    "Social": [
+        "facebook.com",
+        "discord.com",
+        "instagram.com",
+        "quora",
+        "reddit.com"
     ],
-    "Reading and Referencing": [
-
+    "Reading": [
+        "google.com",
+        "yahoo.com",
+        "nytimes.com",
+        "cnn.com",
+        "foxnews.com",
+        "washingtonpost.com",
+        "theverge.com",
+        "vox.com"
     ],
     "Productivity": [
-        
+        "stackoverflow.com",
+        "github.com"
     ],
-    "Creativity": [
-
-    ],
-    "Other":[
-
-    ]
+    "Other":[]
 }

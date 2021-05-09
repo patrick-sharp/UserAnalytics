@@ -5,13 +5,10 @@
   </head>
   <body>
     <div>
-      <textarea id="url_editor"> url</textarea>
+      <textarea id="url_editor"></textarea>
       <div id="function_group">
         <p id="func_1">Add URL Above To</p>
-        <select style="margin-left: 10px; margin-right: 10px;">
-          <option>a</option>
-          <option>a</option>
-          <option>a</option>
+        <select id='category_selector' style="margin-left: 10px; margin-right: 10px;">
         </select>
       </div>
     </div>
@@ -19,9 +16,8 @@
     <div id="dashboard">
       <a href="dashboard.html" style="color: black; text-decoration: none;">Go to Dashboard</a>
     </div>
-    <!-- <button id="dashboard" onclick="location.href = './dashboard.html'">Go to Dashboard</button> -->
     <p id="url"></p>
-    
     <script src="popup.js"></script>
+    <script src="middleware.js"></script>
   </body>
 </html>

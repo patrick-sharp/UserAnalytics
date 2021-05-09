@@ -170,7 +170,8 @@ function clearChromeStorage() {
  */
 async function getDomainsForDay(date) {
   // get domains for a given day
-  let domainsForDayKey = 'domains_for_' + dateString;
+  // let domainsForDayKey = 'domains_for_' + date;
+  let domainsForDayKey = '';
 
   // make the chrome storage call synchronous
   var p = new Promise(function(resolve, reject){
