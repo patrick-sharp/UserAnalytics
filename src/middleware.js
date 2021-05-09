@@ -1,7 +1,15 @@
 /******************************************************************************
  * global variables
  ******************************************************************************/
-const debugMode = true;         // print message to console (service worker)
+const debugMode = true;         // print message to console (service worker)  
+let defaultLastDomainObj = {    // default object if lastDomain key does not exist
+  lastDomain: {
+    domain: null,
+    openedTime: Date.now(),
+    lastInactiveTime: 0,
+    totalInactiveTime: 0
+  }
+};
 
 /*
   Chrome storage sync keys:
@@ -54,15 +62,6 @@ function setLastDomain(domain) {
  * @input: domain is a string that represents the host name in url
  */ 
 function domainChanged(domain) {
-  // default object if lastDomain key does not exist
-  let defaultLastDomainObj = { 
-    lastDomain: {
-      domain: 'null',
-      openedTime: Date.now(),
-      lastInactiveTime: 0,
-      totalInactiveTime: 0
-    }
-  };
   chrome.storage.sync.get({['lastDomain']: defaultLastDomainObj}, function(data) {
     data = data.lastDomain;
 
@@ -125,17 +124,13 @@ function handleUrlChange(webURL) {
  * clean and reset last usage
  */
 function cleanUsage() {
-  chrome.storage.sync.get(['lastDomain'], function(data) {
-    data['domain'] = null;
-    data['openedTime'] = Date.now();
-    data['lastInactiveTime'] = null;
-    data['totalInactiveTime'] = 0;
-    chrome.storage.sync.get(['lastDomain'], function(data) {
-      if (debugMode) {
+  chrome.storage.sync.set(defaultLastDomainObj, function() {});
+    if (debugMode) {
+      chrome.storage.sync.get(['lastDomain'], function(data) {
         console.log('LastDomain key reset');
-      }
-    });
-  });
+        console.log(data);
+      });
+  }
 }
 
 /*
@@ -149,25 +144,25 @@ function clearChromeStorage() {
 
 
 /*
- * Get domains for a given day
- * Note that this computation might be expensive (O(n)).
+ * Get domain:time match for a given day
  * @input: date is a formatted string in the form "month/day/year"(i.e. 4/30/2021).
- * @return: a set of domains, might be empty
+ * @return: a primose that includes an object(i.e. {google.com: 123}), the object might be empty
  */
 async function getDomainsForDay(date) {
-  // get domains for a given day
-  let domainsForDayKey = 'domains_for_' + dateString;
-
   // make the chrome storage call synchronous
   var p = new Promise(function(resolve, reject){
-    chrome.storage.sync.get([domainsForDayKey], function(data) {
-      resolve(data.domains);
+    chrome.storage.sync.get([date], function(data) {
+      if (data[date] === undefined) {
+        data = {};
+      } else {
+        data = data[date];
+      }
+      resolve(data);
     });
   });
-
-  const domainsForDay = await p;
-  return domainsForDay;
+  return await p;
 }
+
 
 
 /*
@@ -176,38 +171,15 @@ async function getDomainsForDay(date) {
  *    date is a formatted string in the form "month/day/year"(i.e. 4/30/2021).
  *    domain is a string that represents the url of a website(i.e. www.google.com)
  * @return:
- *    the time spent on the domain on the given date. (in seconds)
+ *    A promise that includes the time spent on the domain on the given date. (in seconds)
  *    0 if the domain is never visited on that date.
  */
 async function getTimeForDay(date, domain) {
-  // prints out the total time spent on each domain
-  if (debugMode) {
-    chrome.storage.sync.get(null, function(items) {
-      console.log(JSON.stringify(items));
-      var allKeys = Object.keys(items);
-      console.log(allKeys);
-      for (key of allKeys) {
-        chrome.storage.sync.get([key], function(val) {
-          console.log(JSON.stringify(val));
-        });
-      }
-    });
+  const dataObj = await getDomainsForDay(date);
+  if (Object.keys(dataObj).length === 0 || dataObj[domain] === undefined) {
+    return 0;
   }
-  let timeForDomainDayKey = date + "_" + domain;
-
-  // make the chrome storage call synchronously
-  var p = new Promise(function(resolve, reject){
-    chrome.storage.sync.get({[timeForDomainDayKey]: {time: 0}}, function(data) {
-      resolve(data[timeForDomainDayKey].time);
-    });
-  });
-
-  const timeForDomain = await p;
-  if (debugMode) {
-    console.log('time for ' + domain + ' on ' + date);
-  }
-
-  return timeForDomain;
+  return dataObj[domain];
 }
 
 
@@ -217,20 +189,20 @@ async function getTimeForDay(date, domain) {
  *    dates is an array for date in the form of string "month/day/year"(i.e. ["4/30/2021", "5/1/2021"]).
  *    domain is a string that represents the url of a website(i.e. www.google.com)
  * @return:
- *    the time spent on the domain on the given dates. (in seconds)
+ *    A promise that includes the time spent on the domain on the given dates. (in seconds)
  *    0 if the domain is never visited.
  */
-function getTimeForWeek(dates, domain) {
+async function getTimeForWeek(dates, domain) {
   var totalTime = 0;
-  dates.forEach(function(date, index, array) {
-    totalTime += getTimeForDay(date, domain)
-  })
+  for (var i = 0; i < dates.length; i ++) {
+    totalTime += await getTimeForDay(dates[i], domain);
+  }
   return totalTime;
 }
 
 
 /******************************************************************************
- * Util functions (can be used for testing, delete before publishing)
+ * Util functions (can be used for testing)
  ******************************************************************************/
 /*
  * Add elements to map. If already exists, append time
