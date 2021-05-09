@@ -79,24 +79,7 @@ function domainChanged(domain) {
     const dateString = new Date(Date.now()).toLocaleDateString();
 
     // set default value to an empty object
-    chrome.storage.sync.get([dateString], function(data) {
-      if (data[dateString] === undefined) {
-        data[dateString] = {};
-      }
-      data = data[dateString];
-      if (data[lastDomain] === undefined) {
-        data[lastDomain] = 0;
-      }
-      data[lastDomain] = data[lastDomain] + timeSpentOnDomain;
-      let dataObj = {};
-      dataObj[dateString] = data;
-      chrome.storage.sync.set(dataObj, function() {
-        if (debugMode) {
-          console.log('Added: ' + lastDomain + "(" + timeSpentOnDomain + "s)");
-          console.log(dataObj);
-        }
-      });
-    });    
+    addElement(dateString, lastDomain, timeSpentOnDomain);
 
     // update the last domain
     setLastDomain(domain);
@@ -202,34 +185,80 @@ async function getTimeForWeek(dates, domain) {
 
 
 /******************************************************************************
- * Util functions (can be used for testing)
+ * Util functions (can be used for testing, use at your own risks)
  ******************************************************************************/
 /*
  * Add elements to map. If already exists, append time
  */
-//TODO complete these now that we are using sync
 function addElement(date, domain, seconds) {
-  //const keyName = date + "_" + domain;
-  //if (!dateUrlTimeMap.has(keyName)) {
-  //  dateUrlTimeMap.set(keyName, 0);
-  //}
-  //dateUrlTimeMap.set(keyName, dateUrlTimeMap.get(keyName) + seconds);
+  chrome.storage.sync.get([date], function(data) {
+    if (data[date] === undefined) {
+      data[date] = {};
+    }
+    data = data[date];
+    if (data[domain] === undefined) {
+      data[domain] = 0;
+    }
+    data[domain] = data[domain] + seconds;
+    let dataObj = {};
+    dataObj[date] = data;
+    chrome.storage.sync.set(dataObj, function() {
+      if (debugMode) {
+        console.log('Added: ' + domain + "(" + seconds + "s)");
+        console.log(dataObj);
+      }
+    });
+  });
 }
 
 /*
  * Remove elements from the map
- * Return true if successful, false otherwise
  */
 function removeElement(date, domain) {
-  //const keyName = date + "_" + domain;
-  //return dateUrlTimeMap.delete(keyName);
+  chrome.storage.sync.get([date], function(data) {
+    if (data[date] === undefined) {
+      return;
+    }
+    data = data[date];
+    if (data[domain] === undefined) {
+      return;
+    }
+    delete data[domain];
+    let dataObj = {};
+    dataObj[date] = data;
+
+    chrome.storage.sync.set(dataObj, function() {
+      if (debugMode) {
+        console.log('Deleted: ' + domain);
+        console.log(dataObj);
+      }
+    });
+  });
 }
+
+
+/*
+ * Remove date from the map
+ */
+function removeDate(date) {
+  chrome.storage.sync.remove(date, function(data) {
+    console.log('Deleted: ' + date);
+    console.log(data);
+  });
+}
+
 
 /*
  * Get a copy of the map
  */
-function getMap() {
-  //return new Map(dateUrlTimeMap);
+async function getMap() {
+  // make the chrome storage call synchronous
+  var p = new Promise(function(resolve, reject){
+    chrome.storage.sync.get(null, function(data) {
+      resolve(data);
+    });
+  });
+  return await p;
 }
 
 // So node can import, but the file doesn't throw error when imported with importScripts in background.js
@@ -243,6 +272,7 @@ if (typeof exports !== 'undefined') {
   exports.getTimeForWeek = getTimeForWeek;
   exports.addElement = addElement;
   exports.removeElement = removeElement;
+  exports.removeDate = removeDate;
   exports.getMap = getMap;
   exports.handleUrlChange = handleUrlChange;
 }
