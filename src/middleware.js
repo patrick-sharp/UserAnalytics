@@ -1,7 +1,15 @@
 /******************************************************************************
  * global variables
  ******************************************************************************/
-const debugMode = true;         // print message to console (service worker)
+const debugMode = true;         // print message to console (service worker)  
+let defaultLastDomainObj = {    // default object if lastDomain key does not exist
+  lastDomain: {
+    domain: null,
+    openedTime: Date.now(),
+    lastInactiveTime: 0,
+    totalInactiveTime: 0
+  }
+};
 
 /*
   Chrome storage sync keys:
@@ -14,15 +22,13 @@ const debugMode = true;         // print message to console (service worker)
       totalInactiveTime: total time chrome was inactive
     }
 
-    key: date_domain
+    key: date
     value: {
-      time: seconds spent on domain for the time
+      google.com: 125
+      stackoverflow.com: 199
+      ...
     }
 
-    key: domains_for_date
-    value: {
-      domains: list of domains visited that day
-    }
     */
 
 /******************************************************************************
@@ -56,15 +62,6 @@ function setLastDomain(domain) {
  * @input: domain is a string that represents the host name in url
  */ 
 function domainChanged(domain) {
-  // default object if lastDomain key does not exist
-  let defaultLastDomainObj = { 
-    lastDomain: {
-      domain: 'null',
-      openedTime: Date.now(),
-      lastInactiveTime: 0,
-      totalInactiveTime: 0
-    }
-  };
   chrome.storage.sync.get({['lastDomain']: defaultLastDomainObj}, function(data) {
     data = data.lastDomain;
 
@@ -81,34 +78,8 @@ function domainChanged(domain) {
     const timeSpentOnDomain = ((Date.now() - data['openedTime'] - data['totalInactiveTime']) / 1000);
     const dateString = new Date(Date.now()).toLocaleDateString();
 
-    const keyName = dateString + "_" + lastDomain;
-
-    // set default time to 0 if domain has no time spent
-    let defaultValue = { time: 0 };
-    chrome.storage.sync.get({[keyName]: defaultValue}, function(data) {
-      let newTimeObj = {[keyName]: {time: data[keyName].time + timeSpentOnDomain}};
-      chrome.storage.sync.set(newTimeObj, function() {
-        if (debugMode) {
-          console.log('user spent ' + timeSpentOnDomain + ' seconds on ' + lastDomain);
-        }
-      });
-    });
-
-    // add domain to list of domains for the day
-    let domainsForDayKey = 'domains_for_' + dateString;
-    defaultValue = { domains: [] };
-    chrome.storage.sync.get({[domainsForDayKey]: defaultValue}, function(data) {
-      data = data[domainsForDayKey] 
-      // TODO could we make this a Set?
-      if (!data.domains.includes(domain)) {
-        data.domains.push(domain);
-        if (debugMode) {
-          console.log('added ' + domain + ' to list of domains for ' + dateString);
-        }
-      }
-      chrome.storage.sync.set({[domainsForDayKey]: {domains: data.domains}}, function() {
-      });
-    });
+    // set default value to an empty object
+    addElement(dateString, lastDomain, timeSpentOnDomain);
 
     // update the last domain
     setLastDomain(domain);
@@ -125,9 +96,6 @@ function handleUrlChange(webURL) {
     return;
   }
   const url = new URL(webURL);
-  if (debugMode) {
-    console.log('url was changed, hostname is: ' + url.hostname);
-  }
   domainChanged(url.hostname);
 }
 
@@ -136,24 +104,20 @@ function handleUrlChange(webURL) {
  * Access Functions for frontend
  ******************************************************************************/
 /*
- * clean and reset data
+ * clean and reset last usage
  */
 function cleanUsage() {
-  chrome.storage.sync.get(['lastDomain'], function(data) {
-    data['domain'] = null;
-    data['openedTime'] = Date.now();
-    data['lastInactiveTime'] = null;
-    data['totalInactiveTime'] = 0;
-    chrome.storage.sync.get(['lastDomain'], function(data) {
-      if (debugMode) {
+  chrome.storage.sync.set(defaultLastDomainObj, function() {});
+    if (debugMode) {
+      chrome.storage.sync.get(['lastDomain'], function(data) {
         console.log('LastDomain key reset');
-      }
-    });
-  });
+        console.log(data);
+      });
+  }
 }
 
 /*
- * clean out chrome storage
+ * clean out chrome storage entirely
  */
 function clearChromeStorage() {
   chrome.storage.sync.clear(function () {
@@ -163,26 +127,25 @@ function clearChromeStorage() {
 
 
 /*
- * Get domains for a given day
- * Note that this computation might be expensive (O(n)).
+ * Get domain:time match for a given day
  * @input: date is a formatted string in the form "month/day/year"(i.e. 4/30/2021).
- * @return: a set of domains, might be empty
+ * @return: a primose that includes an object(i.e. {google.com: 123}), the object might be empty
  */
 async function getDomainsForDay(date) {
-  // get domains for a given day
-  // let domainsForDayKey = 'domains_for_' + date;
-  let domainsForDayKey = '';
-
   // make the chrome storage call synchronous
   var p = new Promise(function(resolve, reject){
-    chrome.storage.sync.get([domainsForDayKey], function(data) {
-      resolve(data.domains);
+    chrome.storage.sync.get([date], function(data) {
+      if (data[date] === undefined) {
+        data = {};
+      } else {
+        data = data[date];
+      }
+      resolve(data);
     });
   });
-
-  const domainsForDay = await p;
-  return domainsForDay;
+  return await p;
 }
+
 
 
 /*
@@ -191,38 +154,15 @@ async function getDomainsForDay(date) {
  *    date is a formatted string in the form "month/day/year"(i.e. 4/30/2021).
  *    domain is a string that represents the url of a website(i.e. www.google.com)
  * @return:
- *    the time spent on the domain on the given date. (in seconds)
+ *    A promise that includes the time spent on the domain on the given date. (in seconds)
  *    0 if the domain is never visited on that date.
  */
 async function getTimeForDay(date, domain) {
-  // prints out the total time spent on each domain
-  if (debugMode) {
-    chrome.storage.sync.get(null, function(items) {
-      console.log(JSON.stringify(items));
-      var allKeys = Object.keys(items);
-      console.log(allKeys);
-      for (key of allKeys) {
-        chrome.storage.sync.get([key], function(val) {
-          console.log(JSON.stringify(val));
-        });
-      }
-    });
+  const dataObj = await getDomainsForDay(date);
+  if (Object.keys(dataObj).length === 0 || dataObj[domain] === undefined) {
+    return 0;
   }
-  let timeForDomainDayKey = date + "_" + domain;
-
-  // make the chrome storage call synchronously
-  var p = new Promise(function(resolve, reject){
-    chrome.storage.sync.get({[timeForDomainDayKey]: {time: 0}}, function(data) {
-      resolve(data[timeForDomainDayKey].time);
-    });
-  });
-
-  const timeForDomain = await p;
-  if (debugMode) {
-    console.log('time for ' + domain + ' on ' + date);
-  }
-
-  return timeForDomain;
+  return dataObj[domain];
 }
 
 
@@ -232,47 +172,93 @@ async function getTimeForDay(date, domain) {
  *    dates is an array for date in the form of string "month/day/year"(i.e. ["4/30/2021", "5/1/2021"]).
  *    domain is a string that represents the url of a website(i.e. www.google.com)
  * @return:
- *    the time spent on the domain on the given dates. (in seconds)
+ *    A promise that includes the time spent on the domain on the given dates. (in seconds)
  *    0 if the domain is never visited.
  */
-function getTimeForWeek(dates, domain) {
+async function getTimeForWeek(dates, domain) {
   var totalTime = 0;
-  dates.forEach(function(date, index, array) {
-    totalTime += getTimeForDay(date, domain)
-  })
+  for (var i = 0; i < dates.length; i ++) {
+    totalTime += await getTimeForDay(dates[i], domain);
+  }
   return totalTime;
 }
 
 
 /******************************************************************************
- * Util functions (can be used for testing, delete before publishing)
+ * Util functions (can be used for testing, use at your own risks)
  ******************************************************************************/
 /*
  * Add elements to map. If already exists, append time
  */
-//TODO complete these now that we are using sync
 function addElement(date, domain, seconds) {
-  //const keyName = date + "_" + domain;
-  //if (!dateUrlTimeMap.has(keyName)) {
-  //  dateUrlTimeMap.set(keyName, 0);
-  //}
-  //dateUrlTimeMap.set(keyName, dateUrlTimeMap.get(keyName) + seconds);
+  chrome.storage.sync.get([date], function(data) {
+    if (data[date] === undefined) {
+      data[date] = {};
+    }
+    data = data[date];
+    if (data[domain] === undefined) {
+      data[domain] = 0;
+    }
+    data[domain] = data[domain] + seconds;
+    let dataObj = {};
+    dataObj[date] = data;
+    chrome.storage.sync.set(dataObj, function() {
+      if (debugMode) {
+        console.log('Added: ' + domain + "(" + seconds + "s)");
+        console.log(dataObj);
+      }
+    });
+  });
 }
 
 /*
  * Remove elements from the map
- * Return true if successful, false otherwise
  */
 function removeElement(date, domain) {
-  //const keyName = date + "_" + domain;
-  //return dateUrlTimeMap.delete(keyName);
+  chrome.storage.sync.get([date], function(data) {
+    if (data[date] === undefined) {
+      return;
+    }
+    data = data[date];
+    if (data[domain] === undefined) {
+      return;
+    }
+    delete data[domain];
+    let dataObj = {};
+    dataObj[date] = data;
+
+    chrome.storage.sync.set(dataObj, function() {
+      if (debugMode) {
+        console.log('Deleted: ' + domain);
+        console.log(dataObj);
+      }
+    });
+  });
 }
+
+
+/*
+ * Remove date from the map
+ */
+function removeDate(date) {
+  chrome.storage.sync.remove(date, function(data) {
+    console.log('Deleted: ' + date);
+    console.log(data);
+  });
+}
+
 
 /*
  * Get a copy of the map
  */
-function getMap() {
-  //return new Map(dateUrlTimeMap);
+async function getMap() {
+  // make the chrome storage call synchronous
+  var p = new Promise(function(resolve, reject){
+    chrome.storage.sync.get(null, function(data) {
+      resolve(data);
+    });
+  });
+  return await p;
 }
 
 // So node can import, but the file doesn't throw error when imported with importScripts in background.js
@@ -286,6 +272,7 @@ if (typeof exports !== 'undefined') {
   exports.getTimeForWeek = getTimeForWeek;
   exports.addElement = addElement;
   exports.removeElement = removeElement;
+  exports.removeDate = removeDate;
   exports.getMap = getMap;
   exports.handleUrlChange = handleUrlChange;
 }
