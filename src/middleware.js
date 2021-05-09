@@ -14,15 +14,13 @@ const debugMode = true;         // print message to console (service worker)
       totalInactiveTime: total time chrome was inactive
     }
 
-    key: date_domain
+    key: date
     value: {
-      time: seconds spent on domain for the time
+      google.com: 125
+      stackoverflow.com: 199
+      ...
     }
 
-    key: domains_for_date
-    value: {
-      domains: list of domains visited that day
-    }
     */
 
 /******************************************************************************
@@ -81,34 +79,25 @@ function domainChanged(domain) {
     const timeSpentOnDomain = ((Date.now() - data['openedTime'] - data['totalInactiveTime']) / 1000);
     const dateString = new Date(Date.now()).toLocaleDateString();
 
-    const keyName = dateString + "_" + lastDomain;
-
-    // set default time to 0 if domain has no time spent
-    let defaultValue = { time: 0 };
-    chrome.storage.sync.get({[keyName]: defaultValue}, function(data) {
-      let newTimeObj = {[keyName]: {time: data[keyName].time + timeSpentOnDomain}};
-      chrome.storage.sync.set(newTimeObj, function() {
-        if (debugMode) {
-          console.log('user spent ' + timeSpentOnDomain + ' seconds on ' + lastDomain);
-        }
-      });
-    });
-
-    // add domain to list of domains for the day
-    let domainsForDayKey = 'domains_for_' + dateString;
-    defaultValue = { domains: [] };
-    chrome.storage.sync.get({[domainsForDayKey]: defaultValue}, function(data) {
-      data = data[domainsForDayKey] 
-      // TODO could we make this a Set?
-      if (!data.domains.includes(domain)) {
-        data.domains.push(domain);
-        if (debugMode) {
-          console.log('added ' + domain + ' to list of domains for ' + dateString);
-        }
+    // set default value to an empty object
+    chrome.storage.sync.get([dateString], function(data) {
+      if (data[dateString] === undefined) {
+        data[dateString] = {};
       }
-      chrome.storage.sync.set({[domainsForDayKey]: {domains: data.domains}}, function() {
+      data = data[dateString];
+      if (data[lastDomain] === undefined) {
+        data[lastDomain] = 0;
+      }
+      data[lastDomain] = data[lastDomain] + timeSpentOnDomain;
+      let dataObj = {};
+      dataObj[dateString] = data;
+      chrome.storage.sync.set(dataObj, function() {
+        if (debugMode) {
+          console.log('Added: ' + lastDomain + "(" + timeSpentOnDomain + "s)");
+          console.log(dataObj);
+        }
       });
-    });
+    });    
 
     // update the last domain
     setLastDomain(domain);
@@ -125,9 +114,6 @@ function handleUrlChange(webURL) {
     return;
   }
   const url = new URL(webURL);
-  if (debugMode) {
-    console.log('url was changed, hostname is: ' + url.hostname);
-  }
   domainChanged(url.hostname);
 }
 
@@ -136,7 +122,7 @@ function handleUrlChange(webURL) {
  * Access Functions for frontend
  ******************************************************************************/
 /*
- * clean and reset data
+ * clean and reset last usage
  */
 function cleanUsage() {
   chrome.storage.sync.get(['lastDomain'], function(data) {
@@ -153,7 +139,7 @@ function cleanUsage() {
 }
 
 /*
- * clean out chrome storage
+ * clean out chrome storage entirely
  */
 function clearChromeStorage() {
   chrome.storage.sync.clear(function () {
