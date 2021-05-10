@@ -334,9 +334,9 @@ function formatTimeToHour(second) {
 }
 
 function formatTimeToMinute(second) {
-    // var formattedString = second < 0 ? "-" : "+";
+    var formattedString = second < 0 ? "" : "+";
     let minute = Math.floor(second / 60);
-    return minute + "min";
+    return formattedString + minute + "min";
 }
 
 function getPreviousDays(prev) {
