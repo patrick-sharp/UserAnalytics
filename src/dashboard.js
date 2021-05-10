@@ -1,4 +1,3 @@
-// generate date selection button\
 
 const dates = ['Daily', 'Weekly'];
 
@@ -20,6 +19,9 @@ let timesheet_data = [
     }
 ]
 
+var curTimeList = [];
+var prevTimeList = [];
+
 let date_range_selection = ['Last 7 Days', 'Last 14 Days'];
 
 function openSettingPanel() {
@@ -34,23 +36,14 @@ function closeSettingPanel() {
     document.body.style.backgroundColor = '#F2F0EB'
 }
 
-// Make the settings button clickable
-document.getElementById("setting").addEventListener("click", openSettingPanel);
-document.getElementById("setting_close_button").addEventListener("click", closeSettingPanel);
 
 window.onload = function() {
-    var left_container = document.getElementById('left_container');
-    let left_content = generateStatistics("Total Time");
-    left_container.appendChild(left_content);
 
-    // var separator = document.
+    retrieveDailyData();
 
-    var right_container = document.getElementById('right_container');
-    let right_content = generateStatistics("Most Frequent");
-    right_container.appendChild(right_content);
+    document.getElementById("setting").addEventListener("click", openSettingPanel);
+    document.getElementById("setting_close_button").addEventListener("click", closeSettingPanel);
 
-    // display.appendChild(left_container);
-    // display.appendChild(right_container);
 
     dates.forEach(date => {
         var button = document.createElement("button");
@@ -91,6 +84,8 @@ window.onload = function() {
         row.appendChild(time);
     
         timesheet.appendChild(row);})
+
+        renderGraph();
 };
 
 function updateButtonStyle(event) {
@@ -106,13 +101,13 @@ function updateButtonStyle(event) {
     document.getElementById(i).removeAttribute('style');
 }
 
-function generateStatistics(titleString) {
+function generateStatistics(titleString, totalTime, timeDiff) {
 
+    // UI
     let container = document.createElement('div');
     container.id = 'stats_container';
     container.style.marginLeft = '52px';
     container.style.marginTop = '17px';
-
 
     let title = document.createElement('p');
     title.id = 'title';
@@ -131,11 +126,13 @@ function generateStatistics(titleString) {
     title.style.fontSize = '24px';
     title.style.color = '#000000'
     icon.src = 'images/timer.png'
-    time.innerHTML = (5 + 'H' + 24 + 'MIN').replace(/\d+/g, function(v){
+
+    
+    time.innerHTML = formatTimeToHour(totalTime).replace(/\d+/g, function(v){
         return "<span class='numbers'>" + v + "</span>";
     });
 
-    comparison.innerHTML = ('+' + 5 + 'min' + ' compared to yesterday').replace(/(\+|\-)\d+(min)/, function(v) {
+    comparison.innerHTML = (formatTimeToMinute(timeDiff) + " compared to last time").replace(/(\+|\-)\d+(min)/, function(v) {
         return (v.includes('+') ? "<span class='comp_plus'>" : "<span class='comp_minus'>")  + v + "</span>";});
 
     timeContainer.appendChild(time);
@@ -167,128 +164,206 @@ function updateButtonStyle(event) {
 
 
 // Render the graph
-range_selector = document.getElementById('date_range');
-date_range_selection.forEach(function(value) {
-    var option = document.createElement('option');
-    option.text = value;
-    option.value = value;
-    // option.style.lineHeight = '27px';
-    option.style.width = 'fit';
-    range_selector.appendChild(option);
-})
-var ctx_line = document.getElementById("lineChart");
-var lineChart = new Chart(ctx_line, {
-                        type: 'bar',
-                        data: {
-                            labels: Array.from({length: 7}, (_, i) => i + 1),
-                            datasets: [
-                                {
-                                data: [{x: 1, y: 24}, {x: 1, y: 10}],
-                                backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                borderRadius: 16,
-                                barThickness: 24,
-                                grouped: false
-                            }, {
-                                data: [{x: 2, y: 24}, {x: 2, y: 8}],
-                                backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                borderRadius: 16,
-                                barThickness: 24,
-                                grouped: false
-                            }, {
-                                data: [{x: 3, y: 24}, {x: 3, y: 12}],
-                                backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                borderRadius: 16,
-                                barThickness: 24,
-                                grouped: false
-                            }, {
-                                data: [{x: 4, y: 24}, {x: 4, y: 6}],
-                                backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                borderRadius: 16,
-                                barThickness: 24,
-                                grouped: false
-                            }, {
-                                data: [{x: 5, y: 24}, {x: 5, y: 16}],
-                                backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                borderRadius: 16,
-                                barThickness: 24,
-                                grouped: false
-                            }, {
-                                data: [{x: 6, y: 24}, {x: 6, y: 4}],
-                                backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                borderRadius: 16,
-                                barThickness: 24,
-                                grouped: false
-                            }, {
-                                data: [{x: 7, y: 24}, {x: 7, y: 16}],
-                                backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                borderRadius: 16,
-                                barThickness: 24,
-                                grouped: false
-                            }
-
-                        ]
-                        },
-                        options: {
-                            plugins: {
-                                legend: {
-                                    display: false
+function renderGraph() {
+    range_selector = document.getElementById('date_range');
+    date_range_selection.forEach(function(value) {
+        var option = document.createElement('option');
+        option.text = value;
+        option.value = value;
+        // option.style.lineHeight = '27px';
+        option.style.width = 'fit';
+        range_selector.appendChild(option);
+    })
+    var ctx_line = document.getElementById("lineChart");
+    var lineChart = new Chart(ctx_line, {
+                            type: 'bar',
+                            data: {
+                                labels: Array.from({length: 7}, (_, i) => i + 1),
+                                datasets: [
+                                    {
+                                    data: [{x: 1, y: 24}, {x: 1, y: 10}],
+                                    backgroundColor: ['#CFF0C4', '#5AC43B'],
+                                    borderRadius: 16,
+                                    barThickness: 24,
+                                    grouped: false
+                                }, {
+                                    data: [{x: 2, y: 24}, {x: 2, y: 8}],
+                                    backgroundColor: ['#CFF0C4', '#5AC43B'],
+                                    borderRadius: 16,
+                                    barThickness: 24,
+                                    grouped: false
+                                }, {
+                                    data: [{x: 3, y: 24}, {x: 3, y: 12}],
+                                    backgroundColor: ['#CFF0C4', '#5AC43B'],
+                                    borderRadius: 16,
+                                    barThickness: 24,
+                                    grouped: false
+                                }, {
+                                    data: [{x: 4, y: 24}, {x: 4, y: 6}],
+                                    backgroundColor: ['#CFF0C4', '#5AC43B'],
+                                    borderRadius: 16,
+                                    barThickness: 24,
+                                    grouped: false
+                                }, {
+                                    data: [{x: 5, y: 24}, {x: 5, y: 16}],
+                                    backgroundColor: ['#CFF0C4', '#5AC43B'],
+                                    borderRadius: 16,
+                                    barThickness: 24,
+                                    grouped: false
+                                }, {
+                                    data: [{x: 6, y: 24}, {x: 6, y: 4}],
+                                    backgroundColor: ['#CFF0C4', '#5AC43B'],
+                                    borderRadius: 16,
+                                    barThickness: 24,
+                                    grouped: false
+                                }, {
+                                    data: [{x: 7, y: 24}, {x: 7, y: 16}],
+                                    backgroundColor: ['#CFF0C4', '#5AC43B'],
+                                    borderRadius: 16,
+                                    barThickness: 24,
+                                    grouped: false
                                 }
+
+                            ]
                             },
-                            events: [],
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    max: 24,
-                                    grid: {
-                                        display: false,
-                                        drawBorder: true,
-                                        drawOnChartArea: true,
-                                        drawTicks: false,
-                                    },
-                                    ticks: {
-                                        callback: function(value, index, values) {
-                                            return value + "H"
-                                        }
+                            options: {
+                                plugins: {
+                                    legend: {
+                                        display: false
                                     }
                                 },
-                                x: {
-                                    grid: {
-                                        display: false,
-                                        drawBorder: true,
-                                        drawOnChartArea: true,
-                                        drawTicks: false,
+                                events: [],
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        max: 24,
+                                        grid: {
+                                            display: false,
+                                            drawBorder: true,
+                                            drawOnChartArea: true,
+                                            drawTicks: false,
+                                        },
+                                        ticks: {
+                                            callback: function(value, index, values) {
+                                                return value + "H"
+                                            }
+                                        }
+                                    },
+                                    x: {
+                                        grid: {
+                                            display: false,
+                                            drawBorder: true,
+                                            drawOnChartArea: true,
+                                            drawTicks: false,
+                                        }
                                     }
                                 }
                             }
-                        }
-                    });
+                        });
 
-const labels = ['Red', 'Orange', 'Yellow', 'Green', 'Blue'];
-var ctx_polar = document.getElementById('polarChart');
-var polarChart = new Chart(ctx_polar, {
-    type: 'polarArea',
-    data: {
-        labels: labels,
-        datasets: [
-          {
-            label: 'Dataset 1',
-            data: [1,2,3,4,5],
-            backgroundColor: [
-                '#EAD367',
-                '#D3705A',
-                '#D8E8E2',
-                '#C4D293',
-                '#37554C'
+    const labels = ['Red', 'Orange', 'Yellow', 'Green', 'Blue'];
+    var ctx_polar = document.getElementById('polarChart');
+    var polarChart = new Chart(ctx_polar, {
+        type: 'polarArea',
+        data: {
+            labels: labels,
+            datasets: [
+            {
+                label: 'Dataset 1',
+                data: [1,2,3,4,5],
+                backgroundColor: [
+                    '#EAD367',
+                    '#D3705A',
+                    '#D8E8E2',
+                    '#C4D293',
+                    '#37554C'
+                ]
+            }
             ]
-          }
-        ]
-      },
-    options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            display: false,
-          }
+        },
+        options: {
+            responsive: true,
+            plugins: {
+            legend: {
+                display: false,
+            }
+            }
         }
-    }
-});
+    });
+
+}
+
+function retrieveDailyData() {
+    let date = new Date();
+    let today = formatDate((date.getMonth() + 1), date.getDate(), date.getFullYear());
+    let yesterdayDate = getYesterday();
+    let yesterday = formatDate(yesterdayDate.getMonth() + 1, yesterdayDate.getDate(), yesterdayDate.getFullYear());
+
+    getDomainsForDay(today)
+        .then(data => processDailyData(data))
+        .then(data => {
+            curTimeList = data;
+            generateStatistics()
+        });
+    
+    getDomainsForDay(yesterday)
+        .then(data => processDailyData(data))
+        .then(data => {
+            prevTimeList = data;
+
+            var left_container = document.getElementById('left_container');
+            var left_content = generateStatistics("Total Time", curTimeList[0], curTimeList[0] - prevTimeList[0]);
+            left_container.appendChild(left_content);
+        
+            var right_container = document.getElementById('right_container');
+            let right_content = generateStatistics("Most Frequent", curTimeList[1], curTimeList[1] - prevTimeList[1]);
+            right_container.appendChild(right_content);
+        });
+}
+
+// @output: a array of total time, most frequently used time, and its domain
+function processDailyData(data) {
+    let sum = Object.values(data).reduce(function(accumulator, currentValue) {
+        return accumulator + currentValue;
+    }, 0);
+
+    var max = -1;
+    var domain = "";
+    Object.entries(data).forEach(([key, value]) => {
+        console.log(key, value);
+        if (value > max) {
+            max = value;
+            domain = key;
+        }
+    });
+
+    return [sum, max, domain];
+}
+
+// @input: month: the month to be formatted, 0-indexed
+// @input: day: the day of the month
+// @input: year: the full year representation
+// @output: formatted date string in "month/day/year"
+function formatDate(month, day, year) {
+    return month + "/" + day + "/" + year;
+}
+
+
+function formatTimeToHour(second) {
+    let hour = Math.trunc(second / 3600);
+    let minute = Math.ceil(second % 60);
+    return hour +'H' + (minute < 10 ? "0" + minute : minute) + 'MIN';
+}
+
+function formatTimeToMinute(second) {
+    var formattedString = second < 0 ? "-" : "+";
+    let minute = Math.floor(second / 60);
+    return formattedString + minute + "min";
+}
+
+function getYesterday() {
+    const today = new Date()
+    const yesterday = new Date(today)
+    
+    return new Date(yesterday.setDate(today.getDate() - 1));
+}

@@ -1,19 +1,30 @@
+// let debugMode = true;
+
 window.onload = function() {
 
   // test loading category data async
-  let b = chrome.storage.sync.get(["category"], function(data) {
-    console.log("data " + JSON.stringify(data));
+  // let b = chrome.storage.sync.get(["category"], function(data) {
+  //   console.log(JSON.parse(JSON.stringify(data))['category']);
+  // })
+  getCategoryKeys().then(data => {
+    var selector = document.getElementById("category_selector");
+    data.forEach(category => {
+      var option = document.createElement("option");
+      option.text = category;
+      option.value = category;
+      option.style.width = 'fit';
+      selector.appendChild(option);
+    })
+  });
+
+  document.getElementById("func_2").addEventListener('click', function() {
+    let selector = document.getElementById('category_selector');
+    let index = selector.selectedIndex;
+    let item = selector.options[index].value;
+    let url = document.getElementById("url_editor").innerHTML;
+    addLinkToCategory(item,url);
   })
 }
-
-  // var selector = document.getElementById("category_selector");
-  // Categories.forEach(category => {
-  //    var option = document.createElement("option");
-  //    option.text = category;
-  //    option.value = category;
-  //    option.style.width = 'fit';
-  //    selector.appendChild(option);
-  // })
 
 
 

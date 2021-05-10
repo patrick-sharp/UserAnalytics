@@ -129,7 +129,7 @@ function clearChromeStorage() {
 /*
  * Get domain:time match for a given day
  * @input: date is a formatted string in the form "month/day/year"(i.e. 4/30/2021).
- * @return: a primose that includes an object(i.e. {google.com: 123}), the object might be empty
+ * @return: a promise that includes an object(i.e. {google.com: 123}), the object might be empty
  */
 async function getDomainsForDay(date) {
   // make the chrome storage call synchronous
@@ -146,7 +146,31 @@ async function getDomainsForDay(date) {
   return await p;
 }
 
+async function getCategoryList() {
+  var p = new Promise(function(resolve, reject) {
+    return chrome.storage.sync.get(["category"], function (data) {
+      resolve(JSON.parse(JSON.stringify(data))['category']);
+    })
+  });
+  return await p; 
+}
 
+async function getCategoryKeys() {
+  return getCategoryList().then( data => {return Object.keys(data)} );
+}
+
+function addLinkToCategory(category, link) {
+  chrome.storage.sync.get(["category"], function(data) {
+    var list = data['category'][category]
+    if (list.includes(link) == -1) {
+      list.push(link);
+      if (debugMode) {
+        console.log(url + " is saved to " + item);
+      }
+    }
+    chrome.storage.sync.set(data);
+  })
+}
 
 /*
  * get time spent on the domain for a given day
@@ -275,6 +299,7 @@ if (typeof exports !== 'undefined') {
   exports.removeDate = removeDate;
   exports.getMap = getMap;
   exports.handleUrlChange = handleUrlChange;
+  exports.getCategoryKeys = getCategoryKeys;
 }
 
 // create a mock of the chrome API that works similarly to the real one so we can test it.
