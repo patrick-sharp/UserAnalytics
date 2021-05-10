@@ -4,11 +4,11 @@ UserAnalytics is a chrome extension which tracks how much time a user spends on 
 
 ## Goals
 UserAnalytics has 5 main features that we aim to develop in 8 weeks.
-1. User can visualize usage for each domain with a running average
-2. User can visualize usage for each day of the week in hours with a running average
-3. User can configure white/blacklist for which domain tracking
-4. Extension categories time spent automatically (social media, reading/reference, and productivity)
-5. User can visualize time spent per category of websites for each day of the week with a running average.
+1. User can visualize usage for each domain as well as total daily and weekly usage. #operational in Beta
+2. User can visualize usage for each day of the week in hours. #operational in Beta
+3. User can configure white/blacklist for which domain tracking and configure domain categories.
+4. Extension categories time spent automatically (social media, reading/reference, and productivity). #operational in Beta
+5. User can visualize time spent per category of websites. #operational in Beta
 
 There are additional strech goals as well.
 - Focus/Relax mode that can be suggested on/off based on user actions (ML) or manually turned on
