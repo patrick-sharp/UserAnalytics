@@ -6,9 +6,9 @@ var data = {};
 var categories = getCategories();
 var currentDate = new Date();
 
-function getDate(date) {
+async function getDate(date) {
   if (Object.keys(data).length === 0 || data[date] === undefined) {
-    data[date] = getDomainsForDay(date);
+    data[date] = await getDomainsForDay(date);
   }
   return data[date];
 }
@@ -21,8 +21,11 @@ function dateString(dateObj) {
   return String(dateObj.getMonth() + 1) + "/" + dateObj.getDate() + "/" + dateObj.getFullYear();
 }
 
-function yesterday(dateObj) {
-  return new Date().setTime(dateObj.getDate() - 1 )
+function getPreviousDays(prev) {
+  const today = new Date()
+  const yesterday = new Date(today)
+  
+  return new Date(yesterday.setDate(today.getDate() - prev));
 }
 
 /******************************************************************************
@@ -38,8 +41,8 @@ function yesterday(dateObj) {
  *    A promise that includes the time spent on the domain on the given date. (in seconds)
  *    0 if the domain is never visited on that date.
  */
-function getTimeForDay(date, domain) {
-  const dataObj = getDate(date);
+async function getTimeForDay(date, domain) {
+  const dataObj = await getDate(date);
   if (Object.keys(dataObj).length === 0 || dataObj[domain] === undefined) {
     return 0;
   }
@@ -56,10 +59,10 @@ function getTimeForDay(date, domain) {
  *    A promise that includes the time spent on the domain on the given dates. (in seconds)
  *    0 if the domain is never visited.
  */
-function getTimeForWeek(dates, domain) {
+async function getTimeForWeek(dates, domain) {
   var totalTime = 0;
   for (var i = 0; i < dates.length; i ++) {
-    totalTime += getTimeForDay(dates[i], domain);
+    totalTime += await getTimeForDay(dates[i], domain);
   }
   return totalTime;
 }
@@ -70,12 +73,13 @@ function getTimeForWeek(dates, domain) {
  *    A size 2 array, first index the total second spent on Chrome today, 
  *    second index the difference in seconds, today - yesterday.
  */
-function getTotalTime() {
+async function getTotalTime() {
   const todayString = dateString(currentDate);
-  const yesterdayString = dateString(currentDate);
+  const yesterdayString = dateString(getPreviousDays(1));
 
-  const todayData = getDate(todayString);
-  const yesterdayData = getDate(yesterdayString);
+  const todayData = await getDate(todayString);
+  const yesterdayData = await getDate(yesterdayString);
+
 
   var todayTime = 0;
   var yesterdayTime = 0;
@@ -87,5 +91,25 @@ function getTotalTime() {
     yesterdayTime += yesterdayData[domain];
   }
 
-  return [todayTime, todayTime - yesterdayTime]
+  return [todayTime, todayTime - yesterdayTime];
+}
+
+async function getMostFrequentTime() {
+  const todayString = dateString(currentDate);
+
+  const todayData = await getDate(todayString);
+
+  var maxDomain = "";
+  var maxTime = -1;
+
+  for (var domain in todayData) {
+    if (todayData[domain] > maxTime) {
+      maxDomain = domain;
+      maxTime = todayData[domain];
+    }
+  }
+
+  var yesterdayTime = await getTimeForDay(dateString(getPreviousDays(1)), maxDomain);
+
+  return [maxDomain, maxTime, maxTime - yesterdayTime];
 }

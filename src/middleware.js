@@ -131,8 +131,9 @@ function clearChromeStorage() {
  * @input: date is a formatted string in the form "month/day/year"(i.e. 4/30/2021).
  * @return: a promise that includes an object(i.e. {google.com: 123}), the object might be empty
  */
-function getDomainsForDay(date) {
+async function getDomainsForDay(date) {
   // make the chrome storage call synchronous
+  console.log(date);
   var p = new Promise(function(resolve, reject){
     chrome.storage.sync.get([date], function(data) {
       if (data[date] === undefined) {
@@ -149,8 +150,8 @@ function getDomainsForDay(date) {
 /*
  * Get category:[domains] from storage
  */
-function getCategories() {
-  var p = new Promise(function(reslove, reject){
+async function getCategories() {
+  var p = new Promise(function(resolve, reject){
     chrome.storage.sync.get(["category"], function(data) {
       if (data["category"]) {
         data = {};
