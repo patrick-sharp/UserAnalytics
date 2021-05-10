@@ -169,7 +169,7 @@ function updateButtonStyle(event) {
 
 
 // Render the graph
-function renderGraph() {
+async function renderGraph() {
     range_selector = document.getElementById('date_range');
     date_range_selection.forEach(function(value) {
         var option = document.createElement('option');
@@ -179,57 +179,17 @@ function renderGraph() {
         option.style.width = 'fit';
         range_selector.appendChild(option);
     })
+
+    const [lineLabels, lineDataset] = await getLineChartData();
+    console.log(lineLabels);
+    console.log(lineDataset);
+
     var ctx_line = document.getElementById("lineChart");
     var lineChart = new Chart(ctx_line, {
                             type: 'bar',
                             data: {
-                                labels: Array.from({length: 7}, (_, i) => i + 1),
-                                datasets: [
-                                    {
-                                    data: [{x: 1, y: 24}, {x: 1, y: 10}],
-                                    backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                    borderRadius: 16,
-                                    barThickness: 24,
-                                    grouped: false
-                                }, {
-                                    data: [{x: 2, y: 24}, {x: 2, y: 8}],
-                                    backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                    borderRadius: 16,
-                                    barThickness: 24,
-                                    grouped: false
-                                }, {
-                                    data: [{x: 3, y: 24}, {x: 3, y: 12}],
-                                    backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                    borderRadius: 16,
-                                    barThickness: 24,
-                                    grouped: false
-                                }, {
-                                    data: [{x: 4, y: 24}, {x: 4, y: 6}],
-                                    backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                    borderRadius: 16,
-                                    barThickness: 24,
-                                    grouped: false
-                                }, {
-                                    data: [{x: 5, y: 24}, {x: 5, y: 16}],
-                                    backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                    borderRadius: 16,
-                                    barThickness: 24,
-                                    grouped: false
-                                }, {
-                                    data: [{x: 6, y: 24}, {x: 6, y: 4}],
-                                    backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                    borderRadius: 16,
-                                    barThickness: 24,
-                                    grouped: false
-                                }, {
-                                    data: [{x: 7, y: 24}, {x: 7, y: 16}],
-                                    backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                    borderRadius: 16,
-                                    barThickness: 24,
-                                    grouped: false
-                                }
-
-                            ]
+                                labels: lineLabels,
+                                datasets: lineDataset
                             },
                             options: {
                                 plugins: {

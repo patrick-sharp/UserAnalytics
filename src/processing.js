@@ -113,3 +113,37 @@ async function getMostFrequentTime() {
 
   return [maxDomain, maxTime, maxTime - yesterdayTime];
 }
+
+async function getLineChartData() {
+  var labels = [];
+  var dataset = [];
+
+  const templateData = {
+    data: [{x: 1, y: 24}, {x: 1, y: 10}],
+    backgroundColor: ['#CFF0C4', '#5AC43B'],
+    borderRadius: 16,
+    barThickness: 24,
+    grouped: false
+  }
+
+  for (i = 1; i <= 7; i++) {
+    labels.push(dateString(getPreviousDays(7-i)));
+
+    var copy = JSON.parse(JSON.stringify(templateData));
+    copy.data[0].x = labels[i-1];
+    copy.data[1].x = labels[i-1];
+
+    const tempData = await getDate(labels[i-1]);
+    var time = 0;
+
+    for (var domain in tempData) {
+      time += tempData[domain];
+    }
+
+    copy.data[1].y = time / 3600;
+
+    dataset.push(copy);
+  }
+
+  return [labels, dataset]
+}
