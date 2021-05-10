@@ -36,13 +36,11 @@ chrome.runtime.onInstalled.addListener(async () => {
   fetch('mock.json')
   .then(response => response.json())
   .then(jsonData => {
-    for (var key in jsonData) {
-      chrome.storage.sync.set(
-        jsonData[key], function() {
-          console.log("Mock data for " + key + " loaded");
-        }
-      )
-    }
+    chrome.storage.sync.set(
+      jsonData[key], function() {
+        console.log("Mock data loaded");
+      }
+    )
   });
 
 

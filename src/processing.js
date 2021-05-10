@@ -1,11 +1,10 @@
-const { getDomainsForDay, getCategories } = require("./middleware");
-
 /*
  * Global JSON Object storing getDomainsForDay results
  * with functions to access it as well
  */
 var data = {};
 var categories = getCategories();
+var currentDate = new Date();
 
 function getDate(date) {
   if (Object.keys(data).length === 0 || data[date] === undefined) {
@@ -13,6 +12,22 @@ function getDate(date) {
   }
   return data[date];
 }
+
+/******************************************************************************
+ * Date Conversion Functions
+ ******************************************************************************/
+
+function dateString(dateObj) {
+  return String(dateObj.getMonth() + 1) + "/" + dateObj.getDate() + "/" + dateObj.getFullYear();
+}
+
+function yesterday(dateObj) {
+  return new Date().setTime(dateObj.getDate() - 1 )
+}
+
+/******************************************************************************
+ * Data Processing Functions
+ ******************************************************************************/
 
 /*
  * get time spent on the domain for a given day
@@ -47,4 +62,30 @@ function getTimeForWeek(dates, domain) {
     totalTime += getTimeForDay(dates[i], domain);
   }
   return totalTime;
+}
+
+/*
+ * Uses the current date to find total seconds spent on Chrome today as well as the difference from yesterday
+ * @return:
+ *    A size 2 array, first index the total second spent on Chrome today, 
+ *    second index the difference in seconds, today - yesterday.
+ */
+function getTotalTime() {
+  const todayString = dateString(currentDate);
+  const yesterdayString = dateString(currentDate);
+
+  const todayData = getDate(todayString);
+  const yesterdayData = getDate(yesterdayString);
+
+  var todayTime = 0;
+  var yesterdayTime = 0;
+
+  for (var domain in todayData) {
+    todayTime += todayData[domain];
+  }
+  for (var domain in yesterdayData) {
+    yesterdayTime += yesterdayData[domain];
+  }
+
+  return [todayTime, todayTime - yesterdayTime]
 }
