@@ -15,12 +15,22 @@ There are additional strech goals as well.
 - User can work with more advanced data visualizations for specific websites
 - Block sites at certain times, set time limits for certain sites
 
+
+## How to Install UserAnalytics
+1. Clone this repository
+2. Navigate to chrome://extensions in your browser. You can also access this page by clicking on the Chrome menu on the top right side of the Omnibox, hovering over **More Tools** and selecting **Extensions**.
+3. Check the box next to **Developer Mode**.
+4. Click **Load Unpacked Extension** and select the **src** folder in this repository.
+
+## Build & Test System
+- The system will be automatically built when Chrome loads the folder. Note that 'manifest.json' contains the set-up information for chrome extensions.
+
+- Pushing code to the ‘main’ branch of our GitHub repository or opening a pull request to the ‘main’ branch will trigger a CI build. CI testing can also be manually triggered from GitHub’s actions tab.
+
+
 ## Repository Layout
 ### Reports
 This folder is for weekly status reports. It contains a markdown template file for future status reports.
 
 ### src
 This folder contains our Chrome extension, upload this folder to Google Chrome to install UserAnalytics.
-
-## How to Install UserAnalytics
-Instructions to come later
