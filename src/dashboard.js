@@ -398,7 +398,7 @@ function weeklyTotalTime(prevWeek) {
 function weeklyMostFrequent(prevWeek) {
     getMostFrequentForWeek(prevWeek).then(data => {
         // console.log(JSON.stringify(data));
-        let mostFrequent = Object.entries(data).reduce((a, b) => b[1] > a[1] ? b : a);
+        let mostFrequent = data === undefined ? 0 : Object.entries(data).reduce((a, b) => b[1] > a[1] ? b : a);
         var right_container = document.getElementById('right_container');
         let right_content = generateStatistics("Most Frequent", mostFrequent[1], 0);
         right_container.appendChild(right_content);
