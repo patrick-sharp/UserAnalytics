@@ -146,6 +146,43 @@ async function getDomainsForDay(date) {
   return await p;
 }
 
+async function getDomainsForWeek(dates) {
+  var total = 0;
+  if (dates !== undefined) {
+    for await (const date of dates) {
+      let data = await getDomainsForDay(date);
+      let sum = Object.values(data).reduce(function(accumulator, currentValue) {
+        return accumulator + currentValue;
+      }, 0);
+      total += sum;
+    }
+    return total;
+  }
+
+  return 0;
+}
+
+async function getMostFrequentForWeek(dates) {
+  if (dates !== undefined) {
+    var map = {};
+    for await (const date of dates) {
+      let data = await getDomainsForDay(date);
+      Object.entries(data).forEach(([key, value]) => {
+        if (key in map) {
+          let cur = map[key];
+          map[key] += cur + value;
+        } else {
+          map[key] = value;
+        }
+      });
+    }
+    console.log(map);
+    return map;
+  }
+
+  return {};
+}
+
 async function getCategoryList() {
   var p = new Promise(function(resolve, reject) {
     return chrome.storage.sync.get(["category"], function (data) {

@@ -39,10 +39,13 @@ function closeSettingPanel() {
 
 window.onload = function() {
 
-    retrieveDailyData();
+    // retrieveDailyData();
 
     document.getElementById("setting").addEventListener("click", openSettingPanel);
     document.getElementById("setting_close_button").addEventListener("click", closeSettingPanel);
+
+    // getDomainsForWeek().then(a => console.log("a is " + a));
+    // console.log("a is " + a);
 
 
     dates.forEach(date => {
@@ -51,7 +54,7 @@ window.onload = function() {
         button.innerHTML = date;
     
         // var a = document.body.appendChild(button);
-        button.addEventListener('click', updateButtonStyle)
+        button.addEventListener('click', event => updateButtonStyle(event))
         let a = document.getElementById('selector');
         a.appendChild(button);
     })
@@ -61,7 +64,7 @@ window.onload = function() {
     var timesheet = document.getElementById('timesheet');
 
     timesheet_data.forEach(function(value, _index, _arr){
-        console.log(value);
+        // console.log(value);
         // var row = document.createElement('div');
         var row = document.createElement('div');
         row.className = 'timesheet_row';
@@ -88,21 +91,8 @@ window.onload = function() {
         renderGraph();
 };
 
-function updateButtonStyle(event) {
-    console.log(event.target.id);
-    var button = document.getElementById(event.target.id)
-    button.style.borderRadius = '10px';
-    button.style.color = '#5AC43B'
-    button.style.backgroundColor = '#DCFFCF'
-    button.style.border = '1px solid #5AC43B'
-    button.style.boxSizing = 'border-box'
-
-    let i = dates.filter(d => d != event.target.id)[0];
-    document.getElementById(i).removeAttribute('style');
-}
-
 function generateStatistics(titleString, totalTime, timeDiff) {
-
+    console.log(titleString, totalTime, timeDiff)
     // UI
     let container = document.createElement('div');
     container.id = 'stats_container';
@@ -119,8 +109,6 @@ function generateStatistics(titleString, totalTime, timeDiff) {
     let timeContainer = document.createElement('div');
     timeContainer.id = "time_container";
     let time = document.createElement('div');
-    let comparison = document.createElement('span');
-    comparison.id = 'comparison';
 
     title.innerHTML = titleString;
     title.style.fontSize = '24px';
@@ -132,11 +120,15 @@ function generateStatistics(titleString, totalTime, timeDiff) {
         return "<span class='numbers'>" + v + "</span>";
     });
 
-    comparison.innerHTML = (formatTimeToMinute(timeDiff) + " compared to last time").replace(/(\+|\-)\d+(min)/, function(v) {
-        return (v.includes('+') ? "<span class='comp_plus'>" : "<span class='comp_minus'>")  + v + "</span>";});
-
     timeContainer.appendChild(time);
-    timeContainer.appendChild(comparison);
+
+    if (timeDiff != 0) {
+        let comparison = document.createElement('span');
+        comparison.id = 'comparison';
+        comparison.innerHTML = (formatTimeToMinute(timeDiff) + " compared to last time").replace(/(\+|\-)\d+(min)/, function(v) {
+            return (v.includes('+') ? "<span class='comp_plus'>" : "<span class='comp_minus'>")  + v + "</span>";});
+        timeContainer.appendChild(comparison);
+    }
 
     content_container.appendChild(icon);
     content_container.appendChild(timeContainer);
@@ -148,7 +140,7 @@ function generateStatistics(titleString, totalTime, timeDiff) {
 }
 
 function updateButtonStyle(event) {
-    console.log(event.target.id);
+    // console.log(event.target.id);
     var button = document.getElementById(event.target.id)
     button.style.borderRadius = '10px';
     button.style.color = '#5AC43B'
@@ -158,6 +150,20 @@ function updateButtonStyle(event) {
 
     let i = dates.filter(d => d != event.target.id)[0];
     document.getElementById(i).removeAttribute('style');
+
+    var left = document.getElementById('left_container')
+    if (left.children.length > 0) {
+        left.removeChild(left.childNodes[0]);
+    }
+    var right = document.getElementById('right_container')
+    if (right.children.length > 0) {
+        right.removeChild(right.childNodes[0]);
+    }
+    if (event.target.id === "Daily") {
+        retrieveDailyData();
+    } else {
+        retrieveWeeklyData();
+    }
 }
 
 
@@ -296,7 +302,7 @@ function renderGraph() {
 function retrieveDailyData() {
     let date = new Date();
     let today = formatDate((date.getMonth() + 1), date.getDate(), date.getFullYear());
-    let yesterdayDate = getYesterday();
+    let yesterdayDate = getPreviousDays(1);
     let yesterday = formatDate(yesterdayDate.getMonth() + 1, yesterdayDate.getDate(), yesterdayDate.getFullYear());
 
     getDomainsForDay(today)
@@ -321,6 +327,18 @@ function retrieveDailyData() {
         });
 }
 
+function retrieveWeeklyData() {
+    prevWeek = [];
+    for (i = 0; i < 7; i++) {
+        let date = getPreviousDays(i)
+        prevWeek.push( formatDate(date.getMonth() + 1, date.getDate(), date.getFullYear()) );
+    }
+    
+    console.log(prevWeek);
+    weeklyTotalTime(prevWeek);
+    weeklyMostFrequent(prevWeek);
+}
+
 // @output: a array of total time, most frequently used time, and its domain
 function processDailyData(data) {
     let sum = Object.values(data).reduce(function(accumulator, currentValue) {
@@ -330,7 +348,7 @@ function processDailyData(data) {
     var max = -1;
     var domain = "";
     Object.entries(data).forEach(([key, value]) => {
-        console.log(key, value);
+        // console.log(key, value);
         if (value > max) {
             max = value;
             domain = key;
@@ -351,8 +369,9 @@ function formatDate(month, day, year) {
 
 function formatTimeToHour(second) {
     let hour = Math.trunc(second / 3600);
-    let minute = Math.ceil(second % 60);
-    return hour +'H' + (minute < 10 ? "0" + minute : minute) + 'MIN';
+    let minute = Math.abs(Math.ceil(second % 60));
+    // console.log(minute);
+    return hour + 'H' + minute + 'MIN';
 }
 
 function formatTimeToMinute(second) {
@@ -361,9 +380,27 @@ function formatTimeToMinute(second) {
     return formattedString + minute + "min";
 }
 
-function getYesterday() {
+function getPreviousDays(prev) {
     const today = new Date()
     const yesterday = new Date(today)
     
-    return new Date(yesterday.setDate(today.getDate() - 1));
+    return new Date(yesterday.setDate(today.getDate() - prev));
+}
+
+function weeklyTotalTime(prevWeek) {
+    getDomainsForWeek(prevWeek)
+    .then(data => {
+        var left_container = document.getElementById('left_container');
+        var left_content = generateStatistics("Total Time", data, 0);
+        left_container.appendChild(left_content);
+    });
+}
+function weeklyMostFrequent(prevWeek) {
+    getMostFrequentForWeek(prevWeek).then(data => {
+        // console.log(JSON.stringify(data));
+        let mostFrequent = Object.entries(data).reduce((a, b) => b[1] > a[1] ? b : a);
+        var right_container = document.getElementById('right_container');
+        let right_content = generateStatistics("Most Frequent", mostFrequent[1], 0);
+        right_container.appendChild(right_content);
+    });
 }
