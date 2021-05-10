@@ -23,9 +23,9 @@ function dateString(dateObj) {
 
 function getPreviousDays(prev) {
   const today = new Date()
-  const yesterday = new Date(today)
+  const prevDay = new Date(today)
   
-  return new Date(yesterday.setDate(today.getDate() - prev));
+  return new Date(prevDay.setDate(today.getDate() - prev));
 }
 
 /******************************************************************************
@@ -114,6 +114,38 @@ async function getMostFrequentTime() {
   return [maxDomain, maxTime, maxTime - yesterdayTime];
 }
 
+async function getWeeklyTotalTime(prevWeek) {
+  var total = 0;
+
+  console.log(prevWeek);
+  for await (const date of prevWeek) {
+    console.log("date is " + date);
+    let data = await getDate(date);
+    let sum = Object.values(data).reduce(function(accumulator, currentValue) {
+      return accumulator + currentValue;
+    }, 0);
+    total += sum;
+  }
+
+  return [total, 0];
+}
+
+async function getWeeklyMostFrequentTime(prevWeek) {
+  var maxDomain = "";
+  var maxTime = -1;
+  for await (const day of prevWeek) {
+    const todayData = await getDate(day);
+    for (var domain in todayData) {
+      if (todayData[domain] > maxTime) {
+        maxDomain = domain;
+        maxTime = todayData[domain];
+      }
+    }
+  }
+
+  return [maxDomain, maxTime, 0];
+}
+
 async function getLineChartData() {
   var labels = [];
   var dataset = [];
@@ -140,7 +172,7 @@ async function getLineChartData() {
       time += tempData[domain];
     }
 
-    copy.data[1].y = time / 3600;
+    copy.data[1].y = time / 3600 < 1 ? 1 : time / 3600;
 
     dataset.push(copy);
   }

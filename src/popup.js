@@ -1,8 +1,28 @@
 window.onload = function() {
 
   // test loading category data async
-  let b = chrome.storage.sync.get(["category"], function(data) {
-    console.log("data " + JSON.stringify(data));
+  // let b = chrome.storage.sync.get(["category"], function(data) {
+  //   console.log("data " + JSON.stringify(data));
+  // })
+
+  getCategoryKeys().then(data => {
+    var selector = document.getElementById("category_selector");
+    data.forEach(category => {
+      var option = document.createElement("option");
+      option.text = category;
+      option.value = category;
+      option.style.width = 'fit';
+      selector.appendChild(option);
+    })
+  });
+
+  document.getElementById("save").addEventListener('click', function() {
+    let selector = document.getElementById('category_selector');
+    let index = selector.selectedIndex;
+    let item = selector.options[index].value;
+    let url = document.getElementById("url_editor").innerHTML;
+    console.log("saved");
+    addLinkToCategory(item,url);
   })
 }
 

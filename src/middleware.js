@@ -164,6 +164,33 @@ async function getCategories() {
   return await p;
 }
 
+async function getCategoryList() {
+  var p = new Promise(function(resolve, reject) {
+    return chrome.storage.sync.get(["category"], function (data) {
+      resolve(JSON.parse(JSON.stringify(data))['category']);
+    })
+  });
+  return await p; 
+}
+
+async function getCategoryKeys() {
+  return getCategoryList().then( data => {return Object.keys(data)} );
+}
+
+function addLinkToCategory(category, link) {
+  chrome.storage.sync.get(["category"], function(data) {
+    var list = data['category'][category]
+    console.log(list);
+    if (list.indexOf(link) === -1) {
+      list.push(link);
+      chrome.storage.sync.set(data);
+      if (debugMode) {
+        console.log(link + " is saved to " + category);
+      }
+    }
+  })
+}
+
 /******************************************************************************
  * Util functions (can be used for testing, use at your own risks)
  ******************************************************************************/

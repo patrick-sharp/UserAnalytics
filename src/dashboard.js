@@ -158,6 +158,7 @@ function updateButtonStyle(event) {
     if (right.children.length > 0) {
         right.removeChild(right.childNodes[0]);
     }
+
     if (event.target.id === "Daily") {
         retrieveDailyData();
     } else {
@@ -276,36 +277,45 @@ async function retrieveDailyData() {
     right_container.appendChild(right_content);
 }
 
-function retrieveWeeklyData() {
+async function retrieveWeeklyData() {
     prevWeek = [];
     for (i = 0; i < 7; i++) {
-        let date = getPreviousDays(i)
-        prevWeek.push( formatDate(date.getMonth() + 1, date.getDate(), date.getFullYear()) );
+        prevWeek.push(dateString(getPreviousDays(i)));
     }
     
-    console.log(prevWeek);
-    weeklyTotalTime(prevWeek);
-    weeklyMostFrequent(prevWeek);
+    // console.log(prevWeek);
+    weeklyTotalTimeData = await getWeeklyTotalTime(prevWeek);
+    weeklyMostFrequentTimeData = await getWeeklyMostFrequentTime(prevWeek);
+
+    var left_container = document.getElementById('left_container');
+    let left_content = generateStatistics("Total Time", weeklyTotalTimeData[0], weeklyTotalTimeData[1]);
+    left_container.appendChild(left_content);
+    
+    // Add most frequent getMostFrequentTime() in procesing.js
+    mostFrequentTimeData = await getMostFrequentTime();
+    var right_container = document.getElementById('right_container');
+    let right_content = generateStatistics("Most Frequent", weeklyMostFrequentTimeData[1], weeklyMostFrequentTimeData[2]);
+    right_container.appendChild(right_content);
 }
 
-// @output: a array of total time, most frequently used time, and its domain
-function processDailyData(data) {
-    let sum = Object.values(data).reduce(function(accumulator, currentValue) {
-        return accumulator + currentValue;
-    }, 0);
+// // @output: a array of total time, most frequently used time, and its domain
+// function processDailyData(data) {
+//     let sum = Object.values(data).reduce(function(accumulator, currentValue) {
+//         return accumulator + currentValue;
+//     }, 0);
 
-    var max = -1;
-    var domain = "";
-    Object.entries(data).forEach(([key, value]) => {
-        // console.log(key, value);
-        if (value > max) {
-            max = value;
-            domain = key;
-        }
-    });
+//     var max = -1;
+//     var domain = "";
+//     Object.entries(data).forEach(([key, value]) => {
+//         // console.log(key, value);
+//         if (value > max) {
+//             max = value;
+//             domain = key;
+//         }
+//     });
 
-    return [sum, max, domain];
-}
+//     return [sum, max, domain];
+// }
 
 // @input: month: the month to be formatted, 0-indexed
 // @input: day: the day of the month
@@ -319,15 +329,14 @@ function formatDate(month, day, year) {
 function formatTimeToHour(second) {
     console.log(second)
     let hour = Math.trunc(second / 3600);
-    let minute = Math.abs(Math.ceil(second / 60));
-    // console.log(minute);
+    let minute = Math.abs(Math.ceil((second % 3600) / 60));
     return hour + 'H' + minute + 'MIN';
 }
 
 function formatTimeToMinute(second) {
-    var formattedString = second < 0 ? "-" : "+";
+    // var formattedString = second < 0 ? "-" : "+";
     let minute = Math.floor(second / 60);
-    return formattedString + minute + "min";
+    return minute + "min";
 }
 
 function getPreviousDays(prev) {
@@ -337,20 +346,21 @@ function getPreviousDays(prev) {
     return new Date(yesterday.setDate(today.getDate() - prev));
 }
 
-function weeklyTotalTime(prevWeek) {
-    getDomainsForWeek(prevWeek)
-    .then(data => {
-        var left_container = document.getElementById('left_container');
-        var left_content = generateStatistics("Total Time", data, 0);
-        left_container.appendChild(left_content);
-    });
-}
-function weeklyMostFrequent(prevWeek) {
-    getMostFrequentForWeek(prevWeek).then(data => {
-        // console.log(JSON.stringify(data));
-        let mostFrequent = data === undefined ? 0 : Object.entries(data).reduce((a, b) => b[1] > a[1] ? b : a);
-        var right_container = document.getElementById('right_container');
-        let right_content = generateStatistics("Most Frequent", mostFrequent[1], 0);
-        right_container.appendChild(right_content);
-    });
-}
+// function weeklyTotalTime(prevWeek) {
+//     getDomainsForWeek(prevWeek)
+//     .then(data => {
+//         var left_container = document.getElementById('left_container');
+//         var left_content = generateStatistics("Total Time", data, 0);
+//         left_container.appendChild(left_content);
+//     });
+// }
+
+// function weeklyMostFrequent(prevWeek) {
+//     getMostFrequentForWeek(prevWeek).then(data => {
+//         // console.log(JSON.stringify(data));
+//         let mostFrequent = data === undefined ? 0 : Object.entries(data).reduce((a, b) => b[1] > a[1] ? b : a);
+//         var right_container = document.getElementById('right_container');
+//         let right_content = generateStatistics("Most Frequent", mostFrequent[1], 0);
+//         right_container.appendChild(right_content);
+//     });
+// }
