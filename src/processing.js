@@ -203,8 +203,6 @@ async function getTimesheetData() {
   var timesheetData = [];
   const todayData = await getDate(dateString(currentDate))
 
-  console.log(todayData);
-
   for (var domain in todayData) {
     var temp = {}
     temp['icon'] = 'a';
@@ -213,13 +211,9 @@ async function getTimesheetData() {
     timesheetData.push(temp);
   }
 
-  console.log(timesheetData);
-
   timesheetData.sort(function (a, b) {
     return b.time - a.time;
   })
-
-  console.log(timesheetData);
 
   return timesheetData;
 }
