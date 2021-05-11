@@ -129,10 +129,11 @@ function clearChromeStorage() {
 /*
  * Get domain:time match for a given day
  * @input: date is a formatted string in the form "month/day/year"(i.e. 4/30/2021).
- * @return: a primose that includes an object(i.e. {google.com: 123}), the object might be empty
+ * @return: a promise that includes an object(i.e. {google.com: 123}), the object might be empty
  */
 async function getDomainsForDay(date) {
   // make the chrome storage call synchronous
+  console.log(date);
   var p = new Promise(function(resolve, reject){
     chrome.storage.sync.get([date], function(data) {
       if (data[date] === undefined) {
@@ -146,43 +147,35 @@ async function getDomainsForDay(date) {
   return await p;
 }
 
-
-
 /*
- * get time spent on the domain for a given day
- * @input:
- *    date is a formatted string in the form "month/day/year"(i.e. 4/30/2021).
- *    domain is a string that represents the url of a website(i.e. www.google.com)
- * @return:
- *    A promise that includes the time spent on the domain on the given date. (in seconds)
- *    0 if the domain is never visited on that date.
+ * Get category:[domains] from storage
  */
-async function getTimeForDay(date, domain) {
-  const dataObj = await getDomainsForDay(date);
-  if (Object.keys(dataObj).length === 0 || dataObj[domain] === undefined) {
-    return 0;
-  }
-  return dataObj[domain];
+async function getCategoryList() {
+  var p = new Promise(function(resolve, reject) {
+    return chrome.storage.sync.get(["category"], function (data) {
+      resolve(JSON.parse(JSON.stringify(data))['category']);
+    })
+  });
+  return await p; 
 }
 
-
-/*
- * get time spent on the domain for a given week
- * @input:
- *    dates is an array for date in the form of string "month/day/year"(i.e. ["4/30/2021", "5/1/2021"]).
- *    domain is a string that represents the url of a website(i.e. www.google.com)
- * @return:
- *    A promise that includes the time spent on the domain on the given dates. (in seconds)
- *    0 if the domain is never visited.
- */
-async function getTimeForWeek(dates, domain) {
-  var totalTime = 0;
-  for (var i = 0; i < dates.length; i ++) {
-    totalTime += await getTimeForDay(dates[i], domain);
-  }
-  return totalTime;
+async function getCategoryKeys() {
+  return getCategoryList().then( data => {return Object.keys(data)} );
 }
 
+function addLinkToCategory(category, link) {
+  chrome.storage.sync.get(["category"], function(data) {
+    var list = data['category'][category]
+    console.log(list);
+    if (list.indexOf(link) === -1) {
+      list.push(link);
+      chrome.storage.sync.set(data);
+      if (debugMode) {
+        console.log(link + " is saved to " + category);
+      }
+    }
+  })
+}
 
 /******************************************************************************
  * Util functions (can be used for testing, use at your own risks)
@@ -268,8 +261,9 @@ if (typeof exports !== 'undefined') {
   exports.cleanUsage = cleanUsage;
   exports.clearChromeStorage = clearChromeStorage;
   exports.getDomainsForDay = getDomainsForDay;
-  exports.getTimeForDay = getTimeForDay;
-  exports.getTimeForWeek = getTimeForWeek;
+  exports.getCategoryList = getCategoryList;
+  exports.getCategoryKeys = getCategoryKeys;
+  exports.addLinkToCategory = addLinkToCategory;
   exports.addElement = addElement;
   exports.removeElement = removeElement;
   exports.removeDate = removeDate;

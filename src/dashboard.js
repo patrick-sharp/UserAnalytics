@@ -1,24 +1,22 @@
-// generate date selection button\
-
 const dates = ['Daily', 'Weekly'];
 
-let timesheet_data = [
-    {
-        icon:'a',
-        title:'b',
-        times:'c',
-    },
-    {
-        icon:'a',
-        title:'d',
-        times:'e',
-    },
-    {
-        icon:'a',
-        title:'f',
-        times:'g',
-    }
-]
+// let timesheet_data = [
+//     {
+//         icon:'a',
+//         title:'b',
+//         time:'10H28MIN',
+//     },
+//     {
+//         icon:'a',
+//         title:'d',
+//         time:'0H1MIN',
+//     },
+//     {
+//         icon:'a',
+//         title:'f',
+//         time:'12H9MIN',
+//     }
+// ]
 
 let date_range_selection = ['Last 7 Days', 'Last 14 Days'];
 
@@ -34,23 +32,17 @@ function closeSettingPanel() {
     document.body.style.backgroundColor = '#F2F0EB'
 }
 
-// Make the settings button clickable
-document.getElementById("setting").addEventListener("click", openSettingPanel);
-document.getElementById("setting_close_button").addEventListener("click", closeSettingPanel);
 
-window.onload = function() {
-    var left_container = document.getElementById('left_container');
-    let left_content = generateStatistics("Total Time");
-    left_container.appendChild(left_content);
+window.onload = async function() {
 
-    // var separator = document.
+    // retrieveDailyData();
 
-    var right_container = document.getElementById('right_container');
-    let right_content = generateStatistics("Most Frequent");
-    right_container.appendChild(right_content);
+    document.getElementById("setting").addEventListener("click", openSettingPanel);
+    document.getElementById("setting_close_button").addEventListener("click", closeSettingPanel);
 
-    // display.appendChild(left_container);
-    // display.appendChild(right_container);
+    // getDomainsForWeek().then(a => console.log("a is " + a));
+    // console.log("a is " + a);
+
 
     dates.forEach(date => {
         var button = document.createElement("button");
@@ -58,17 +50,20 @@ window.onload = function() {
         button.innerHTML = date;
     
         // var a = document.body.appendChild(button);
-        button.addEventListener('click', updateButtonStyle)
+        button.addEventListener('click', event => updateButtonStyle(event))
         let a = document.getElementById('selector');
         a.appendChild(button);
     })
 
     document.getElementById("Daily").click()
 
+    renderGraph();
+
     var timesheet = document.getElementById('timesheet');
 
+    var timesheet_data = await getTimesheetData();
     timesheet_data.forEach(function(value, _index, _arr){
-        console.log(value);
+        // console.log(value);
         // var row = document.createElement('div');
         var row = document.createElement('div');
         row.className = 'timesheet_row';
@@ -76,12 +71,12 @@ window.onload = function() {
         img.src = 'images/timer.png'
         var title = document.createElement('span');
         title.id = 'title';
-        title.innerHTML = 'youtube.com';
+        title.innerHTML = value.title;
         var spacer = document.createElement('span');
         spacer.id = 'spacer';
         var time = document.createElement('span');
         time.id = 'time';
-        time.innerHTML = '10H28MIN'.replace(/\d+/g, function(v){
+        time.innerHTML = formatTimeToHour(value.time).replace(/\d+/g, function(v){
             return "<span class='numbers'>" + v + "</span>";
         });
     
@@ -90,29 +85,17 @@ window.onload = function() {
         row.appendChild(spacer);
         row.appendChild(time);
     
-        timesheet.appendChild(row);})
+        timesheet.appendChild(row);
+    })
 };
 
-function updateButtonStyle(event) {
-    console.log(event.target.id);
-    var button = document.getElementById(event.target.id)
-    button.style.borderRadius = '10px';
-    button.style.color = '#5AC43B'
-    button.style.backgroundColor = '#DCFFCF'
-    button.style.border = '1px solid #5AC43B'
-    button.style.boxSizing = 'border-box'
-
-    let i = dates.filter(d => d != event.target.id)[0];
-    document.getElementById(i).removeAttribute('style');
-}
-
-function generateStatistics(titleString) {
-
+function generateStatistics(titleString, totalTime, timeDiff) {
+    console.log(titleString, totalTime, timeDiff)
+    // UI
     let container = document.createElement('div');
     container.id = 'stats_container';
     container.style.marginLeft = '52px';
     container.style.marginTop = '17px';
-
 
     let title = document.createElement('p');
     title.id = 'title';
@@ -124,22 +107,26 @@ function generateStatistics(titleString) {
     let timeContainer = document.createElement('div');
     timeContainer.id = "time_container";
     let time = document.createElement('div');
-    let comparison = document.createElement('span');
-    comparison.id = 'comparison';
 
     title.innerHTML = titleString;
     title.style.fontSize = '24px';
     title.style.color = '#000000'
     icon.src = 'images/timer.png'
-    time.innerHTML = (5 + 'H' + 24 + 'MIN').replace(/\d+/g, function(v){
+
+    
+    time.innerHTML = formatTimeToHour(totalTime).replace(/\d+/g, function(v){
         return "<span class='numbers'>" + v + "</span>";
     });
 
-    comparison.innerHTML = ('+' + 5 + 'min' + ' compared to yesterday').replace(/(\+|\-)\d+(min)/, function(v) {
-        return (v.includes('+') ? "<span class='comp_plus'>" : "<span class='comp_minus'>")  + v + "</span>";});
-
     timeContainer.appendChild(time);
-    timeContainer.appendChild(comparison);
+
+    if (timeDiff != 0) {
+        let comparison = document.createElement('span');
+        comparison.id = 'comparison';
+        comparison.innerHTML = (formatTimeToMinute(timeDiff) + " compared to last time").replace(/(\+|\-)\d+(min)/, function(v) {
+            return (v.includes('+') ? "<span class='comp_plus'>" : "<span class='comp_minus'>")  + v + "</span>";});
+        timeContainer.appendChild(comparison);
+    }
 
     content_container.appendChild(icon);
     content_container.appendChild(timeContainer);
@@ -151,7 +138,7 @@ function generateStatistics(titleString) {
 }
 
 function updateButtonStyle(event) {
-    console.log(event.target.id);
+    // console.log(event.target.id);
     var button = document.getElementById(event.target.id)
     button.style.borderRadius = '10px';
     button.style.color = '#5AC43B'
@@ -161,134 +148,216 @@ function updateButtonStyle(event) {
 
     let i = dates.filter(d => d != event.target.id)[0];
     document.getElementById(i).removeAttribute('style');
+
+    var left = document.getElementById('left_container')
+    if (left.children.length > 0) {
+        left.removeChild(left.childNodes[0]);
+    }
+    var right = document.getElementById('right_container')
+    if (right.children.length > 0) {
+        right.removeChild(right.childNodes[0]);
+    }
+
+    if (event.target.id === "Daily") {
+        retrieveDailyData();
+    } else {
+        retrieveWeeklyData();
+    }
 }
 
 
 
 
 // Render the graph
-range_selector = document.getElementById('date_range');
-date_range_selection.forEach(function(value) {
-    var option = document.createElement('option');
-    option.text = value;
-    option.value = value;
-    // option.style.lineHeight = '27px';
-    option.style.width = 'fit';
-    range_selector.appendChild(option);
-})
-var ctx_line = document.getElementById("lineChart");
-var lineChart = new Chart(ctx_line, {
-                        type: 'bar',
-                        data: {
-                            labels: Array.from({length: 7}, (_, i) => i + 1),
-                            datasets: [
-                                {
-                                data: [{x: 1, y: 24}, {x: 1, y: 10}],
-                                backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                borderRadius: 16,
-                                barThickness: 24,
-                                grouped: false
-                            }, {
-                                data: [{x: 2, y: 24}, {x: 2, y: 8}],
-                                backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                borderRadius: 16,
-                                barThickness: 24,
-                                grouped: false
-                            }, {
-                                data: [{x: 3, y: 24}, {x: 3, y: 12}],
-                                backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                borderRadius: 16,
-                                barThickness: 24,
-                                grouped: false
-                            }, {
-                                data: [{x: 4, y: 24}, {x: 4, y: 6}],
-                                backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                borderRadius: 16,
-                                barThickness: 24,
-                                grouped: false
-                            }, {
-                                data: [{x: 5, y: 24}, {x: 5, y: 16}],
-                                backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                borderRadius: 16,
-                                barThickness: 24,
-                                grouped: false
-                            }, {
-                                data: [{x: 6, y: 24}, {x: 6, y: 4}],
-                                backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                borderRadius: 16,
-                                barThickness: 24,
-                                grouped: false
-                            }, {
-                                data: [{x: 7, y: 24}, {x: 7, y: 16}],
-                                backgroundColor: ['#CFF0C4', '#5AC43B'],
-                                borderRadius: 16,
-                                barThickness: 24,
-                                grouped: false
-                            }
+async function renderGraph() {
+    range_selector = document.getElementById('date_range');
+    date_range_selection.forEach(function(value) {
+        var option = document.createElement('option');
+        option.text = value;
+        option.value = value;
+        // option.style.lineHeight = '27px';
+        option.style.width = 'fit';
+        range_selector.appendChild(option);
+    })
 
-                        ]
-                        },
-                        options: {
-                            plugins: {
-                                legend: {
-                                    display: false
-                                }
+    const [lineLabels, lineDataset] = await getLineChartData();
+
+    var ctx_line = document.getElementById("lineChart");
+    var lineChart = new Chart(ctx_line, {
+                            type: 'bar',
+                            data: {
+                                labels: lineLabels,
+                                datasets: lineDataset
                             },
-                            events: [],
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    max: 24,
-                                    grid: {
-                                        display: false,
-                                        drawBorder: true,
-                                        drawOnChartArea: true,
-                                        drawTicks: false,
-                                    },
-                                    ticks: {
-                                        callback: function(value, index, values) {
-                                            return value + "H"
-                                        }
+                            options: {
+                                plugins: {
+                                    legend: {
+                                        display: false
                                     }
                                 },
-                                x: {
-                                    grid: {
-                                        display: false,
-                                        drawBorder: true,
-                                        drawOnChartArea: true,
-                                        drawTicks: false,
+                                events: [],
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        max: 24,
+                                        grid: {
+                                            display: false,
+                                            drawBorder: true,
+                                            drawOnChartArea: true,
+                                            drawTicks: false,
+                                        },
+                                        ticks: {
+                                            callback: function(value, index, values) {
+                                                return value + "H"
+                                            }
+                                        }
+                                    },
+                                    x: {
+                                        grid: {
+                                            display: false,
+                                            drawBorder: true,
+                                            drawOnChartArea: true,
+                                            drawTicks: false,
+                                        }
                                     }
                                 }
                             }
-                        }
-                    });
+                        });
 
-const labels = ['Red', 'Orange', 'Yellow', 'Green', 'Blue'];
-var ctx_polar = document.getElementById('polarChart');
-var polarChart = new Chart(ctx_polar, {
-    type: 'polarArea',
-    data: {
-        labels: labels,
-        datasets: [
-          {
-            label: 'Dataset 1',
-            data: [1,2,3,4,5],
-            backgroundColor: [
-                '#EAD367',
-                '#D3705A',
-                '#D8E8E2',
-                '#C4D293',
-                '#37554C'
+    const [polarLabels, polarDataset] = await getPolarChartData();
+    var ctx_polar = document.getElementById('polarChart');
+    var polarChart = new Chart(ctx_polar, {
+        type: 'polarArea',
+        data: {
+            labels: polarLabels,
+            datasets: [
+            {
+                label: 'Dataset 1',
+                data: polarDataset,
+                backgroundColor: [
+                    '#EAD367',
+                    '#D3705A',
+                    '#D8E8E2',
+                    '#C4D293',
+                    '#37554C'
+                ]
+            }
             ]
-          }
-        ]
-      },
-    options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            display: false,
-          }
+        },
+        options: {
+            responsive: true,
+            plugins: {
+            legend: {
+                display: false,
+            }
+            }
         }
+    });
+
+}
+
+async function retrieveDailyData() {
+    // let date = new Date();
+    // let today = formatDate((date.getMonth() + 1), date.getDate(), date.getFullYear());
+    // let yesterdayDate = getPreviousDays(1);
+    // let yesterday = formatDate(yesterdayDate.getMonth() + 1, yesterdayDate.getDate(), yesterdayDate.getFullYear());
+
+    totalTimeData = await getTotalTime();
+    var left_container = document.getElementById('left_container');
+    let left_content = generateStatistics("Total Time", totalTimeData[0], totalTimeData[1]);
+    left_container.appendChild(left_content);
+    
+    // Add most frequent getMostFrequentTime() in procesing.js
+    mostFrequentTimeData = await getMostFrequentTime();
+    var right_container = document.getElementById('right_container');
+    let right_content = generateStatistics("Most Frequent", mostFrequentTimeData[1], mostFrequentTimeData[2]);
+    right_container.appendChild(right_content);
+}
+
+async function retrieveWeeklyData() {
+    prevWeek = [];
+    for (i = 0; i < 7; i++) {
+        prevWeek.push(dateString(getPreviousDays(i)));
     }
-});
+    
+    // console.log(prevWeek);
+    weeklyTotalTimeData = await getWeeklyTotalTime(prevWeek);
+    weeklyMostFrequentTimeData = await getWeeklyMostFrequentTime(prevWeek);
+
+    var left_container = document.getElementById('left_container');
+    let left_content = generateStatistics("Total Time", weeklyTotalTimeData[0], weeklyTotalTimeData[1]);
+    left_container.appendChild(left_content);
+    
+    // Add most frequent getMostFrequentTime() in procesing.js
+    mostFrequentTimeData = await getMostFrequentTime();
+    var right_container = document.getElementById('right_container');
+    let right_content = generateStatistics("Most Frequent", weeklyMostFrequentTimeData[1], weeklyMostFrequentTimeData[2]);
+    right_container.appendChild(right_content);
+}
+
+// // @output: a array of total time, most frequently used time, and its domain
+// function processDailyData(data) {
+//     let sum = Object.values(data).reduce(function(accumulator, currentValue) {
+//         return accumulator + currentValue;
+//     }, 0);
+
+//     var max = -1;
+//     var domain = "";
+//     Object.entries(data).forEach(([key, value]) => {
+//         // console.log(key, value);
+//         if (value > max) {
+//             max = value;
+//             domain = key;
+//         }
+//     });
+
+//     return [sum, max, domain];
+// }
+
+// @input: month: the month to be formatted, 0-indexed
+// @input: day: the day of the month
+// @input: year: the full year representation
+// @output: formatted date string in "month/day/year"
+function formatDate(month, day, year) {
+    return month + "/" + day + "/" + year;
+}
+
+
+function formatTimeToHour(second) {
+    console.log(second)
+    let hour = Math.trunc(second / 3600);
+    let minute = Math.abs(Math.ceil((second % 3600) / 60));
+    return hour + 'H' + minute + 'MIN';
+}
+
+function formatTimeToMinute(second) {
+    var formattedString = second < 0 ? "" : "+";
+    let minute = Math.floor(second / 60);
+    return formattedString + minute + "min";
+}
+
+function getPreviousDays(prev) {
+    const today = new Date()
+    const yesterday = new Date(today)
+    
+    return new Date(yesterday.setDate(today.getDate() - prev));
+}
+
+// function weeklyTotalTime(prevWeek) {
+//     getDomainsForWeek(prevWeek)
+//     .then(data => {
+//         var left_container = document.getElementById('left_container');
+//         var left_content = generateStatistics("Total Time", data, 0);
+//         left_container.appendChild(left_content);
+//     });
+// }
+
+// function weeklyMostFrequent(prevWeek) {
+//     getMostFrequentForWeek(prevWeek).then(data => {
+//         // console.log(JSON.stringify(data));
+//         let mostFrequent = data === undefined ? 0 : Object.entries(data).reduce((a, b) => b[1] > a[1] ? b : a);
+//         var right_container = document.getElementById('right_container');
+//         let right_content = generateStatistics("Most Frequent", mostFrequent[1], 0);
+//         right_container.appendChild(right_content);
+//     });
+// }

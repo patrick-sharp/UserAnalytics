@@ -33,6 +33,16 @@ chrome.runtime.onInstalled.addListener(async () => {
     )
   });
 
+  fetch('mock.json')
+  .then(response => response.json())
+  .then(jsonData => {
+    chrome.storage.sync.set(
+      jsonData, function() {
+        console.log("Mock data loaded");
+      }
+    )
+  });
+
 
   // Open a new tab pointing at our page's URL using JavaScript's object initializer shorthand.
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#new_notations_in_ecmascript_2015

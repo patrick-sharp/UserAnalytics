@@ -1,0 +1,78 @@
+{
+    "5/11/2021": {
+        "addons.mozilla.org":15.649,
+        "answers.microsoft.com":66.61999999999999,
+        "calendar.google.com":1037.586,
+        "canvas.uw.edu":154.918,
+        "chrome.google.com":201.132,
+        "courses.cs.washington.edu":93.734,
+        "dba.stackexchange.com":4.951,
+        "developer.mozilla.org":36.974000000000004,
+        "docs.google.com":2154.891,
+        "drive.google.com":1.778,
+        "euw.op.gg":9.78,
+        "extensions":1073.5959999999998,
+        "github.com":1851.8729999999998,
+        "idp.u.washington.edu":6.812,
+        "javascript.plainenglish.io":207.57999999999998,
+        "mail.google.com":1004.461,
+        "newtab":1760.708,
+        "preview.redd.it":10.054,
+        "seonkyounglongest.com":2164.069,
+        "stackoverflow.com":682.7879999999998,
+        "twitter.com":57.032000000000004,
+        "vscode-auth.github.com":271.671,
+        "washington.zoom.us":79.995,
+        "www.facebook.com":728.025,
+        "www.google.com":2552.5569999999999,
+        "www.gradescope.com":143.211,
+        "www.invenglobal.com":37.09,
+        "www.messenger.com":21.608,
+        "www.notion.so":8.809000000000001,
+        "www.reddit.com":3091.9289999999996,
+        "www.twitch.tv":1084.754,
+        "www.w3schools.com":46.739,
+        "www.youtube.com":2154.891
+    },
+    "5/10/2021": {
+        "addons.mozilla.org":15.649,
+        "calendar.google.com":1037.586,
+        "canvas.uw.edu":154.918,
+        "chrome.google.com":201.132,
+        "courses.cs.washington.edu":93.734,
+        "developer.mozilla.org":36.974000000000004,
+        "docs.google.com":3091.9289999999996,
+        "github.com":2851.8729999999998,
+        "idp.u.washington.edu":6.812,
+        "javascript.plainenglish.io":207.57999999999998,
+        "mail.google.com":1004.461,
+        "newtab":76.708,
+        "seonkyounglongest.com":5871.274,
+        "stackoverflow.com":682.7879999999998,
+        "twitter.com":570.032000000000004,
+        "vscode-auth.github.com":271.671,
+        "www.facebook.com":728.025,
+        "www.google.com":552.5569999999999,
+        "www.gradescope.com":143.211,
+        "www.messenger.com":201.608,
+        "www.reddit.com":5871.274,
+        "www.twitch.tv":1084.754,
+        "www.w3schools.com":46.739,
+        "www.youtube.com":4871.274
+    },
+    "5/9/2021": {
+        "www.google.com": 3600
+    },
+    "5/8/2021": {
+        "www.google.com": 7200
+    },
+    "5/7/2021": {
+        "www.google.com": 5400
+    },
+    "5/6/2021": {
+        "www.google.com": 14400
+    },
+    "5/5/2021": {
+        "www.google.com": 8800
+    }
+}
