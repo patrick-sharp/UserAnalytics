@@ -179,3 +179,47 @@ async function getLineChartData() {
 
   return [labels, dataset]
 }
+
+async function getPolarChartData() {
+  var labels = await getCategoryKeys();
+  var dataset = [];
+  var categories = await getCategoryList();
+  const todayString = dateString(currentDate)
+
+  for (var i = 0; i < labels.length; i++) {
+    dataset.push(0);
+
+    const domains = categories[labels[i]]
+    for (var j = 0; j < domains.length; j++) {
+      dataset[i] += await getTimeForDay(todayString, domains[j]);
+    }
+
+  }
+
+  return [labels, dataset]
+}
+
+async function getTimesheetData() {
+  var timesheetData = [];
+  const todayData = await getDate(dateString(currentDate))
+
+  console.log(todayData);
+
+  for (var domain in todayData) {
+    var temp = {}
+    temp['icon'] = 'a';
+    temp['title'] = domain;
+    temp['time'] = todayData[domain];
+    timesheetData.push(temp);
+  }
+
+  console.log(timesheetData);
+
+  timesheetData.sort(function (a, b) {
+    return b.time - a.time;
+  })
+
+  console.log(timesheetData);
+
+  return timesheetData;
+}

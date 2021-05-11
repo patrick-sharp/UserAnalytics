@@ -1,25 +1,22 @@
 const dates = ['Daily', 'Weekly'];
 
-let timesheet_data = [
-    {
-        icon:'a',
-        title:'b',
-        times:'c',
-    },
-    {
-        icon:'a',
-        title:'d',
-        times:'e',
-    },
-    {
-        icon:'a',
-        title:'f',
-        times:'g',
-    }
-]
-
-//var curTimeList = [];
-var prevTimeList = [];
+// let timesheet_data = [
+//     {
+//         icon:'a',
+//         title:'b',
+//         time:'10H28MIN',
+//     },
+//     {
+//         icon:'a',
+//         title:'d',
+//         time:'0H1MIN',
+//     },
+//     {
+//         icon:'a',
+//         title:'f',
+//         time:'12H9MIN',
+//     }
+// ]
 
 let date_range_selection = ['Last 7 Days', 'Last 14 Days'];
 
@@ -36,7 +33,7 @@ function closeSettingPanel() {
 }
 
 
-window.onload = function() {
+window.onload = async function() {
 
     // retrieveDailyData();
 
@@ -60,8 +57,11 @@ window.onload = function() {
 
     document.getElementById("Daily").click()
 
+    renderGraph();
+
     var timesheet = document.getElementById('timesheet');
 
+    var timesheet_data = await getTimesheetData();
     timesheet_data.forEach(function(value, _index, _arr){
         // console.log(value);
         // var row = document.createElement('div');
@@ -71,12 +71,12 @@ window.onload = function() {
         img.src = 'images/timer.png'
         var title = document.createElement('span');
         title.id = 'title';
-        title.innerHTML = 'youtube.com';
+        title.innerHTML = value.title;
         var spacer = document.createElement('span');
         spacer.id = 'spacer';
         var time = document.createElement('span');
         time.id = 'time';
-        time.innerHTML = '10H28MIN'.replace(/\d+/g, function(v){
+        time.innerHTML = formatTimeToHour(value.time).replace(/\d+/g, function(v){
             return "<span class='numbers'>" + v + "</span>";
         });
     
@@ -85,9 +85,8 @@ window.onload = function() {
         row.appendChild(spacer);
         row.appendChild(time);
     
-        timesheet.appendChild(row);})
-
-        renderGraph();
+        timesheet.appendChild(row);
+    })
 };
 
 function generateStatistics(titleString, totalTime, timeDiff) {
@@ -182,8 +181,6 @@ async function renderGraph() {
     })
 
     const [lineLabels, lineDataset] = await getLineChartData();
-    console.log(lineLabels);
-    console.log(lineDataset);
 
     var ctx_line = document.getElementById("lineChart");
     var lineChart = new Chart(ctx_line, {
@@ -227,16 +224,16 @@ async function renderGraph() {
                             }
                         });
 
-    const labels = ['Red', 'Orange', 'Yellow', 'Green', 'Blue'];
+    const [polarLabels, polarDataset] = await getPolarChartData();
     var ctx_polar = document.getElementById('polarChart');
     var polarChart = new Chart(ctx_polar, {
         type: 'polarArea',
         data: {
-            labels: labels,
+            labels: polarLabels,
             datasets: [
             {
                 label: 'Dataset 1',
-                data: [1,2,3,4,5],
+                data: polarDataset,
                 backgroundColor: [
                     '#EAD367',
                     '#D3705A',
