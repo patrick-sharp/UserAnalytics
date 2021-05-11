@@ -3,7 +3,6 @@
  * with functions to access it as well
  */
 var data = {};
-var categories = getCategories();
 var currentDate = new Date();
 
 async function getDate(date) {
