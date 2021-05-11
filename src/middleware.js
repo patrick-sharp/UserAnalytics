@@ -150,20 +150,6 @@ async function getDomainsForDay(date) {
 /*
  * Get category:[domains] from storage
  */
-async function getCategories() {
-  var p = new Promise(function(resolve, reject){
-    chrome.storage.sync.get(["category"], function(data) {
-      if (data["category"]) {
-        data = {};
-      } else {
-        data = data["category"];
-      }
-      resolve(data);
-    });
-  })
-  return await p;
-}
-
 async function getCategoryList() {
   var p = new Promise(function(resolve, reject) {
     return chrome.storage.sync.get(["category"], function (data) {
@@ -275,8 +261,9 @@ if (typeof exports !== 'undefined') {
   exports.cleanUsage = cleanUsage;
   exports.clearChromeStorage = clearChromeStorage;
   exports.getDomainsForDay = getDomainsForDay;
-  exports.getTimeForDay = getTimeForDay;
-  exports.getTimeForWeek = getTimeForWeek;
+  exports.getCategoryList = getCategoryList;
+  exports.getCategoryKeys = getCategoryKeys;
+  exports.addLinkToCategory = addLinkToCategory;
   exports.addElement = addElement;
   exports.removeElement = removeElement;
   exports.removeDate = removeDate;
