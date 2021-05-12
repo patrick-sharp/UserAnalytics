@@ -111,7 +111,7 @@ function generateStatistics(titleString, totalTime, timeDiff) {
     title.innerHTML = titleString;
     title.style.fontSize = '24px';
     title.style.color = '#000000'
-    icon.src = titleString === 'Most Frequent' ? 'images/reddit.png' : 'images/timer.png'
+    icon.src = 'images/timer.png'
 
     
     time.innerHTML = formatTimeToHour(totalTime).replace(/\d+/g, function(v){
