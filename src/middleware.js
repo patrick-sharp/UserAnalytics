@@ -29,7 +29,7 @@ let defaultLastDomainObj = {    // default object if lastDomain key does not exi
       ...
     }
 
-    */
+*/
 
 /******************************************************************************
  * Middleware Functions
@@ -40,12 +40,14 @@ let defaultLastDomainObj = {    // default object if lastDomain key does not exi
  */
 function setLastDomain(domain) {
   chrome.storage.sync.get(['lastDomain'], function(data) {
+    data = data.lastDomain;
+
     let lastDomainObj = { 
       lastDomain: {
         domain: domain,
         openedTime: Date.now(),
-        lastInactiveTime: data['lastInactiveTime'],
-        totalInactiveTime: data['totalInactiveTime'] ? data['totalInactiveTime'] : 0
+        lastInactiveTime: 0,
+        totalInactiveTime: 0
       }
     };
     chrome.storage.sync.set(lastDomainObj, function() {
@@ -108,11 +110,11 @@ function handleUrlChange(webURL) {
  */
 function cleanUsage() {
   chrome.storage.sync.set(defaultLastDomainObj, function() {});
-    if (debugMode) {
-      chrome.storage.sync.get(['lastDomain'], function(data) {
-        console.log('LastDomain key reset');
-        console.log(data);
-      });
+  if (debugMode) {
+    chrome.storage.sync.get(['lastDomain'], function(data) {
+      console.log('LastDomain key reset');
+      console.log(data);
+    });
   }
 }
 
@@ -175,6 +177,59 @@ function addLinkToCategory(category, link) {
       }
     }
   })
+}
+
+// call when the user is not in chrome (chrome is not in focus)
+function chromeInactive() {
+  // set lastInactiveTime to now  
+  chrome.storage.sync.get(['lastDomain'], function(data) {
+    data = data.lastDomain;
+    // check if lastInactiveTime was already set
+    if (data['lastInactiveTime'] > 0) {
+      return;
+    }
+    let lastDomainObj = { 
+      lastDomain: {
+        domain: data['domain'],
+        openedTime: data['openedTime'],
+        lastInactiveTime: Date.now(),
+        totalInactiveTime: data['totalInactiveTime'] ? data['totalInactiveTime'] : 0
+      }
+    };
+    chrome.storage.sync.set(lastDomainObj, function() {
+      if (debugMode) {
+        console.log('chrome inactive, lastActiveTime set');
+      }
+    });
+  });
+}
+
+// call when the user is in chrome
+function chromeActive() {
+  // update totalInactiveTime
+  chrome.storage.sync.get(['lastDomain'], function(data) {
+    data = data.lastDomain;
+    if (!data['lastInactiveTime'] || data['lastInactiveTime'] === 0) {
+      if (debugMode) {
+        console.log('chrome active: nothing to update');
+      }
+      return;
+    }
+    let inactiveTime = Date.now() - data['lastInactiveTime'];
+    let lastDomainObj = { 
+      lastDomain: {
+        domain: data['domain'],
+        openedTime: data['openedTime'],
+        lastInactiveTime: 0,
+        totalInactiveTime: data['totalInactiveTime'] ? data['totalInactiveTime'] + inactiveTime : inactiveTime
+      }
+    };
+    chrome.storage.sync.set(lastDomainObj, function() {
+      if (debugMode) {
+        console.log('chrome active, totalInactiveTime updated');
+      }
+    });
+  });
 }
 
 /******************************************************************************
@@ -269,6 +324,8 @@ if (typeof exports !== 'undefined') {
   exports.removeDate = removeDate;
   exports.getMap = getMap;
   exports.handleUrlChange = handleUrlChange;
+  exports.chromeActive = chromeActive;
+  exports.chromeInactive = chromeInactive;
 }
 
 // create a mock of the chrome API that works similarly to the real one so we can test it.
@@ -296,9 +353,9 @@ if (typeof chrome === 'undefined') {
             const key = arg[0];
             const result = TESTING_localStorage[key] === undefined ? {} : TESTING_localStorage[key];
             callback(result);
-          // TODO: implement object arg for this function
-          // } else if (typeof arg === 'object') {
-          //   const key = Object.keys
+            // TODO: implement object arg for this function
+            // } else if (typeof arg === 'object') {
+            //   const key = Object.keys
           } else {
             throw 'Error: arg is not array or object';
           }
