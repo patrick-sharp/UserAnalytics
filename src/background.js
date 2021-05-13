@@ -93,3 +93,15 @@ chrome.tabs.onUpdated.addListener((tabId, change, tab) => {
 });
 
 
+// check if chrome is in focus every second
+setInterval(checkBrowserFocus, 1000);  
+
+function checkBrowserFocus(){
+  chrome.windows.getCurrent(function(browser){
+    if (browser.focused) {
+      chromeActive(); 
+    } else {
+      chromeInactive(); 
+    }
+  })
+}
