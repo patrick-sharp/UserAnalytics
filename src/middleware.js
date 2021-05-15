@@ -2,6 +2,7 @@
  * global variables
  ******************************************************************************/
 const debugMode = true;         // print message to console (service worker)  
+var doTrack = true;             // TODO: chrome storage? or default yes when user starts chrome?
 let defaultLastDomainObj = {    // default object if lastDomain key does not exist
   lastDomain: {
     domain: null,
@@ -114,7 +115,7 @@ function domainChanged(domain) {
  * @input: weburl is a string that represents the full url of a webside
  */
 function handleUrlChange(webURL) {
-  if (webURL == "") {   // new Tab
+  if (webURL == "" || (!doTrack)) {   // new Tab or do not track
     return;
   }
   const url = new URL(webURL);
@@ -221,6 +222,11 @@ function updateWhitelist(domains){
       console.log(whitelistObj);
     }
   });
+}
+
+// update doTrack variable (option: boolean)
+function enableTracking(option) {
+  doTrack = option;
 }
 
 // call when the user is not in chrome (chrome is not in focus)
@@ -372,6 +378,7 @@ if (typeof exports !== 'undefined') {
   exports.chromeInactive = chromeInactive;
   exports.getWhitelist = getWhitelist;
   exports.updateWhitelist = updateWhitelist;
+  exports.enableTracking = enableTracking;
 }
 
 // create a mock of the chrome API that works similarly to the real one so we can test it.
