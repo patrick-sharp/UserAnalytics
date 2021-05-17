@@ -87,6 +87,10 @@ window.onload = async function() {
     
         timesheet.appendChild(row);
     })
+
+    var whitelist = await getWhitelist();
+    document.getElementById("whitelist_editor").innerHTML = whitelist;
+    console.log(JSON.stringify(whitelist));
 };
 
 function generateStatistics(titleString, totalTime, timeDiff) {

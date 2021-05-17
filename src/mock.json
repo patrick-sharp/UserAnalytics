@@ -74,5 +74,9 @@
     },
     "5/5/2021": {
         "www.google.com": 8800
-    }
+    },
+    "whitelist": [
+        "www.espn.com",
+        "www.amazon.com"
+    ]
 }

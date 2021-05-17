@@ -97,6 +97,16 @@ input {
     margin-right: 150px;
 }
 
+textarea {
+    font-family: 'Poppins', sans-serif;
+    resize: none;
+    height: 50px;
+    width: 300px;
+    border-radius: 6px;
+    background-color: #F9F9F9;
+    border: 2px solid #5AC43B;
+}
+
 #setting {
     width: 48px;
     height: 48px;
@@ -137,6 +147,13 @@ input {
     font-size: 36px;
     margin-left: 50px;
     color: #ccc;
+}
+
+#whitelist_button {
+    width: 50px;
+    text-align: center;
+    color: white;
+    background-color:#00754a;
 }
 
 #date_selector {
