@@ -81,7 +81,21 @@ window.onload = async function() {
     
         timesheet.appendChild(row);
     })
+
+    var whitelist = await getWhitelist();
+    document.getElementById("whitelist_editor").innerHTML = whitelist.join(", ");
+    document.getElementById("whitelist_button").onclick = saveWhitelist;
 };
+
+function saveWhitelist() {
+    var whitelist = document.getElementById("whitelist_editor").value.split(',');
+    for (var i = 0; i < whitelist.length; i++) {
+        whitelist[i] = whitelist[i].trim();
+    }
+    updateWhitelist(whitelist);
+    document.getElementById("whitelist_success_text").innerHTML = "Saved!";
+    setTimeout(() => { document.getElementById("whitelist_success_text").innerHTML = ""; }, 2000)
+}
 
 function generateStatistics(titleString, totalTime, timeDiff) {
     // UI

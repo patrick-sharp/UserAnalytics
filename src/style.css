@@ -97,6 +97,16 @@ input {
     margin-right: 150px;
 }
 
+textarea {
+    font-family: 'Poppins', sans-serif;
+    resize: none;
+    height: 50px;
+    width: 300px;
+    border-radius: 6px;
+    background-color: #F9F9F9;
+    border: 2px solid #5AC43B;
+}
+
 #setting {
     width: 48px;
     height: 48px;
@@ -137,6 +147,29 @@ input {
     font-size: 36px;
     margin-left: 50px;
     color: #ccc;
+}
+
+#whitelist_button {
+    width: 50px;
+    text-align: center;
+    color: white;
+    background-color:#00754a;
+}
+
+#whitelist_button:hover {
+    color: white;
+    background-color:#5AC43B;
+}
+
+#whitelist_button:active {
+    color: black;
+    background-color:gray;
+}
+
+#whitelist_success_text {
+    color:#00754a;
+    text-align: center;
+    font-size: 15px;
 }
 
 #date_selector {
