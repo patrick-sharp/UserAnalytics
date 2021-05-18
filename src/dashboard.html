@@ -25,10 +25,6 @@
                         <input type="checkbox">
                     </label>
                 </div>
-                <!-- <div id="block_list" class="setting_list">Block List</div>
-                <textarea id="block_list_input" hidden></textarea>
-                <div id="export_list_button" class="setting_list">Export Block List</div>
-                <div id="clear_list_button" class="setting_list">Clear Block List</div> -->
             </div>
             <footer class="footer">
                 <p>Created with Love & Care</p>
@@ -50,16 +46,14 @@
                 </div>
             </div>
             <div id="stats_view">
-                <div id='data_chart'>
+                <div id='data_chart_left' class="canvas">
                     <div id="activity_container">
                         <div id="activity_title">Activity</div>
-                        <span id="spacer"></span>
                         <select name="range" id="date_range"></select>
                     </div>
                     <canvas id="lineChart" class="chart"></canvas>
                 </div>
-                <span id="spacer"></span>
-                <div id="data_chart">
+                <div id="data_chart_right" class="canvas">
                     <canvas id="polarChart" class="chart"></canvas>
                 </div>
             </div>
