@@ -301,7 +301,7 @@ input {
 
 #timesheet {
     display: grid;
-    place-items: start;
+    place-items: stretch;
 }
 
 #timesheet .timesheet_row {
@@ -314,7 +314,7 @@ input {
     background-color: var(--container-background-color);
     border-radius: 18px;
     height: 70px;
-    width: clamp(600px, 90%, 100%);
+    width: clamp(600px, 100%, 100%);
 }
 
 #timesheet img {
