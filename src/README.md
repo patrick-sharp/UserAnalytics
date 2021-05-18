@@ -1,14 +1,17 @@
 # User Analytics Developer guide
 
 ## How to obtain the source code:
-Clone or Fork this repository.
+Clone this repository to your local machine to access the source code. You may also fork this repository for your own copy.
 
 ## Repository Layout
-### Reports
-This folder is for weekly status reports. It contains a markdown template file for future status reports.
-
 ### src
-This folder contains our Chrome extension, upload this folder to Google Chrome to install UserAnalytics.
+This folder contains the main Chrome extension and developer documentation. Any functioal changes should be here. Upload this folder to Google Chrome to install UserAnalytics.
+
+### test
+This folder cotains all the unit tests for both frontend and backend featurese of UserAnalytics.
+
+### Reports
+This folder is for weekly CSE 403 status reports. It contains a markdown template file for future status reports.
 
 ## Build & Test System
 - The system will be automatically built when Chrome loads the folder. 
@@ -18,7 +21,7 @@ This folder contains our Chrome extension, upload this folder to Google Chrome t
 ## How to add new tests
 
 ## How to build a release of the software.
-
+Again the system automatically builds when Chrome loads the extension. In the future the may be releases on the Chrome Extension store.
 
 ## More resources:
 1. Overview: https://developer.chrome.com/docs/extensions/mv3/overview/
