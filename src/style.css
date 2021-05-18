@@ -166,6 +166,12 @@ textarea {
     background-color:gray;
 }
 
+#whitelist_success_text {
+    color:#00754a;
+    text-align: center;
+    font-size: 15px;
+}
+
 #date_selector {
     display: flex;
     flex-direction: column;

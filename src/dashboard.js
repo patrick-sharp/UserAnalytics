@@ -99,6 +99,8 @@ function saveWhitelist() {
         whitelist[i] = whitelist[i].trim();
     }
     updateWhitelist(whitelist);
+    document.getElementById("whitelist_success_text").innerHTML = "Saved!";
+    setTimeout(() => { document.getElementById("whitelist_success_text").innerHTML = ""; }, 2000)
 }
 
 function generateStatistics(titleString, totalTime, timeDiff) {
