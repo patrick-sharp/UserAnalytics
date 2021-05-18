@@ -89,9 +89,17 @@ window.onload = async function() {
     })
 
     var whitelist = await getWhitelist();
-    document.getElementById("whitelist_editor").innerHTML = whitelist;
-    console.log(JSON.stringify(whitelist));
+    document.getElementById("whitelist_editor").innerHTML = whitelist.join(", ");
+    document.getElementById("whitelist_button").onclick = saveWhitelist;
 };
+
+function saveWhitelist() {
+    var whitelist = document.getElementById("whitelist_editor").value.split(',');
+    for (var i = 0; i < whitelist.length; i++) {
+        whitelist[i] = whitelist[i].trim();
+    }
+    updateWhitelist(whitelist);
+}
 
 function generateStatistics(titleString, totalTime, timeDiff) {
     console.log(titleString, totalTime, timeDiff)

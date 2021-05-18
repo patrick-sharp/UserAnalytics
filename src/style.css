@@ -156,6 +156,16 @@ textarea {
     background-color:#00754a;
 }
 
+#whitelist_button:hover {
+    color: white;
+    background-color:#5AC43B;
+}
+
+#whitelist_button:active {
+    color: black;
+    background-color:gray;
+}
+
 #date_selector {
     display: flex;
     flex-direction: column;
