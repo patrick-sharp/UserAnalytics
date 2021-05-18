@@ -40,10 +40,6 @@ window.onload = async function() {
     document.getElementById("setting").addEventListener("click", openSettingPanel);
     document.getElementById("setting_close_button").addEventListener("click", closeSettingPanel);
 
-    // getDomainsForWeek().then(a => console.log("a is " + a));
-    // console.log("a is " + a);
-
-
     dates.forEach(date => {
         var button = document.createElement("button");
         button.id = date;
@@ -63,8 +59,6 @@ window.onload = async function() {
 
     var timesheet_data = await getTimesheetData();
     timesheet_data.forEach(function(value, _index, _arr){
-        // console.log(value);
-        // var row = document.createElement('div');
         var row = document.createElement('div');
         row.className = 'timesheet_row';
         var img = document.createElement('img');
@@ -90,7 +84,6 @@ window.onload = async function() {
 };
 
 function generateStatistics(titleString, totalTime, timeDiff) {
-    console.log(titleString, totalTime, timeDiff)
     // UI
     let container = document.createElement('div');
     container.id = 'stats_container';
@@ -138,7 +131,6 @@ function generateStatistics(titleString, totalTime, timeDiff) {
 }
 
 function updateButtonStyle(event) {
-    // console.log(event.target.id);
     var button = document.getElementById(event.target.id)
     button.style.borderRadius = '10px';
     button.style.color = '#5AC43B'
@@ -280,7 +272,6 @@ async function retrieveWeeklyData() {
         prevWeek.push(dateString(getPreviousDays(i)));
     }
     
-    // console.log(prevWeek);
     weeklyTotalTimeData = await getWeeklyTotalTime(prevWeek);
     weeklyMostFrequentTimeData = await getWeeklyMostFrequentTime(prevWeek);
 
@@ -324,7 +315,6 @@ function formatDate(month, day, year) {
 
 
 function formatTimeToHour(second) {
-    console.log(second)
     let hour = Math.trunc(second / 3600);
     let minute = Math.abs(Math.ceil((second % 3600) / 60));
     return hour + 'H' + minute + 'MIN';

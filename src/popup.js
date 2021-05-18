@@ -1,10 +1,5 @@
 window.onload = function() {
 
-  // test loading category data async
-  // let b = chrome.storage.sync.get(["category"], function(data) {
-  //   console.log("data " + JSON.stringify(data));
-  // })
-
   getCategoryKeys().then(data => {
     var selector = document.getElementById("category_selector");
     data.forEach(category => {
@@ -21,7 +16,6 @@ window.onload = function() {
     let index = selector.selectedIndex;
     let item = selector.options[index].value;
     let url = document.getElementById("url_editor").innerHTML;
-    console.log("saved");
     addLinkToCategory(item,url);
   })
 }

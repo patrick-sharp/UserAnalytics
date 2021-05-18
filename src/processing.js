@@ -116,7 +116,7 @@ async function getMostFrequentTime() {
 async function getWeeklyTotalTime(prevWeek) {
   var total = 0;
 
-  console.log(prevWeek);
+  // console.log(prevWeek);
   for await (const date of prevWeek) {
     console.log("date is " + date);
     let data = await getDate(date);
