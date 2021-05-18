@@ -1,3 +1,8 @@
+try {
+  importScripts('./psl.min.js');
+} catch (e) {
+  console.error(e);
+}
 /******************************************************************************
  * global variables
  ******************************************************************************/
@@ -119,7 +124,8 @@ function handleUrlChange(webURL) {
     return;
   }
   const url = new URL(webURL);
-  domainChanged(url.hostname);
+  let domain = psl.get(url.hostname);
+  domainChanged(domain);
 }
 
 
