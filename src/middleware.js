@@ -2,6 +2,7 @@
  * global variables
  ******************************************************************************/
 const debugMode = true;         // print message to console (service worker)  
+var doTrack = true;             // TODO: chrome storage? or default yes when user starts chrome?
 let defaultLastDomainObj = {    // default object if lastDomain key does not exist
   lastDomain: {
     domain: null,
@@ -27,6 +28,11 @@ let defaultLastDomainObj = {    // default object if lastDomain key does not exi
       google.com: 125
       stackoverflow.com: 199
       ...
+    }
+
+    key: whitelist
+    value: {
+      [google.com, youtube.com, ...]
     }
 
 */
@@ -80,11 +86,26 @@ function domainChanged(domain) {
     const timeSpentOnDomain = ((Date.now() - data['openedTime'] - data['totalInactiveTime']) / 1000);
     const dateString = new Date(Date.now()).toLocaleDateString();
 
-    // set default value to an empty object
+    // add data to the map
     addElement(dateString, lastDomain, timeSpentOnDomain);
 
-    // update the last domain
-    setLastDomain(domain);
+    // check if the current domain is in the whitelist
+    chrome.storage.sync.get(["whitelist"], function (data) {
+      var list = data['whitelist'];
+      if (list === undefined) {
+        list = []
+      }
+      if (list.includes(domain)) {
+        if (debugMode) {
+          console.log("White list url found: " + domain);
+        }
+        // reset LastDomain object
+        cleanUsage();
+      } else {
+        // update the last domain
+        setLastDomain(domain);
+      }
+    })
   });
 }
 
@@ -94,7 +115,7 @@ function domainChanged(domain) {
  * @input: weburl is a string that represents the full url of a webside
  */
 function handleUrlChange(webURL) {
-  if (webURL == "") {   // new Tab
+  if (webURL == "" || (!doTrack)) {   // new Tab or do not track
     return;
   }
   const url = new URL(webURL);
@@ -135,7 +156,6 @@ function clearChromeStorage() {
  */
 async function getDomainsForDay(date) {
   // make the chrome storage call synchronous
-  console.log(date);
   var p = new Promise(function(resolve, reject){
     chrome.storage.sync.get([date], function(data) {
       if (data[date] === undefined) {
@@ -168,7 +188,6 @@ async function getCategoryKeys() {
 function addLinkToCategory(category, link) {
   chrome.storage.sync.get(["category"], function(data) {
     var list = data['category'][category]
-    console.log(list);
     if (list.indexOf(link) === -1) {
       list.push(link);
       chrome.storage.sync.set(data);
@@ -177,6 +196,37 @@ function addLinkToCategory(category, link) {
       }
     }
   })
+}
+
+// return a copy of the whiteList
+async function getWhitelist() {
+  var p = new Promise(function(resolve, reject) {
+    chrome.storage.sync.get(["whitelist"], function (data) {
+      var list = data['whitelist']
+      if (list === undefined) {
+        list = []
+      }
+      resolve(list);
+    })
+  });
+  return await p; 
+}
+
+// update the whiteList (domains: list)
+function updateWhitelist(domains){
+  whitelistObj = {}
+  whitelistObj["whitelist"] = domains
+  chrome.storage.sync.set(whitelistObj, function() {
+    if (debugMode) {
+      console.log('Update white list: ' + domains);
+      console.log(whitelistObj);
+    }
+  });
+}
+
+// update doTrack variable (option: boolean)
+function enableTracking(option) {
+  doTrack = option;
 }
 
 // call when the user is not in chrome (chrome is not in focus)
@@ -236,7 +286,7 @@ function chromeActive() {
  * Util functions (can be used for testing, use at your own risks)
  ******************************************************************************/
 /*
- * Add elements to map. If already exists, append time
+ * Add time data to map. If already exists, append time
  */
 function addElement(date, domain, seconds) {
   chrome.storage.sync.get([date], function(data) {
@@ -260,7 +310,7 @@ function addElement(date, domain, seconds) {
 }
 
 /*
- * Remove elements from the map
+ * Remove time data from the map
  */
 function removeElement(date, domain) {
   chrome.storage.sync.get([date], function(data) {
@@ -326,6 +376,9 @@ if (typeof exports !== 'undefined') {
   exports.handleUrlChange = handleUrlChange;
   exports.chromeActive = chromeActive;
   exports.chromeInactive = chromeInactive;
+  exports.getWhitelist = getWhitelist;
+  exports.updateWhitelist = updateWhitelist;
+  exports.enableTracking = enableTracking;
 }
 
 // create a mock of the chrome API that works similarly to the real one so we can test it.
