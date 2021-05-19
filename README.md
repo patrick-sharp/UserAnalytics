@@ -16,6 +16,9 @@ UserAnalytics is a chrome extension which tracks how much time a user spends on 
 
 
 ## How to report a bug
+
+To report a bug, make a new issue on our public GitHub repo ([Link](https://github.com/patrick-sharp/UserAnalytics)). Include the following pieces of information in the issue:
+
 <!-- THIS INFORMATION IS MANDATORY - YOUR ISSUE WILL BE CLOSED IF IT IS MISSING.
 Please format any code or console output with three ticks ``` above and below. -->
 
@@ -47,3 +50,4 @@ Please format any code or console output with three ticks ``` above and below. -
 - [ ] Differentiate subdomain from their parent domains.
 - [ ] Update extension popup UI.
 - [ ] Missing title for the right chart.
+
