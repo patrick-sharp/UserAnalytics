@@ -42,7 +42,7 @@ Please format any code or console output with three ticks ``` above and below. -
 
 
 ## WIP Functionalities and Known bugs
-- [ ] User unable to make deletions to their whitelist.
+- [x] User unable to make deletions to their whitelist.
 - [ ] The website/domain icons are not presented along with the domain name (currently it is a timer icon).
 - [ ] The activity chart doesn't support reviewing data up to 14 days ago.
 - [ ] The category chart needs unit when hovering. Categories should be displayed according to the order in descending order and the colors should match categories. 
