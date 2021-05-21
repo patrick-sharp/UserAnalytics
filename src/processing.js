@@ -204,7 +204,7 @@ async function getTimesheetData() {
 
   for (var domain in todayData) {
     var temp = {}
-    temp['icon'] = 'a';
+    // temp['icon'] = 'a';
     temp['title'] = domain;
     temp['time'] = todayData[domain];
     timesheetData.push(temp);

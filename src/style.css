@@ -225,7 +225,7 @@ textarea {
 
 #activity_container {
     display: grid;
-    grid-template-columns: 150px auto 150px;
+    grid-template-columns: 300px auto 150px;
     grid-template-areas: "activity_title . date_selector";
     align-items: center;
     align-content: center;
@@ -342,7 +342,7 @@ textarea {
     grid-template-columns: 80px auto 150px;
     grid-template-rows: auto;
     grid-template-areas: "image title time";
-    align-items: end;
+    align-items: center;
     margin-top: 20px;
     background-color: var(--container-background-color);
     border-radius: 18px;
