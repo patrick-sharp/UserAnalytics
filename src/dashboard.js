@@ -1,41 +1,19 @@
 const dates = ['Daily', 'Weekly'];
 
-// let timesheet_data = [
-//     {
-//         icon:'a',
-//         title:'b',
-//         time:'10H28MIN',
-//     },
-//     {
-//         icon:'a',
-//         title:'d',
-//         time:'0H1MIN',
-//     },
-//     {
-//         icon:'a',
-//         title:'f',
-//         time:'12H9MIN',
-//     }
-// ]
 
 let date_range_selection = ['Last 7 Days', 'Last 14 Days'];
 
 function openSettingPanel() {
     document.getElementById("setting_panel").style.width = "50%";
-    // document.getElementById("main").style.marginLeft = "50%";
-    // document.body.style.backgroundColor = "rgba(0,0,0,0.25)";
 }
 
 function closeSettingPanel() {
     document.getElementById("setting_panel").style.width = "0";
-    // document.getElementById("main").style.marginLeft = "0";
     document.body.style.backgroundColor = '#F2F0EB'
 }
 
 
 window.onload = async function() {
-
-    // retrieveDailyData();
 
     document.getElementById("setting").addEventListener("click", openSettingPanel);
     document.getElementById("setting_close_button").addEventListener("click", closeSettingPanel);
@@ -45,7 +23,6 @@ window.onload = async function() {
         button.id = date;
         button.innerHTML = date;
     
-        // var a = document.body.appendChild(button);
         button.addEventListener('click', event => updateButtonStyle(event))
         let a = document.getElementById('selector');
         a.appendChild(button);
@@ -62,12 +39,12 @@ window.onload = async function() {
         var row = document.createElement('div');
         row.className = 'timesheet_row';
         var img = document.createElement('img');
-        img.src = 'images/timer.png'
+        img.style.width = '32px';
+        img.style.height = '32px'
+        img.src = 'https://www.google.com/s2/favicons?sz=64&domain_url=' + value.title;
         var title = document.createElement('span');
         title.id = 'title';
         title.innerHTML = value.title;
-        var spacer = document.createElement('span');
-        spacer.id = 'spacer';
         var time = document.createElement('span');
         time.id = 'time';
         time.innerHTML = formatTimeToHour(value.time).replace(/\d+/g, function(v){
@@ -76,7 +53,6 @@ window.onload = async function() {
     
         row.appendChild(img);
         row.appendChild(title);
-        row.appendChild(spacer);
         row.appendChild(time);
     
         timesheet.appendChild(row);
@@ -97,7 +73,7 @@ function saveWhitelist() {
     setTimeout(() => { document.getElementById("whitelist_success_text").innerHTML = ""; }, 2000)
 }
 
-function generateStatistics(titleString, totalTime, timeDiff) {
+function generateStatistics(titleString, totalTime, timeDiff, domain) {
     // UI
     let container = document.createElement('div');
     container.id = 'stats_container';
@@ -118,7 +94,9 @@ function generateStatistics(titleString, totalTime, timeDiff) {
     title.innerHTML = titleString;
     title.style.fontSize = '24px';
     title.style.color = '#000000'
-    icon.src = 'images/timer.png'
+    icon.src = domain === "" ? 'images/timer.svg' : 'https://www.google.com/s2/favicons?sz=64&domain_url=' + domain
+    icon.style.width = '32px';
+    icon.style.height = '32px';
 
     
     time.innerHTML = formatTimeToHour(totalTime).replace(/\d+/g, function(v){
@@ -263,20 +241,15 @@ async function renderGraph() {
 }
 
 async function retrieveDailyData() {
-    // let date = new Date();
-    // let today = formatDate((date.getMonth() + 1), date.getDate(), date.getFullYear());
-    // let yesterdayDate = getPreviousDays(1);
-    // let yesterday = formatDate(yesterdayDate.getMonth() + 1, yesterdayDate.getDate(), yesterdayDate.getFullYear());
-
     totalTimeData = await getTotalTime();
     var left_container = document.getElementById('left_container');
-    let left_content = generateStatistics("Total Time", totalTimeData[0], totalTimeData[1]);
+    let left_content = generateStatistics("Total Time", totalTimeData[0], totalTimeData[1], '');
     left_container.appendChild(left_content);
     
     // Add most frequent getMostFrequentTime() in procesing.js
     mostFrequentTimeData = await getMostFrequentTime();
     var right_container = document.getElementById('right_container');
-    let right_content = generateStatistics("Most Frequent", mostFrequentTimeData[1], mostFrequentTimeData[2]);
+    let right_content = generateStatistics("Most Frequent", mostFrequentTimeData[1], mostFrequentTimeData[2], mostFrequentTimeData[0]);
     right_container.appendChild(right_content);
 }
 
