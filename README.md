@@ -47,7 +47,10 @@ Please format any code or console output with three ticks ``` above and below. -
 - [ ] The activity chart doesn't support reviewing data up to 14 days ago.
 - [ ] The category chart needs unit when hovering. Categories should be displayed according to the order in descending order and the colors should match categories. 
 - [ ] Do not track extension URL and new tab.
-- [ ] Differentiate subdomain from their parent domains.
+- [X] Differentiate subdomain from their parent domains.
 - [ ] Update extension popup UI.
 - [ ] Missing title for the right chart.
+- [ ] Correct other category to "uncategorized" category, needs correction in data processing layer
+- [ ] Add ability to view and modify categories in setting
+- [ ] Change "Most frequent weekly" to expected behavior
 
