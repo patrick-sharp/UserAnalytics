@@ -33,22 +33,26 @@ button.current {
     background-color: var(--background-color);
     border-top-right-radius: 20px;
     border-bottom-right-radius: 20px;
-    overflow-x: hidden; /* Disable horizontal scroll */
+    overflow-x:scroll;
     padding-top: 60px; 
     transition: 0.5s;
     box-shadow: 8px 8px 40px rgba(0, 0, 0, 0.2);
 }
 
 .setting_list {
-    display: flex;
+    display: grid;
+    grid-template-columns: 200px auto;
+    grid-template-rows: auto;
+    grid-template-areas: "title .";
+    align-items: center;
     background-color: #F9F9F9;
     margin-top: 20px;
-    min-height: 54px;
-    align-items: center;
+    /* min-height: 54px; */
     padding-left: 20px;
     border-radius: 12px;
     font-size: 18px;
     font-weight: 400;
+    width: clamp(610px, 100%, 100%);
 }
 
 .footer {
@@ -85,10 +89,6 @@ input {
     width: 20px;
     height: 20px;
 }
-
-/* input[type=checkbox]:checked {
-    background-color: greenyellow;
-} */
 
 #main {
     background-color: #F2F0EB;
@@ -128,6 +128,7 @@ textarea {
 }
 
 #setting_title {
+    grid-area: title;
     font-weight: 600;
     font-size: 40px;
     margin-left: 40px;
@@ -135,7 +136,8 @@ textarea {
 }
 
 #setting_content {
-    display: flexbox;
+    /* display: flex; */
+    /* flex-direction: row; */
     margin-left: 50px;
     margin-right: 50px;
 }
@@ -147,6 +149,13 @@ textarea {
     font-size: 36px;
     margin-left: 50px;
     color: #ccc;
+}
+
+#setting_functionality {
+    display: flex;
+    justify-self: end;
+    align-self: center;
+    margin-right: 20px;
 }
 
 #whitelist_button {
