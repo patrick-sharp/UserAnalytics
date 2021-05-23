@@ -1,5 +1,6 @@
 window.onload = function() {
 
+  // retrieve category keys from Chrome storage
   getCategoryKeys().then(data => {
     var selector = document.getElementById("category_selector");
     data.forEach(category => {
@@ -11,6 +12,7 @@ window.onload = function() {
     })
   });
 
+  // add `click` event listener to DOM 
   document.getElementById("save").addEventListener('click', function() {
     let selector = document.getElementById('category_selector');
     let index = selector.selectedIndex;
@@ -20,17 +22,10 @@ window.onload = function() {
   })
 }
 
-  // var selector = document.getElementById("category_selector");
-  // Categories.forEach(category => {
-  //    var option = document.createElement("option");
-  //    option.text = category;
-  //    option.value = category;
-  //    option.style.width = 'fit';
-  //    selector.appendChild(option);
-  // })
 
-
-
+/**
+ * Add `DOMContentLoaded` listener
+ */
 document.addEventListener('DOMContentLoaded', function () {
   var links = document.getElementsByTagName("a");
   for (var i = 0; i < links.length; i++) {
@@ -47,6 +42,9 @@ document.addEventListener('DOMContentLoaded', function () {
 // check the current active url every 1 second
 window.setInterval(checkBrowserFocus, 1000);  
 
+/**
+ * Check the currently visited domain site and update the domain name in popup
+ */
 function checkBrowserFocus(){
   chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
     if (tabs[0]) {

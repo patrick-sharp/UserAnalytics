@@ -5,6 +5,12 @@
 var data = {};
 var currentDate = new Date();
 
+/**
+ * Get the time data from specific date
+ * 
+ * @param {string} date the date string the data will be retrieved from
+ * @returns a JSON object that contains the data from specified `date`
+ */
 async function getDate(date) {
   if (Object.keys(data).length === 0 || data[date] === undefined) {
     data[date] = await getDomainsForDay(date);
@@ -16,10 +22,21 @@ async function getDate(date) {
  * Date Conversion Functions
  ******************************************************************************/
 
+/**
+ * formate a date object to corresponding date string in MM/DD/YYYY format
+ * @param {Date} dateObj 
+ * @returns a string representation of the date object
+ */
 function dateString(dateObj) {
   return String(dateObj.getMonth() + 1) + "/" + dateObj.getDate() + "/" + dateObj.getFullYear();
 }
 
+/**
+ * Return a Date object `prev` number of days before today
+ * 
+ * @param {number} prev 
+ * @returns a Date object `prev` number of days before today
+ */
 function getPreviousDays(prev) {
   const today = new Date()
   const prevDay = new Date(today)
@@ -31,14 +48,11 @@ function getPreviousDays(prev) {
  * Data Processing Functions
  ******************************************************************************/
 
-/*
- * get time spent on the domain for a given day
- * @input:
- *    date is a formatted string in the form "month/day/year"(i.e. 4/30/2021).
- *    domain is a string that represents the url of a website(i.e. www.google.com)
- * @return:
- *    A promise that includes the time spent on the domain on the given date. (in seconds)
- *    0 if the domain is never visited on that date.
+/**
+ * Get time spent on the domain for a given day
+ * @param {string} date  formatted string in the form "MM/DD/YYYY"(i.e. 4/30/2021).
+ * @param {string} domain url of a website(i.e. www.google.com)
+ * @returns A promise that includes the time spent on the domain on the given date. (in seconds); 0 if the domain is never visited on that date.
  */
 async function getTimeForDay(date, domain) {
   const dataObj = await getDate(date);
@@ -47,16 +61,13 @@ async function getTimeForDay(date, domain) {
   }
   return dataObj[domain];
 }
-  
-  
-/*
- * get time spent on the domain for a given week
- * @input:
- *    dates is an array for date in the form of string "month/day/year"(i.e. ["4/30/2021", "5/1/2021"]).
- *    domain is a string that represents the url of a website(i.e. www.google.com)
- * @return:
- *    A promise that includes the time spent on the domain on the given dates. (in seconds)
- *    0 if the domain is never visited.
+
+/**
+ * Get time spent on the domain for a given week
+ * @param {Array} dates an array for date in the form of string "MM/DD/YYYY"(i.e. ["4/30/2021", "5/1/2021"]).
+ * @param {string} domain url of a website(i.e. www.google.com)
+ * @returns A promise that includes the time spent on the domain on the given dates. (in seconds)
+ *          0 if the domain is never visited.
  */
 async function getTimeForWeek(dates, domain) {
   var totalTime = 0;
@@ -66,11 +77,10 @@ async function getTimeForWeek(dates, domain) {
   return totalTime;
 }
 
-/*
+/**
  * Uses the current date to find total seconds spent on Chrome today as well as the difference from yesterday
- * @return:
- *    A size 2 array, first index the total second spent on Chrome today, 
- *    second index the difference in seconds, today - yesterday.
+ * @returns A size 2 array, first index the total second spent on Chrome today, 
+ *          second index the difference in seconds, today - yesterday.
  */
 async function getTotalTime() {
   const todayString = dateString(currentDate);
@@ -93,6 +103,14 @@ async function getTotalTime() {
   return [todayTime, todayTime - yesterdayTime];
 }
 
+/**
+ * Get the amount of time for the most frequently visited site
+ * 
+ * @see getTimeForDay
+ * @returns an array of size 3. arr[0]: the URL of the most frequently visited domain; 
+ *                              arr[1]: the amount of time spent on the domain; 
+ *                              arr[2]: the time different in second compared to yesterday
+ */
 async function getMostFrequentTime() {
   const todayString = dateString(currentDate);
 
@@ -113,12 +131,17 @@ async function getMostFrequentTime() {
   return [maxDomain, maxTime, maxTime - yesterdayTime];
 }
 
+/**
+ * get the weekly data for the past week
+ * 
+ * @param {Array} prevWeek an array of size 7 containing date strings of past 7 days
+ * @returns an array size of 2. arr[0]: the total amount of time spent on chrome for the past 7 days
+ *                              arr[1]: dummy data that represents the time difference
+ */
 async function getWeeklyTotalTime(prevWeek) {
   var total = 0;
 
-  // console.log(prevWeek);
   for await (const date of prevWeek) {
-    console.log("date is " + date);
     let data = await getDate(date);
     let sum = Object.values(data).reduce(function(accumulator, currentValue) {
       return accumulator + currentValue;
@@ -129,6 +152,14 @@ async function getWeeklyTotalTime(prevWeek) {
   return [total, 0];
 }
 
+/**
+ * Get the most frequently visited sites and the time for the past 7 days
+ * 
+ * @param {Array} prevWeek an array of size 7 containing date strings of past 7 days 
+ * @returns an array of size 3. arr[0]: the string URL of the most frequently visited site
+ *                              arr[1]: the total time spent on that site
+ *                              arr[2]: dummy data that represents the time difference
+ */
 async function getWeeklyMostFrequentTime(prevWeek) {
   var maxDomain = "";
   var maxTime = -1;
@@ -145,6 +176,15 @@ async function getWeeklyMostFrequentTime(prevWeek) {
   return [maxDomain, maxTime, 0];
 }
 
+/**
+ * Prepare data for the linear chart in the dashboard
+ * 
+ * @see dateString
+ * @see getPreviousDays
+ * @see getDate
+ * @returns an array of size 2; arr[0]: the date labels for the past 7 days
+ *                              arr[1]: the dataset for the past 7 days 
+ */
 async function getLineChartData() {
   var labels = [];
   var dataset = [];
@@ -179,6 +219,16 @@ async function getLineChartData() {
   return [labels, dataset]
 }
 
+/**
+ * Prepare category data for the polar chart in the dashboard
+ * 
+ * @see getCategoryKeys
+ * @see getCategoryList
+ * @see dateString
+ * @see getTimeForDay
+ * @returns an array of size 2. arr[0]: the category labels
+ *                              arr[1]: the dataset for every category
+ */
 async function getPolarChartData() {
   var labels = await getCategoryKeys();
   var dataset = [];
@@ -198,13 +248,20 @@ async function getPolarChartData() {
   return [labels, dataset]
 }
 
+/**
+ * Prepare data for each domain visited for the past day
+ * 
+ * @see dateString
+ * @see getDate
+ * 
+ * @returns an array object containing each domain and its corresponding time spent. Example format: {domain: time}
+ */
 async function getTimesheetData() {
   var timesheetData = [];
   const todayData = await getDate(dateString(currentDate))
 
   for (var domain in todayData) {
     var temp = {}
-    temp['icon'] = 'a';
     temp['title'] = domain;
     temp['time'] = todayData[domain];
     timesheetData.push(temp);

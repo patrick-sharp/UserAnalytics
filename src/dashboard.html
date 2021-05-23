@@ -19,30 +19,25 @@
             <div id="setting_title">Settings</div>
             <div id="setting_content">
                 <div class="setting_list">
-                    <h5 id="tracking" style="width: fit-content;">Turn off Tracking</h5>
-                    <span id="spacer" style="margin-left: 10%; width: 50%;"></span>
-                    <label class="switch">
-                        <input type="checkbox">
-                    </label>
+                    <h5 id="tracking">Turn off Tracking</h5>
+                    <div id="setting_functionality">
+                        <label class="switch">
+                            <input type="checkbox">
+                        </label>
+                    </div>
                 </div>
-                <!-- <div id="whitelist">
-                    <textarea id="url_editor"></textarea>
-                </div> -->
                 <div class="setting_list">
-                    <h5 id="whitelist" style="width: fit-content;">Do-Not-Track List</h5>
-                    <span id="spacer" style="width: 10%;"></span>
-                    <textarea id="whitelist_editor"></textarea>
-                    <button id="whitelist_button">Save</button>
-                    <p id="whitelist_success_text"></p>
+                    <h5 id="whitelist">Do-Not-Track List</h5>
+                    <div id="setting_functionality">
+                        <textarea id="whitelist_editor"></textarea>
+                        <button id="whitelist_button">Save</button>
+                        <p id="whitelist_success_text"></p>
+                    </div>
                 </div>
                 
                 <!-- <div id="export_list_button" class="setting_list">Export Block List</div>
                 <div id="clear_list_button" class="setting_list">Clear Block List</div> -->
             </div>
-            <footer class="footer">
-                <p>Created with Love & Care</p>
-                <p>User Analytics</p>
-            </footer>
         </div>
         <button id="setting">
             <img id="setting_icon" src="images/setting_icon.png">
@@ -67,6 +62,9 @@
                     <canvas id="lineChart" class="chart"></canvas>
                 </div>
                 <div id="data_chart_right" class="canvas">
+                    <div id="activity_container">
+                        <div id="activity_title">Categories</div>
+                    </div>
                     <canvas id="polarChart" class="chart"></canvas>
                 </div>
             </div>
