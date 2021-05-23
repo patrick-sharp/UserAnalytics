@@ -259,12 +259,16 @@ function updateWhitelist(domains){
 
 
 /**
- * Update doTrack variable (option: boolean)
- * @param {boolean} option the option of tracking
+ * Flip doTrack variable
  */
-function enableTracking(option) {
-  doTrack = option;
+function toggleTracking() {
+  doTrack = !doTrack;
 }
+
+function getTrackingStatus() {
+  return doTrack;
+}
+
 
 /**
  * Call when the user is not in chrome (chrome is not in focus)

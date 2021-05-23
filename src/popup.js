@@ -17,8 +17,14 @@ window.onload = function() {
     let selector = document.getElementById('category_selector');
     let index = selector.selectedIndex;
     let item = selector.options[index].value;
-    let url = document.getElementById("url_editor").innerHTML;
+    let url = document.getElementById("url").innerHTML;
     addLinkToCategory(item,url);
+  })
+
+  document.getElementById("trackingToggle").checked = getTrackingStatus();
+
+  document.getElementById("trackingToggle").addEventListener('change', function() {
+    toggleTracking();
   })
 }
 
@@ -49,8 +55,7 @@ function checkBrowserFocus(){
   chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
     if (tabs[0]) {
       const url = new URL(tabs[0].url)
-      document.getElementById("url").innerHTML = "Currently Visiting: " + url.hostname;
-      document.getElementById("url_editor").innerHTML = url.hostname;
+      document.getElementById("url").innerHTML = url.hostname;
     }
   });
 }
