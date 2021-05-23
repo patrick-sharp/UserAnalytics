@@ -3,10 +3,17 @@ const dates = ['Daily', 'Weekly'];
 
 let date_range_selection = ['Last 7 Days', 'Last 14 Days'];
 
+
+/**
+ * Open setting panel
+ */
 function openSettingPanel() {
     document.getElementById("setting_panel").style.width = "50%";
 }
 
+/**
+ * Close the setting panel
+ */
 function closeSettingPanel() {
     document.getElementById("setting_panel").style.width = "0";
     document.body.style.backgroundColor = '#F2F0EB'
@@ -63,6 +70,11 @@ window.onload = async function() {
     document.getElementById("whitelist_button").onclick = saveWhitelist;
 };
 
+/**
+ * Save the whitelist to Chrome storage, and update the visual indication
+ * 
+ * @see updateWhitelist
+ */
 function saveWhitelist() {
     var whitelist = document.getElementById("whitelist_editor").value.split(',');
     for (var i = 0; i < whitelist.length; i++) {
@@ -73,6 +85,15 @@ function saveWhitelist() {
     setTimeout(() => { document.getElementById("whitelist_success_text").innerHTML = ""; }, 2000)
 }
 
+/**
+ * Generate necessary statistics for top banner section
+ * 
+ * @param {string}  titleString indicate which section the statistics is used for
+ * @param {number}  totalTime   the total amount of time for `titleString`
+ * @param {number}  timeDiff    the time difference compared to last time
+ * @param {string}  domain      the most frequently used domain under `titleString`. empty string for `Daily`
+ * @returns a UI container that encapsulates title, icon, time and time difference
+ */
 function generateStatistics(titleString, totalTime, timeDiff, domain) {
     // UI
     let container = document.createElement('div');
@@ -122,6 +143,13 @@ function generateStatistics(titleString, totalTime, timeDiff, domain) {
     return container;
 }
 
+/**
+ * Update the `Daily, Weekly` button style and corresponding data when clicked
+ * 
+ * @param {object} event the click event from DOM
+ * @see retrieveDailyData
+ * @see retrieveWeeklyData
+ */
 function updateButtonStyle(event) {
     var button = document.getElementById(event.target.id)
     button.style.borderRadius = '10px';
@@ -152,14 +180,15 @@ function updateButtonStyle(event) {
 
 
 
-// Render the graph
+/**
+ * Render the Chrome usage graphs
+ */
 async function renderGraph() {
     range_selector = document.getElementById('date_range');
     date_range_selection.forEach(function(value) {
         var option = document.createElement('option');
         option.text = value;
         option.value = value;
-        // option.style.lineHeight = '27px';
         option.style.width = 'fit';
         range_selector.appendChild(option);
     })
@@ -240,19 +269,28 @@ async function renderGraph() {
 
 }
 
+/**
+ * Retrieve Daily usage data from Chrome storage
+ * 
+ * @see generateStatistics
+ */
 async function retrieveDailyData() {
     totalTimeData = await getTotalTime();
     var left_container = document.getElementById('left_container');
     let left_content = generateStatistics("Total Time", totalTimeData[0], totalTimeData[1], '');
     left_container.appendChild(left_content);
     
-    // Add most frequent getMostFrequentTime() in procesing.js
     mostFrequentTimeData = await getMostFrequentTime();
     var right_container = document.getElementById('right_container');
     let right_content = generateStatistics("Most Frequent", mostFrequentTimeData[1], mostFrequentTimeData[2], mostFrequentTimeData[0]);
     right_container.appendChild(right_content);
 }
 
+/**
+ * Retrieve Weekly usage data from Chrome storage and update data in the container through 
+ * 
+ * @see generateStatistics
+ */
 async function retrieveWeeklyData() {
     prevWeek = [];
     for (i = 0; i < 7; i++) {
@@ -273,68 +311,53 @@ async function retrieveWeeklyData() {
     right_container.appendChild(right_content);
 }
 
-// // @output: a array of total time, most frequently used time, and its domain
-// function processDailyData(data) {
-//     let sum = Object.values(data).reduce(function(accumulator, currentValue) {
-//         return accumulator + currentValue;
-//     }, 0);
 
-//     var max = -1;
-//     var domain = "";
-//     Object.entries(data).forEach(([key, value]) => {
-//         // console.log(key, value);
-//         if (value > max) {
-//             max = value;
-//             domain = key;
-//         }
-//     });
-
-//     return [sum, max, domain];
-// }
-
-// @input: month: the month to be formatted, 0-indexed
-// @input: day: the day of the month
-// @input: year: the full year representation
-// @output: formatted date string in "month/day/year"
+/**
+ * Format month, day and year into MM/DD/YYYY format
+ * @example 5/8/2021, 10/12/2020
+ * 
+ * @param {number} month the month to be formatted, 0-indexed
+ * @param {number} day   the day of the month
+ * @param {number} year  the full year representation
+ * @returns a formatted time string
+ */
 function formatDate(month, day, year) {
     return month + "/" + day + "/" + year;
 }
 
-
+/**
+ * Format a number in second to corresponding hour string 
+ * 
+ * @param {number} second 
+ * @returns a corresponding hour string
+ */
 function formatTimeToHour(second) {
     let hour = Math.trunc(second / 3600);
     let minute = Math.abs(Math.ceil((second % 3600) / 60));
     return hour + 'H' + minute + 'MIN';
 }
 
+/**
+ * Format a number in second to corresponding minutes
+ * 
+ * @param {number} second 
+ * @returns a formatted minute string
+ */
 function formatTimeToMinute(second) {
     var formattedString = second < 0 ? "" : "+";
     let minute = Math.floor(second / 60);
     return formattedString + minute + "min";
 }
 
+/**
+ * Return a Date object `prev` number of days before today
+ * 
+ * @param {number} prev 
+ * @returns a Date object `prev` number of days before today
+ */
 function getPreviousDays(prev) {
     const today = new Date()
     const yesterday = new Date(today)
     
     return new Date(yesterday.setDate(today.getDate() - prev));
 }
-
-// function weeklyTotalTime(prevWeek) {
-//     getDomainsForWeek(prevWeek)
-//     .then(data => {
-//         var left_container = document.getElementById('left_container');
-//         var left_content = generateStatistics("Total Time", data, 0);
-//         left_container.appendChild(left_content);
-//     });
-// }
-
-// function weeklyMostFrequent(prevWeek) {
-//     getMostFrequentForWeek(prevWeek).then(data => {
-//         // console.log(JSON.stringify(data));
-//         let mostFrequent = data === undefined ? 0 : Object.entries(data).reduce((a, b) => b[1] > a[1] ? b : a);
-//         var right_container = document.getElementById('right_container');
-//         let right_content = generateStatistics("Most Frequent", mostFrequent[1], 0);
-//         right_container.appendChild(right_content);
-//     });
-// }

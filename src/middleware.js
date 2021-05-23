@@ -46,9 +46,11 @@ let defaultLastDomainObj = {    // default object if lastDomain key does not exi
 /******************************************************************************
  * Middleware Functions
  ******************************************************************************/
-/*
- * sets the last domain key to the domain and current timestamp
- * @input: domain is a string that represents the host name in url
+
+/**
+ * Sets the last domain key to the domain and current timestamp
+ * 
+ * @param {string} domain a string that represents the host name in url
  */
 function setLastDomain(domain) {
   chrome.storage.sync.get(['lastDomain'], function(data) {
@@ -71,9 +73,10 @@ function setLastDomain(domain) {
 }
 
 
-/* 
- * calculates the time and add to the domain spent
- * @input: domain is a string that represents the host name in url
+/**
+ * Calculates the time and add to the domain spent
+ * 
+ * @param {string} domain host name in url
  */ 
 function domainChanged(domain) {
   chrome.storage.sync.get({['lastDomain']: defaultLastDomainObj}, function(data) {
@@ -116,10 +119,11 @@ function domainChanged(domain) {
 }
 
 
-/* 
- * called by invoke functions in chrome when domain is changed
- * @input: weburl is a string that represents the full url of a webside
- */
+/**
+ * Called by invoke functions in chrome when domain is changed
+ * 
+ * @param {string} webURL the full url of a website
+ */ 
 function handleUrlChange(webURL) {
   if (webURL == "" || (!doTrack)) {   // new Tab or do not track
     return;
@@ -133,7 +137,8 @@ function handleUrlChange(webURL) {
 /******************************************************************************
  * Access Functions for frontend
  ******************************************************************************/
-/*
+
+/**
  * clean and reset last usage
  */
 function cleanUsage() {
@@ -146,7 +151,7 @@ function cleanUsage() {
   }
 }
 
-/*
+/**
  * clean out chrome storage entirely
  */
 function clearChromeStorage() {
@@ -156,10 +161,11 @@ function clearChromeStorage() {
 }
 
 
-/*
- * Get domain:time match for a given day
- * @input: date is a formatted string in the form "month/day/year"(i.e. 4/30/2021).
- * @return: a promise that includes an object(i.e. {google.com: 123}), the object might be empty
+/**
+ * Get `domain:time` match for a given day
+ * 
+ * @param date a formatted string in the form "MM/DD/YYYY"(i.e. 4/30/2021).
+ * @returns a promise that includes an object(i.e. {google.com: 123}), the object might be empty
  */
 async function getDomainsForDay(date) {
   // make the chrome storage call synchronous
@@ -176,8 +182,9 @@ async function getDomainsForDay(date) {
   return await p;
 }
 
-/*
+/**
  * Get category:[domains] from storage
+ * @returns a promise that includes an object(i.e. {"Entertainment": [domain1, domain2]}), the object might be empty
  */
 async function getCategoryList() {
   var p = new Promise(function(resolve, reject) {
@@ -188,10 +195,22 @@ async function getCategoryList() {
   return await p; 
 }
 
+/**
+ * Retrieve Category names from Chrome storage
+ * 
+ * @see getCategoryList
+ * @returns a list of keys that represents defined Categories
+ */
 async function getCategoryKeys() {
   return getCategoryList().then( data => {return Object.keys(data)} );
 }
 
+/**
+ * Add user-selected link to specific category to Chrome storage
+ * 
+ * @param {string} category user-selected category
+ * @param {string} link domain URL that will added to the `category`
+ */
 function addLinkToCategory(category, link) {
   chrome.storage.sync.get(["category"], function(data) {
     var list = data['category'][category]
@@ -205,7 +224,11 @@ function addLinkToCategory(category, link) {
   })
 }
 
-// return a copy of the whiteList
+/**
+ * Return a Promise of a copy of the whiteList from Chrome storage
+ * 
+ * @returns a copy of the whitelist 
+ */
 async function getWhitelist() {
   var p = new Promise(function(resolve, reject) {
     chrome.storage.sync.get(["whitelist"], function (data) {
@@ -219,7 +242,10 @@ async function getWhitelist() {
   return await p; 
 }
 
-// update the whiteList (domains: list)
+/**
+ * Update the whiteList (domains: list)
+ * @param {string} domains the domain URL to be added
+ */
 function updateWhitelist(domains){
   whitelistObj = {}
   whitelistObj["whitelist"] = domains
@@ -231,12 +257,18 @@ function updateWhitelist(domains){
   });
 }
 
-// update doTrack variable (option: boolean)
+
+/**
+ * Update doTrack variable (option: boolean)
+ * @param {boolean} option the option of tracking
+ */
 function enableTracking(option) {
   doTrack = option;
 }
 
-// call when the user is not in chrome (chrome is not in focus)
+/**
+ * Call when the user is not in chrome (chrome is not in focus)
+ */
 function chromeInactive() {
   // set lastInactiveTime to now  
   chrome.storage.sync.get(['lastDomain'], function(data) {
@@ -261,7 +293,9 @@ function chromeInactive() {
   });
 }
 
-// call when the user is in chrome
+/**
+ * Call when the user is in chrome
+ */
 function chromeActive() {
   // update totalInactiveTime
   chrome.storage.sync.get(['lastDomain'], function(data) {
@@ -292,8 +326,14 @@ function chromeActive() {
 /******************************************************************************
  * Util functions (can be used for testing, use at your own risks)
  ******************************************************************************/
-/*
+
+
+/**
  * Add time data to map. If already exists, append time
+ * 
+ * @param {string} date    the date to be added to
+ * @param {string} domain  the domain name to be added
+ * @param {string} seconds the amount of time, in second, to be added
  */
 function addElement(date, domain, seconds) {
   chrome.storage.sync.get([date], function(data) {
@@ -316,8 +356,11 @@ function addElement(date, domain, seconds) {
   });
 }
 
-/*
+/**
  * Remove time data from the map
+ * 
+ * @param {string} date   the date string that data will be removed from
+ * @param {string} domain the domain that will be removed
  */
 function removeElement(date, domain) {
   chrome.storage.sync.get([date], function(data) {
@@ -345,6 +388,12 @@ function removeElement(date, domain) {
 /*
  * Remove date from the map
  */
+
+/**
+ * Remove date from the map
+ *  
+ * @param {string} date the date string that will be removed
+ */
 function removeDate(date) {
   chrome.storage.sync.remove(date, function(data) {
     console.log('Deleted: ' + date);
@@ -353,7 +402,7 @@ function removeDate(date) {
 }
 
 
-/*
+/**
  * Get a copy of the map
  */
 async function getMap() {
