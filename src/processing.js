@@ -116,9 +116,7 @@ async function getMostFrequentTime() {
 async function getWeeklyTotalTime(prevWeek) {
   var total = 0;
 
-  // console.log(prevWeek);
   for await (const date of prevWeek) {
-    console.log("date is " + date);
     let data = await getDate(date);
     let sum = Object.values(data).reduce(function(accumulator, currentValue) {
       return accumulator + currentValue;
@@ -204,7 +202,6 @@ async function getTimesheetData() {
 
   for (var domain in todayData) {
     var temp = {}
-    // temp['icon'] = 'a';
     temp['title'] = domain;
     temp['time'] = todayData[domain];
     timesheetData.push(temp);
