@@ -190,6 +190,7 @@ function updateButtonStyle(event) {
 
 /**
  * Render the Chrome usage graphs
+ * Polar Chart will be updated if already populated
  * @param {string} status indicate daily or weekly data
  */
 async function renderGraph(status) {
@@ -197,7 +198,6 @@ async function renderGraph(status) {
     // plot linechart
     if (charts.length === 0) {
         const [lineLabels, lineDataset] = await getLineChartData();
-        console.log(lineLabels, lineDataset);
         var ctx_line = document.getElementById("lineChart");
         var lineChart = new Chart(ctx_line, {
                                 type: 'bar',
