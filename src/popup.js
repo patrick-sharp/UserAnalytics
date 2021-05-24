@@ -18,7 +18,7 @@ window.onload = async function() {
     let index = selector.selectedIndex;
     let item = selector.options[index].value;
     let url = document.getElementById("url").innerHTML;
-    alert(url);
+    alert("Added " + url + " to " + item + ".");
     addLinkToCategory(item,url);
   })
 
@@ -69,7 +69,7 @@ function checkBrowserFocus(){
   chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
     if (tabs[0]) {
       const url = new URL(tabs[0].url)
-      document.getElementById("url").innerHTML = url.hostname;
+      document.getElementById("url").innerHTML = psl.get(url.hostname);
     }
   });
 }

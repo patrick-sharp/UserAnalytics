@@ -490,7 +490,8 @@ if (typeof exports !== 'undefined') {
   exports.chromeInactive = chromeInactive;
   exports.getWhitelist = getWhitelist;
   exports.updateWhitelist = updateWhitelist;
-  exports.enableTracking = enableTracking;
+  exports.toggleTracking = toggleTracking;
+  exports.getTrackingStatus = getTrackingStatus;
 }
 
 // create a mock of the chrome API that works similarly to the real one so we can test it.
