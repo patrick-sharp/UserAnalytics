@@ -226,25 +226,38 @@ async function getLineChartData() {
  * @see getCategoryList
  * @see dateString
  * @see getTimeForDay
+ * @param {string} status indicate daily or weekly data
  * @returns an array of size 2. arr[0]: the category labels
  *                              arr[1]: the dataset for every category
  */
-async function getPolarChartData() {
+async function getPolarChartData(status) {
   var labels = await getCategoryKeys();
   var dataset = [];
   var categories = await getCategoryList();
-  const todayString = dateString(currentDate)
-
   for (var i = 0; i < labels.length; i++) {
     dataset.push(0);
-
-    const domains = categories[labels[i]]
-    for (var j = 0; j < domains.length; j++) {
-      dataset[i] += await getTimeForDay(todayString, domains[j]);
-    }
-
   }
 
+  if (status === "Daily") {
+    const todayString = dateString(currentDate)
+    for (var i = 0; i < labels.length; i++) { 
+      const domains = categories[labels[i]]
+      for (var j = 0; j < domains.length; j++) {
+        dataset[i] += await getTimeForDay(todayString, domains[j]);
+      }
+    }
+  } else { // status === "Weekly"
+    prevWeek = [];
+    for (i = 0; i < 7; i++) {
+        prevWeek.push(dateString(getPreviousDays(i)));
+    }
+    for (var i = 0; i < labels.length; i++) { 
+      const domains = categories[labels[i]]
+      for (var j = 0; j < domains.length; j++) {
+        dataset[i] += await getTimeForWeek(prevWeek, domains[j]);
+      }
+    }
+  }
   return [labels, dataset]
 }
 

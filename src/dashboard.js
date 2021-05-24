@@ -1,5 +1,5 @@
 const dates = ['Daily', 'Weekly'];
-
+var charts = [];                    // linechart, polarchart
 
 let date_range_selection = ['Last 7 Days', 'Last 14 Days'];
 
@@ -37,8 +37,8 @@ window.onload = async function() {
 
     document.getElementById("Daily").click()
 
-    renderGraph();
-    generateTimeSheet("Daily")
+    // renderGraph();
+    // generateTimeSheet("Daily")
 
     var whitelist = await getWhitelist();
     document.getElementById("whitelist_editor").innerHTML = whitelist.join(", ");
@@ -183,9 +183,11 @@ function updateButtonStyle(event) {
     if (event.target.id === "Daily") {
         retrieveDailyData();
         generateTimeSheet("Daily")
+        renderGraph("Daily")
     } else {
         retrieveWeeklyData();
         generateTimeSheet("Weekly")
+        renderGraph("Weekly")
     }
 }
 
@@ -194,8 +196,9 @@ function updateButtonStyle(event) {
 
 /**
  * Render the Chrome usage graphs
+ * @param {string} status indicate daily or weekly data
  */
-async function renderGraph() {
+async function renderGraph(status) {
     range_selector = document.getElementById('date_range');
     date_range_selection.forEach(function(value) {
         var option = document.createElement('option');
@@ -205,53 +208,62 @@ async function renderGraph() {
         range_selector.appendChild(option);
     })
 
-    const [lineLabels, lineDataset] = await getLineChartData();
-
-    var ctx_line = document.getElementById("lineChart");
-    var lineChart = new Chart(ctx_line, {
-                            type: 'bar',
-                            data: {
-                                labels: lineLabels,
-                                datasets: lineDataset
-                            },
-                            options: {
-                                plugins: {
-                                    legend: {
-                                        display: false
-                                    }
+    // plot linechart
+    if (charts.length === 0) {
+        const [lineLabels, lineDataset] = await getLineChartData();
+        var ctx_line = document.getElementById("lineChart");
+        var lineChart = new Chart(ctx_line, {
+                                type: 'bar',
+                                data: {
+                                    labels: lineLabels,
+                                    datasets: lineDataset
                                 },
-                                events: [],
-                                scales: {
-                                    y: {
-                                        beginAtZero: true,
-                                        max: 24,
-                                        grid: {
-                                            display: false,
-                                            drawBorder: true,
-                                            drawOnChartArea: true,
-                                            drawTicks: false,
-                                        },
-                                        ticks: {
-                                            callback: function(value, index, values) {
-                                                return value + "H"
-                                            }
+                                options: {
+                                    plugins: {
+                                        legend: {
+                                            display: false
                                         }
                                     },
-                                    x: {
-                                        grid: {
-                                            display: false,
-                                            drawBorder: true,
-                                            drawOnChartArea: true,
-                                            drawTicks: false,
+                                    events: [],
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            max: 24,
+                                            grid: {
+                                                display: false,
+                                                drawBorder: true,
+                                                drawOnChartArea: true,
+                                                drawTicks: false,
+                                            },
+                                            ticks: {
+                                                callback: function(value, index, values) {
+                                                    return value + "H"
+                                                }
+                                            }
+                                        },
+                                        x: {
+                                            grid: {
+                                                display: false,
+                                                drawBorder: true,
+                                                drawOnChartArea: true,
+                                                drawTicks: false,
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        });
-
-    const [polarLabels, polarDataset] = await getPolarChartData();
+                            });
+        charts.push(lineChart);
+    }
+    
+    // plot polarChart
+    var polarChart = null;
+    if (charts.length === 2) {
+        polarChart = charts.pop();
+        polarChart.destroy();
+    }
+    const [polarLabels, polarDataset] = await getPolarChartData(status);
     var ctx_polar = document.getElementById('polarChart');
-    var polarChart = new Chart(ctx_polar, {
+    polarChart = new Chart(ctx_polar, {
         type: 'polarArea',
         data: {
             labels: polarLabels,
@@ -278,7 +290,7 @@ async function renderGraph() {
             }
         }
     });
-
+    charts.push(polarChart);
 }
 
 /**
