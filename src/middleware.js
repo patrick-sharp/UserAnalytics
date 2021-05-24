@@ -315,6 +315,9 @@ async function getTrackingStatus() {
 function setDoTrack(track) {
   let doTrackObj = {}
   doTrackObj["doTrack"] = track;
+  if (track === false) {
+    cleanUsage();  // reset LastDomain object
+  }
   chrome.storage.sync.set(doTrackObj, function(){
     if (debugMode) {
       console.log("Setting: doTrack is set to " + track)
