@@ -38,10 +38,23 @@ window.onload = async function() {
     document.getElementById("Daily").click()
 
     renderGraph();
+    generateTimeSheet("Daily")
 
+    var whitelist = await getWhitelist();
+    document.getElementById("whitelist_editor").innerHTML = whitelist.join(", ");
+    document.getElementById("whitelist_button").onclick = saveWhitelist;
+};
+
+/**
+ * generate timeSheet
+ * @param {string} status indicate daily or weekly data
+ * @see getTimeSheetData()
+ */
+async function generateTimeSheet(status) {
     var timesheet = document.getElementById('timesheet');
+    timesheet.innerHTML = null;
 
-    var timesheet_data = await getTimesheetData();
+    var timesheet_data = await getTimesheetData(status);
     timesheet_data.forEach(function(value, _index, _arr){
         var row = document.createElement('div');
         row.className = 'timesheet_row';
@@ -64,11 +77,8 @@ window.onload = async function() {
     
         timesheet.appendChild(row);
     })
+}
 
-    var whitelist = await getWhitelist();
-    document.getElementById("whitelist_editor").innerHTML = whitelist.join(", ");
-    document.getElementById("whitelist_button").onclick = saveWhitelist;
-};
 
 /**
  * Save the whitelist to Chrome storage, and update the visual indication
@@ -172,8 +182,10 @@ function updateButtonStyle(event) {
 
     if (event.target.id === "Daily") {
         retrieveDailyData();
+        generateTimeSheet("Daily")
     } else {
         retrieveWeeklyData();
+        generateTimeSheet("Weekly")
     }
 }
 

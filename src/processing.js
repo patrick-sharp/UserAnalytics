@@ -254,22 +254,52 @@ async function getPolarChartData() {
  * @see dateString
  * @see getDate
  * 
+ * @param status indicate Daily or Weekly data
  * @returns an array object containing each domain and its corresponding time spent. Example format: {domain: time}
  */
-async function getTimesheetData() {
+async function getTimesheetData(status) {
   var timesheetData = [];
-  const todayData = await getDate(dateString(currentDate))
 
-  for (var domain in todayData) {
-    var temp = {}
-    temp['title'] = domain;
-    temp['time'] = todayData[domain];
-    timesheetData.push(temp);
+  if (status === "Daily") {
+    const todayData = await getDate(dateString(currentDate))
+    for (var domain in todayData) {
+      var temp = {}
+      temp['title'] = domain;
+      temp['time'] = todayData[domain];
+      timesheetData.push(temp);
+    }
+    timesheetData.sort(function (a, b) {
+      return b.time - a.time;
+    })
+  } else {  // status === "Weekly"
+    prevWeek = [];
+    for (i = 0; i < 7; i++) {
+        prevWeek.push(dateString(getPreviousDays(i)));
+    }
+    for await (const day of prevWeek) {
+      const todayData = await getDate(day)
+      for (var domain in todayData) {
+        var found = false
+        for (var i = 0; i < timesheetData.length; i++) {  // check if the element already exists
+          let tempObj = timesheetData[i]
+          if (tempObj['title'] === domain) {
+            tempObj['time'] += todayData[domain];
+            found = true
+            break;
+          }
+        }
+        if (!found) {
+          var temp = {}
+          temp['title'] = domain;
+          temp['time'] = todayData[domain];
+          timesheetData.push(temp);
+        }
+      }
+    }
+    timesheetData.sort(function (a, b) {
+      return b.time - a.time;
+    }) 
   }
 
-  timesheetData.sort(function (a, b) {
-    return b.time - a.time;
-  })
-
-  return timesheetData;
+  return timesheetData;  
 }
