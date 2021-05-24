@@ -21,7 +21,7 @@ window.onload = async function() {
     alert("Added " + url + " to " + item + ".");
     addLinkToCategory(item,url);
   })
-
+  
   document.getElementById("trackingToggle").checked = await getTrackingStatus();
   changeOnOffText();
 
