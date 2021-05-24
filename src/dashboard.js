@@ -39,6 +39,14 @@ window.onload = async function() {
 
     // renderGraph();
     // generateTimeSheet("Daily")
+    range_selector = document.getElementById('date_range');
+    date_range_selection.forEach(function(value) {
+        var option = document.createElement('option');
+        option.text = value;
+        option.value = value;
+        option.style.width = 'fit';
+        range_selector.appendChild(option);
+    })
 
     var whitelist = await getWhitelist();
     document.getElementById("whitelist_editor").innerHTML = whitelist.join(", ");
@@ -199,14 +207,6 @@ function updateButtonStyle(event) {
  * @param {string} status indicate daily or weekly data
  */
 async function renderGraph(status) {
-    range_selector = document.getElementById('date_range');
-    date_range_selection.forEach(function(value) {
-        var option = document.createElement('option');
-        option.text = value;
-        option.value = value;
-        option.style.width = 'fit';
-        range_selector.appendChild(option);
-    })
 
     // plot linechart
     if (charts.length === 0) {
