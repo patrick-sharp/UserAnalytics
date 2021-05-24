@@ -43,13 +43,12 @@ Please format any code or console output with three ticks ``` above and below. -
 
 ## WIP Functionalities and Known bugs
 - [x] User unable to make deletions to their whitelist.
-- [ ] The website/domain icons are not presented along with the domain name (currently it is a timer icon).
-- [ ] The activity chart doesn't support reviewing data up to 14 days ago.
+- [x] The website/domain icons are not presented along with the domain name (currently it is a timer icon).
 - [ ] The category chart needs unit when hovering. Categories should be displayed according to the order in descending order and the colors should match categories. 
 - [ ] Do not track extension URL and new tab.
 - [X] Differentiate subdomain from their parent domains.
 - [ ] Update extension popup UI.
-- [ ] Missing title for the right chart.
+- [x] Missing title for the right chart.
 - [ ] Correct other category to "uncategorized" category, needs correction in data processing layer
 - [ ] Add ability to view and modify categories in setting
 - [ ] Change "Most frequent weekly" to expected behavior
