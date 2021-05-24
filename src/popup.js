@@ -1,4 +1,4 @@
-window.onload = function() {
+window.onload = async function() {
 
   // retrieve category keys from Chrome storage
   getCategoryKeys().then(data => {
@@ -18,16 +18,30 @@ window.onload = function() {
     let index = selector.selectedIndex;
     let item = selector.options[index].value;
     let url = document.getElementById("url").innerHTML;
+    alert(url);
     addLinkToCategory(item,url);
   })
 
-  document.getElementById("trackingToggle").checked = getTrackingStatus();
+  document.getElementById("trackingToggle").checked = await getTrackingStatus();
+  changeOnOffText();
 
   document.getElementById("trackingToggle").addEventListener('change', function() {
+    changeOnOffText();
     toggleTracking();
   })
 }
 
+function changeOnOffText() {
+  if (document.getElementById("trackingToggle").checked) {
+    var onoff = document.getElementById("tracking_onoff");
+    onoff.innerHTML = "ON";
+    onoff.style.color = "#5AC43B";
+  } else {
+    var onoff = document.getElementById("tracking_onoff");
+    onoff.innerHTML = "OFF";
+    onoff.style.color = "#CCC";
+  }
+}
 
 /**
  * Add `DOMContentLoaded` listener
