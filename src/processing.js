@@ -155,25 +155,15 @@ async function getWeeklyTotalTime(prevWeek) {
 /**
  * Get the most frequently visited sites and the time for the past 7 days
  * 
- * @param {Array} prevWeek an array of size 7 containing date strings of past 7 days 
  * @returns an array of size 3. arr[0]: the string URL of the most frequently visited site
  *                              arr[1]: the total time spent on that site
  *                              arr[2]: dummy data that represents the time difference
  */
-async function getWeeklyMostFrequentTime(prevWeek) {
-  var maxDomain = "";
-  var maxTime = -1;
-  for await (const day of prevWeek) {
-    const todayData = await getDate(day);
-    for (var domain in todayData) {
-      if (todayData[domain] > maxTime) {
-        maxDomain = domain;
-        maxTime = todayData[domain];
-      }
-    }
-  }
+async function getWeeklyMostFrequentTime() {
+  let timeSheetData = await getTimesheetData("Weekly");
+  let obj = timeSheetData[0];
 
-  return [maxDomain, maxTime, 0];
+  return [obj['title'], obj['time'], 0];
 }
 
 /**

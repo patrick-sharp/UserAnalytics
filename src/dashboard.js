@@ -125,7 +125,7 @@ function generateStatistics(titleString, totalTime, timeDiff, domain) {
     title.innerHTML = titleString;
     title.style.fontSize = '24px';
     title.style.color = '#000000'
-    icon.src = domain === "" ? 'images/timer.svg' : 'https://www.google.com/s2/favicons?sz=64&domain_url=' + domain
+    icon.src = domain === "" ? 'images/timer.svg' : ('https://www.google.com/s2/favicons?sz=64&domain_url=' + domain)
     icon.style.width = '32px';
     icon.style.height = '32px';
 
@@ -322,16 +322,16 @@ async function retrieveWeeklyData() {
     }
     
     weeklyTotalTimeData = await getWeeklyTotalTime(prevWeek);
-    weeklyMostFrequentTimeData = await getWeeklyMostFrequentTime(prevWeek);
+    weeklyMostFrequentTimeData = await getWeeklyMostFrequentTime();
 
     var left_container = document.getElementById('left_container');
-    let left_content = generateStatistics("Total Time", weeklyTotalTimeData[0], weeklyTotalTimeData[1]);
+    let left_content = generateStatistics("Total Time", weeklyTotalTimeData[0], weeklyTotalTimeData[1], '');
     left_container.appendChild(left_content);
     
     // Add most frequent getMostFrequentTime() in procesing.js
     mostFrequentTimeData = await getMostFrequentTime();
     var right_container = document.getElementById('right_container');
-    let right_content = generateStatistics("Most Frequent", weeklyMostFrequentTimeData[1], weeklyMostFrequentTimeData[2]);
+    let right_content = generateStatistics("Most Frequent", weeklyMostFrequentTimeData[1], weeklyMostFrequentTimeData[2], weeklyMostFrequentTimeData[0]);
     right_container.appendChild(right_content);
 }
 
