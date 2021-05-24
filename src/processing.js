@@ -201,7 +201,7 @@ async function getLineChartData() {
       time += tempData[domain];
     }
 
-    copy.data[1].y = time / 3600 < 1 ? 1 : time / 3600;
+    copy.data[1].y = time / 3600 < 1 ? 0.5 : time / 3600;
 
     dataset.push(copy);
   }

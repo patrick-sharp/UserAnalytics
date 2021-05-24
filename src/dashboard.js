@@ -1,9 +1,6 @@
 const dates = ['Daily', 'Weekly'];
 var charts = [];                    // linechart, polarchart
 
-let date_range_selection = ['Last 7 Days', 'Last 14 Days'];
-
-
 /**
  * Open setting panel
  */
@@ -36,17 +33,6 @@ window.onload = async function() {
     })
 
     document.getElementById("Daily").click()
-
-    // renderGraph();
-    // generateTimeSheet("Daily")
-    range_selector = document.getElementById('date_range');
-    date_range_selection.forEach(function(value) {
-        var option = document.createElement('option');
-        option.text = value;
-        option.value = value;
-        option.style.width = 'fit';
-        range_selector.appendChild(option);
-    })
 
     var whitelist = await getWhitelist();
     document.getElementById("whitelist_editor").innerHTML = whitelist.join(", ");
@@ -211,6 +197,7 @@ async function renderGraph(status) {
     // plot linechart
     if (charts.length === 0) {
         const [lineLabels, lineDataset] = await getLineChartData();
+        console.log(lineLabels, lineDataset);
         var ctx_line = document.getElementById("lineChart");
         var lineChart = new Chart(ctx_line, {
                                 type: 'bar',
@@ -257,39 +244,41 @@ async function renderGraph(status) {
     
     // plot polarChart
     var polarChart = null;
+    const [polarLabels, polarDataset] = await getPolarChartData(status);
     if (charts.length === 2) {
         polarChart = charts.pop();
-        polarChart.destroy();
-    }
-    const [polarLabels, polarDataset] = await getPolarChartData(status);
-    var ctx_polar = document.getElementById('polarChart');
-    polarChart = new Chart(ctx_polar, {
-        type: 'polarArea',
-        data: {
-            labels: polarLabels,
-            datasets: [
-            {
-                label: 'Dataset 1',
-                data: polarDataset,
-                backgroundColor: [
-                    '#EAD367',
-                    '#D3705A',
-                    '#D8E8E2',
-                    '#C4D293',
-                    '#37554C'
+        polarChart.data.datasets[0].data = polarDataset
+        polarChart.update("show");
+    } else {
+        var ctx_polar = document.getElementById('polarChart');
+        polarChart = new Chart(ctx_polar, {
+            type: 'polarArea',
+            data: {
+                labels: polarLabels,
+                datasets: [
+                {
+                    label: 'Dataset 1',
+                    data: polarDataset,
+                    backgroundColor: [
+                        '#EAD367',
+                        '#D3705A',
+                        '#D8E8E2',
+                        '#C4D293',
+                        '#37554C'
+                    ]
+                }
                 ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false,
+                    }
+                }
             }
-            ]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-            legend: {
-                display: false,
-            }
-            }
-        }
-    });
+        });
+    }
     charts.push(polarChart);
 }
 
