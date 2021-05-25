@@ -156,7 +156,9 @@ function cleanUsage() {
  */
 function clearChromeStorage() {
   chrome.storage.sync.clear(function () {
-    console.log('cleared chrome storage');
+    if (debugMode) {
+      console.log('cleared chrome storage');
+    }
   });
 }
 
@@ -396,8 +398,10 @@ function removeElement(date, domain) {
  */
 function removeDate(date) {
   chrome.storage.sync.remove(date, function(data) {
-    console.log('Deleted: ' + date);
-    console.log(data);
+    if (debugMode) {
+      console.log('Deleted: ' + date);
+      console.log(data);
+    }
   });
 }
 
@@ -419,6 +423,7 @@ async function getMap() {
 if (typeof exports !== 'undefined') {
   exports.setLastDomain = setLastDomain;
   exports.domainChanged = domainChanged;
+  exports.handleUrlChange = handleUrlChange;
   exports.cleanUsage = cleanUsage;
   exports.clearChromeStorage = clearChromeStorage;
   exports.getDomainsForDay = getDomainsForDay;
@@ -450,7 +455,8 @@ if (typeof chrome === 'undefined') {
       sync: {
         set: function(arg, callback) {
           if (typeof arg === 'object') {
-            const key = Object.keys(arg)[0]
+            const key = Object.keys(arg)[0];
+            // console.log(key);
             TESTING_localStorage[key] = arg[key];
           } else {
             throw 'Error: arg is not object';
@@ -462,12 +468,19 @@ if (typeof chrome === 'undefined') {
             const key = arg[0];
             const result = TESTING_localStorage[key] === undefined ? {} : TESTING_localStorage[key];
             callback(result);
-            // TODO: implement object arg for this function
-            // } else if (typeof arg === 'object') {
-            //   const key = Object.keys
+          } else if (typeof arg === 'object') {
+            const key = Object.keys(arg)[0];
+            const result = TESTING_localStorage[key] === undefined ? arg[key] : {[key]: TESTING_localStorage[key]};
+            callback(result);
           } else {
             throw 'Error: arg is not array or object';
           }
+        },
+        clear: function(callback) {
+          for (let key of Object.keys(TESTING_localStorage)) {
+            delete TESTING_localStorage[key];
+          }
+          callback();
         }
       }
     },
