@@ -165,6 +165,11 @@ function updateButtonStyle(event) {
     let i = dates.filter(d => d != event.target.id)[0];
     document.getElementById(i).removeAttribute('style');
 
+    let tags = document.getElementsByClassName('changeable_date_range')
+    for (let tag of tags) {
+        tag.innerHTML = event.target.id;
+    }
+
     var left = document.getElementById('left_container')
     if (left.children.length > 0) {
         left.removeChild(left.childNodes[0]);
