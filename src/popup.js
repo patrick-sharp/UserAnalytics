@@ -69,7 +69,8 @@ function checkBrowserFocus(){
   chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
     if (tabs[0]) {
       const url = new URL(tabs[0].url)
-      document.getElementById("url").innerHTML = psl.get(url.hostname);
+      const formattedURL = psl.get(url.hostname);
+      document.getElementById("url").innerHTML = formattedURL === null ? "Nothing to save" : formattedURL;
     }
   });
 }
