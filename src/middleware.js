@@ -8,7 +8,6 @@ try {
  * global variables
  ******************************************************************************/
 const debugMode = true;         // print message to console (service worker)  
-var doTrack = true;             // TODO: chrome storage? or default yes when user starts chrome?
 let defaultLastDomainObj = {    // default object if lastDomain key does not exist
   lastDomain: {
     domain: null,
@@ -39,6 +38,11 @@ let defaultLastDomainObj = {    // default object if lastDomain key does not exi
     key: whitelist
     value: {
       [google.com, youtube.com, ...]
+    }
+
+    key: doTrack
+    value: {
+      boolean
     }
 
 */
@@ -125,12 +129,24 @@ function domainChanged(domain) {
  * @param {string} webURL the full url of a website
  */ 
 function handleUrlChange(webURL) {
-  if (webURL == "" || (!doTrack)) {   // new Tab or do not track
+  if (webURL == "") {   // new Tab
     return;
   }
-  const url = new URL(webURL);
-  let domain = psl.get(url.hostname);
-  domainChanged(domain);
+
+  //do not track
+  chrome.storage.sync.get(["doTrack"], function(data) {
+    if (data["doTrack"] === undefined) {
+      setDoTrack(true)
+    } else if (data["doTrack"] === false) {
+      if (debugMode) {
+        console.log("doTrack is turned off.")
+      }
+      return;
+    }
+    const url = new URL(webURL);
+    let domain = psl.get(url.hostname);
+    domainChanged(domain);
+  });
 }
 
 
@@ -261,11 +277,54 @@ function updateWhitelist(domains){
 
 
 /**
- * Update doTrack variable (option: boolean)
- * @param {boolean} option the option of tracking
+ * Flip doTrack variable
  */
-function enableTracking(option) {
-  doTrack = option;
+function toggleTracking() {
+  chrome.storage.sync.get(["doTrack"], function (data) {
+    var val = data["doTrack"]
+    if (val === undefined) {
+      setDoTrack(true)
+      val = true
+    }
+    setDoTrack(!val)
+    if (debugMode) {
+      console.log("ToggleTracking: " + val + " => " + !val);
+    }
+  })
+}
+
+/**
+ * Get doTrack status (default will be set to true)
+ */
+async function getTrackingStatus() {
+  var p = new Promise(function(resolve, reject) {
+    chrome.storage.sync.get(["doTrack"], function (data) {
+      var val = data["doTrack"]
+      if (val === undefined) {
+        setDoTrack(true)
+        val = true
+      }
+      resolve(val);
+    })
+  });
+  return await p; 
+}
+
+/**
+ * Set value for doTrack
+ * @param {boolean} track the status for doTrack
+ */
+function setDoTrack(track) {
+  let doTrackObj = {}
+  doTrackObj["doTrack"] = track;
+  if (track === false) {
+    cleanUsage();  // reset LastDomain object
+  }
+  chrome.storage.sync.set(doTrackObj, function(){
+    if (debugMode) {
+      console.log("Setting: doTrack is set to " + track)
+    }
+  });
 }
 
 /**
@@ -303,9 +362,6 @@ function chromeActive() {
   chrome.storage.sync.get(['lastDomain'], function(data) {
     data = data.lastDomain;
     if (!data['lastInactiveTime'] || data['lastInactiveTime'] === 0) {
-      if (debugMode) {
-        console.log('chrome active: nothing to update');
-      }
       return;
     }
     let inactiveTime = Date.now() - data['lastInactiveTime'];
@@ -439,7 +495,8 @@ if (typeof exports !== 'undefined') {
   exports.chromeInactive = chromeInactive;
   exports.getWhitelist = getWhitelist;
   exports.updateWhitelist = updateWhitelist;
-  exports.enableTracking = enableTracking;
+  exports.toggleTracking = toggleTracking;
+  exports.getTrackingStatus = getTrackingStatus;
 }
 
 // create a mock of the chrome API that works similarly to the real one so we can test it.
