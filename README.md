@@ -44,12 +44,13 @@ Please format any code or console output with three ticks ``` above and below. -
 ## WIP Functionalities and Known bugs
 - [x] User unable to make deletions to their whitelist.
 - [x] The website/domain icons are not presented along with the domain name (currently it is a timer icon).
-- [ ] The category chart needs unit when hovering. Categories should be displayed according to the order in descending order and the colors should match categories. 
-- [ ] Do not track extension URL and new tab.
 - [X] Differentiate subdomain from their parent domains.
-- [ ] Update extension popup UI.
+- [x] Update extension popup UI.
 - [x] Missing title for the right chart.
+- [X] Change "Most frequent weekly" to expected behavior
 - [ ] Correct other category to "uncategorized" category, needs correction in data processing layer
+- [ ] The category chart needs unit when hovering. Categories should be displayed according to the order in descending order and the colors should match categories.
+- [ ] Do not track UserAnalytic dashboard, chrome://*, and new tab.
+- [ ] Better favicon fetching
 - [ ] Add ability to view and modify categories in setting
-- [ ] Change "Most frequent weekly" to expected behavior
 
