@@ -7,7 +7,6 @@
         <script src="middleware.js"></script>
         <script src="processing.js"></script>
         <script src="dashboard.js"></script>
-        <script src="dashboard_test.js"></script>
 		<title>UserAnalytics Dashboard</title>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <!-- <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet"> -->
@@ -79,6 +78,7 @@
                 </footer>
             </div>
         </div>
-        
+        <!-- This has to be at the bottom so the DOM will load before tests are run.-->
+        <script src="dashboard_test.js"></script>
 	</body>
 </html>
