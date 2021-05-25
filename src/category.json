@@ -2,37 +2,37 @@
     "Entertainment": [
         "netflix.com",
         "hulu.com",
-        "www.youtube.com",
-        "www.twitch.tv",
+        "youtube.com",
+        "twitch.tv",
         "disneyplus.com",
         "hbo.com",
         "hbomax.com"
     ],
     "Social": [
-        "www.facebook.com",
+        "facebook.com",
         "discord.com",
         "instagram.com",
         "quora.com",
-        "www.reddit.com",
-        "www.messenger.com"
+        "reddit.com",
+        "messenger.com"
     ],
     "Reading": [
-        "www.google.com",
-        "www.yahoo.com",
-        "www.nytimes.com",
-        "www.cnn.com",
-        "www.foxnews.com",
-        "www.washingtonpost.com",
-        "www.theverge.com",
-        "www.vox.com"
+        "google.com",
+        "yahoo.com",
+        "nytimes.com",
+        "cnn.com",
+        "foxnews.com",
+        "washingtonpost.com",
+        "theverge.com",
+        "vox.com"
     ],
     "Productivity": [
         "stackoverflow.com",
         "github.com",
-        "www.w3schools.com",
+        "w3schools.com",
         "mail.google.com"
     ],
-    "Other":[
+    "Uncategorized":[
         "newtab"
     ]
 }

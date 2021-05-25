@@ -244,10 +244,16 @@ async function renderGraph(status) {
     
     // plot polarChart
     var polarChart = null;
-    const [polarLabels, polarDataset] = await getPolarChartData(status);
+    const polarData = await getPolarChartData(status);
+    const sortedPolarData = Object.entries(polarData)
+                            .sort(([,a],[,b]) => b-a)
+                            .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
+    const polarLabels = Object.keys(sortedPolarData);
+    const polarDataset = Object.values(sortedPolarData);
+    const order = Array.from(Array(polarLabels.length), (_, i) => i+1).reverse()
     if (charts.length === 2) {
         polarChart = charts.pop();
-        polarChart.data.datasets[0].data = polarDataset
+        // polarChart.data.datasets[0].data = polarDataset
         polarChart.update("show");
     } else {
         var ctx_polar = document.getElementById('polarChart');
@@ -257,8 +263,8 @@ async function renderGraph(status) {
                 labels: polarLabels,
                 datasets: [
                 {
-                    label: 'Dataset 1',
-                    data: polarDataset,
+                    label: '',
+                    data: order,
                     backgroundColor: [
                         '#EAD367',
                         '#D3705A',
@@ -274,6 +280,17 @@ async function renderGraph(status) {
                 plugins: {
                     legend: {
                         display: false,
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let index = context.dataIndex;
+                                let label = polarLabels[index]
+                                let data = polarDataset[index];
+
+                                return label + ": " + (data / 60).toFixed(2) + "min";
+                            }
+                        }
                     }
                 }
             }

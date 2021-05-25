@@ -217,38 +217,69 @@ async function getLineChartData() {
  * @see dateString
  * @see getTimeForDay
  * @param {string} status indicate daily or weekly data
- * @returns an array of size 2. arr[0]: the category labels
- *                              arr[1]: the dataset for every category
+ * @returns a new object with {Category: time, ...}
  */
 async function getPolarChartData(status) {
-  var labels = await getCategoryKeys();
-  var dataset = [];
   var categories = await getCategoryList();
-  for (var i = 0; i < labels.length; i++) {
-    dataset.push(0);
-  }
-
+  
   if (status === "Daily") {
     const todayString = dateString(currentDate)
-    for (var i = 0; i < labels.length; i++) { 
-      const domains = categories[labels[i]]
-      for (var j = 0; j < domains.length; j++) {
-        dataset[i] += await getTimeForDay(todayString, domains[j]);
-      }
-    }
+    const domains = await getDomainsForDay(todayString)
+    return mapDomainToCategory(domains, categories);
   } else { // status === "Weekly"
-    prevWeek = [];
+    var prevWeek = [];
+    var dataset = {};
     for (i = 0; i < 7; i++) {
         prevWeek.push(dateString(getPreviousDays(i)));
     }
-    for (var i = 0; i < labels.length; i++) { 
-      const domains = categories[labels[i]]
-      for (var j = 0; j < domains.length; j++) {
-        dataset[i] += await getTimeForWeek(prevWeek, domains[j]);
+
+    var list = [];
+    for (let prev of prevWeek) {      
+      const domains = await getDomainsForDay(prev)
+      list.push(mapDomainToCategory(domains, categories));
+    }
+
+    list.forEach(d => {
+      for (let [key, value] of Object.entries(d)) {
+        if (dataset.hasOwnProperty(key)) {
+          dataset[key] += value;
+        } else {
+          dataset[key] = value;
+        }
       }
+    });
+
+    return dataset
+  }
+}
+
+/**
+ * Map domains to corresponding category based on domain filters in each category 
+ * @private
+ * @param {Array} domains list of {domain, time} pair from given time period
+ * @param {Object} categories  list of categories and corresponding filter domains
+ * 
+ * @returns a new object with {Category: time, ...}
+ */
+function mapDomainToCategory(domains, categories) {
+  var dataset = {};
+  for (let [domain, time] of Object.entries(domains)) {
+    let added = false;
+    for (let [category, list] of Object.entries(categories)) {
+      if (dataset[category] === undefined) {
+        dataset[category] = 0;
+      }
+
+      if (list.includes(domain)) {
+        added = true;
+        dataset[category] = dataset[category] + time;
+      } 
+    }
+    if (!added) {
+      dataset['Uncategorized'] += time;
     }
   }
-  return [labels, dataset]
+  return dataset;
 }
 
 /**
