@@ -250,15 +250,43 @@ async function renderGraph(status) {
     // plot polarChart
     var polarChart = null;
     const polarData = await getPolarChartData(status);
+
+    // console.log(polarData)
+
     const sortedPolarData = Object.entries(polarData)
                             .sort(([,a],[,b]) => b-a)
                             .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
     const polarLabels = Object.keys(sortedPolarData);
+
+
     const polarDataset = Object.values(sortedPolarData);
+
+    let updatePolarChartToolTip = function(context) {
+        let index = context.dataIndex;
+    
+        let label = polarLabels[index]
+        let data = polarDataset[index];
+    
+        console.log(data)
+    
+        return label + ": " + (data / 60).toFixed(2) + "min";
+    }
+
+    console.log(polarDataset)
+
     const order = Array.from(Array(polarLabels.length), (_, i) => i+1).reverse()
     if (charts.length === 2) {
         polarChart = charts.pop();
-        // polarChart.data.datasets[0].data = polarDataset
+        polarChart.options.plugins.tooltip.callbacks.label = function(context) {
+            let index = context.dataIndex;
+
+            let label = polarLabels[index]
+            let data = polarDataset[index];
+
+            console.log(data)
+
+            return label + ": " + (data / 60).toFixed(2) + "min";
+        }
         polarChart.update("show");
     } else {
         var ctx_polar = document.getElementById('polarChart');
@@ -288,13 +316,7 @@ async function renderGraph(status) {
                     },
                     tooltip: {
                         callbacks: {
-                            label: function(context) {
-                                let index = context.dataIndex;
-                                let label = polarLabels[index]
-                                let data = polarDataset[index];
-
-                                return label + ": " + (data / 60).toFixed(2) + "min";
-                            }
+                            label: updatePolarChartToolTip
                         }
                     }
                 }
