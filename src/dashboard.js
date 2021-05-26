@@ -52,7 +52,8 @@ async function generateTimeSheet(status) {
     timesheet.innerHTML = null;
 
     var timesheet_data = await getTimesheetData(status);
-    timesheet_data.forEach(async function(value, _index, _arr){
+    for (var i = 0; i < timesheet_data.length; i ++) {
+        let value = timesheet_data[i]
         var row = document.createElement('div');
         row.className = 'timesheet_row';
         var img = document.createElement('img');
@@ -73,7 +74,7 @@ async function generateTimeSheet(status) {
         row.appendChild(time);
     
         timesheet.appendChild(row);
-    })
+    }
 }
 
 
