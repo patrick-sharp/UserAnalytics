@@ -394,36 +394,19 @@ let googleFaviconFetchDefaultUrl = fetch(`https://care37-cors-anywhere.herokuapp
   return url;
 });
 
-let statvooFaviconFetchDefaultUrl = fetch(`https://care37-cors-anywhere.herokuapp.com/https://api.statvoo.com/favicon/?url=null.com.com.com.com`).then(res => {
-  return res.blob();
-}).then(img => {
-  return readFileAsDataURL(img);
-}).then(url => { 
-  return url;
-});
-
-
 // get a url of the favicon for a given domain
 async function getFavicon(domain) {
 
-  let googleRes = await fetch(`https://care37-cors-anywhere.herokuapp.com/https://www.google.com/s2/favicons?domain=${domain}`);
+  let googleRes = await fetch(`https://care37-cors-anywhere.herokuapp.com/https://www.google.com/s2/favicons?sz=128&domain=${domain}`);
   let img = await googleRes.blob();
   let url = await readFileAsDataURL(img);
   googleFaviconFetchDefaultUrl = await googleFaviconFetchDefaultUrl;
 
   // if the favicon doesn't exist fetch from another domain
   if (url === googleFaviconFetchDefaultUrl) {
-    let statvooRes = await fetch(`https://care37-cors-anywhere.herokuapp.com/https://api.statvoo.com/favicon/?url=${domain}`);
-    img = await statvooRes.blob();
+    let duckduckgoRes = await fetch(`https://care37-cors-anywhere.herokuapp.com/https://icons.duckduckgo.com/ip3/${domain}.ico`);
+    img = await duckduckgoRes.blob();
     url = await readFileAsDataURL(img);
-    statvooFaviconFetchDefaultUrl = await statvooFaviconFetchDefaultUrl;
-
-    // if the favicon doesn't exist fetch from another domain
-    if (url === statvooFaviconFetchDefaultUrl) {
-      let duckduckgoRes = await fetch(`https://care37-cors-anywhere.herokuapp.com/https://icons.duckduckgo.com/ip3/${domain}.ico`);
-      img = await duckduckgoRes.blob();
-      url = await readFileAsDataURL(img);
-    }
   }
 
   return url;
