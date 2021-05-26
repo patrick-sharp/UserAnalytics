@@ -18,8 +18,10 @@ window.onload = async function() {
     let index = selector.selectedIndex;
     let item = selector.options[index].value;
     let url = document.getElementById("url").innerHTML;
-    alert("Added " + url + " to " + item + ".");
-    addLinkToCategory(item,url);
+    if (url !== "Nothing to save") {
+      alert("Added " + url + " to " + item + ".");
+      addLinkToCategory(item,url);
+    }
   })
   
   document.getElementById("trackingToggle").checked = await getTrackingStatus();

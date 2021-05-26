@@ -4,9 +4,11 @@ var charts = [];                    // linechart, polarchart
 /**
  * Open setting panel
  */
-function openSettingPanel() {
+async function openSettingPanel() {
     document.getElementById("setting_panel").style.width = "50%";
+    document.getElementById("switch_check").checked = await getTrackingStatus(); 
 }
+
 
 /**
  * Close the setting panel
@@ -21,6 +23,7 @@ window.onload = async function() {
 
     document.getElementById("setting").addEventListener("click", openSettingPanel);
     document.getElementById("setting_close_button").addEventListener("click", closeSettingPanel);
+    document.getElementById("switch_check").addEventListener('click', toggleTracking)
 
     dates.forEach(date => {
         var button = document.createElement("button");
@@ -271,14 +274,7 @@ async function renderGraph(status) {
     const order = Array.from(Array(polarLabels.length), (_, i) => i+1).reverse()
     if (charts.length === 2) {
         polarChart = charts.pop();
-        polarChart.options.plugins.tooltip.callbacks.label = function(context) {
-            let index = context.dataIndex;
-
-            let label = polarLabels[index]
-            let data = polarDataset[index];
-
-            return label + ": " + (data / 60).toFixed(2) + "min";
-        }
+        polarChart.options.plugins.tooltip.callbacks.label = updatePolarChartToolTip
         polarChart.update("show");
     } else {
         var ctx_polar = document.getElementById('polarChart');
