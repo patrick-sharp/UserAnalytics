@@ -26,6 +26,7 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
         uses: actions/checkout@v2
+      - run: npm install fetch
       - name: run the action in the action.yml file in the root of the repo
         uses: ./
         id: test
