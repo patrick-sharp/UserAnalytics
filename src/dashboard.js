@@ -251,8 +251,6 @@ async function renderGraph(status) {
     var polarChart = null;
     const polarData = await getPolarChartData(status);
 
-    // console.log(polarData)
-
     const sortedPolarData = Object.entries(polarData)
                             .sort(([,a],[,b]) => b-a)
                             .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
@@ -267,12 +265,8 @@ async function renderGraph(status) {
         let label = polarLabels[index]
         let data = polarDataset[index];
     
-        console.log(data)
-    
         return label + ": " + (data / 60).toFixed(2) + "min";
     }
-
-    console.log(polarDataset)
 
     const order = Array.from(Array(polarLabels.length), (_, i) => i+1).reverse()
     if (charts.length === 2) {
@@ -282,8 +276,6 @@ async function renderGraph(status) {
 
             let label = polarLabels[index]
             let data = polarDataset[index];
-
-            console.log(data)
 
             return label + ": " + (data / 60).toFixed(2) + "min";
         }
