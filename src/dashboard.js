@@ -49,13 +49,13 @@ async function generateTimeSheet(status) {
     timesheet.innerHTML = null;
 
     var timesheet_data = await getTimesheetData(status);
-    timesheet_data.forEach(function(value, _index, _arr){
+    timesheet_data.forEach(async function(value, _index, _arr){
         var row = document.createElement('div');
         row.className = 'timesheet_row';
         var img = document.createElement('img');
         img.style.width = '32px';
         img.style.height = '32px'
-        img.src = 'https://www.google.com/s2/favicons?sz=64&domain_url=' + value.title;
+        img.src = await getFavicon(value.title);
         var title = document.createElement('span');
         title.id = 'title';
         title.innerHTML = value.title;

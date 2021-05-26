@@ -381,6 +381,65 @@ function chromeActive() {
   });
 }
 
+
+/*
+ * Default Favicon images from google and statvoo
+ * https://stackoverflow.com/questions/5119041/how-can-i-get-a-web-sites-favicon
+ */
+let googleFaviconFetchDefaultUrl = fetch(`https://care37-cors-anywhere.herokuapp.com/https://www.google.com/s2/favicons?domain=null.com.com.com.com`).then(res => {
+  return res.blob();
+}).then(img => {
+  return readFileAsDataURL(img);
+}).then(url => { 
+  return url;
+});
+
+let statvooFaviconFetchDefaultUrl = fetch(`https://care37-cors-anywhere.herokuapp.com/https://api.statvoo.com/favicon/?url=null.com.com.com.com`).then(res => {
+  return res.blob();
+}).then(img => {
+  return readFileAsDataURL(img);
+}).then(url => { 
+  return url;
+});
+
+
+// get a url of the favicon for a given domain
+async function getFavicon(domain) {
+
+  let googleRes = await fetch(`https://care37-cors-anywhere.herokuapp.com/https://www.google.com/s2/favicons?domain=${domain}`);
+  let img = await googleRes.blob();
+  let url = await readFileAsDataURL(img);
+  googleFaviconFetchDefaultUrl = await googleFaviconFetchDefaultUrl;
+
+  // if the favicon doesn't exist fetch from another domain
+  if (url === googleFaviconFetchDefaultUrl) {
+    let statvooRes = await fetch(`https://care37-cors-anywhere.herokuapp.com/https://api.statvoo.com/favicon/?url=${domain}`);
+    img = await statvooRes.blob();
+    url = await readFileAsDataURL(img);
+    statvooFaviconFetchDefaultUrl = await statvooFaviconFetchDefaultUrl;
+
+    // if the favicon doesn't exist fetch from another domain
+    if (url === statvooFaviconFetchDefaultUrl) {
+      let duckduckgoRes = await fetch(`https://care37-cors-anywhere.herokuapp.com/https://icons.duckduckgo.com/ip3/${domain}.ico`);
+      img = await duckduckgoRes.blob();
+      url = await readFileAsDataURL(img);
+    }
+  }
+
+  return url;
+}
+
+// convert the image blob data from a request to a local base64 url so we can compare them 
+async function readFileAsDataURL(file) {
+  let result_base64 = await new Promise((resolve) => {
+    let fileReader = new FileReader();
+    fileReader.onload = (e) => resolve(fileReader.result);
+    fileReader.readAsDataURL(file);
+  });
+
+  return result_base64;
+}
+
 /******************************************************************************
  * Util functions (can be used for testing, use at your own risks)
  ******************************************************************************/
