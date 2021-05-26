@@ -55,20 +55,24 @@
             <div id="stats_view">
                 <div id='data_chart_left' class="canvas">
                     <div id="activity_container">
-                        <div id="activity_title">Activity</div>
-                        <select name="range" id="date_range"></select>
+                        <div id="activity_title">Activities</div>
+                        <div name='range' id="date_range">Weekly</div>
                     </div>
                     <canvas id="lineChart" class="chart"></canvas>
                 </div>
                 <div id="data_chart_right" class="canvas">
                     <div id="activity_container">
                         <div id="activity_title">Categories</div>
+                        <div name='range' id="date_range" class="changeable_date_range">Weekly</div>
                     </div>
                     <canvas id="polarChart" class="chart"></canvas>
                 </div>
             </div>
             <div id="timesheet_container">
-                <p id="timesheet_container_title">Timesheet</p>
+                <div id="activity_container">
+                    <div id="activity_title">Timesheet</div>
+                    <div name='range' id="date_range" class="changeable_date_range">Weekly</div>
+                </div>
                 <div id="timesheet"></div>
             </div>
             <div>

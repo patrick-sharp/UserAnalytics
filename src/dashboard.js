@@ -1,8 +1,5 @@
 const dates = ['Daily', 'Weekly'];
-
-
-let date_range_selection = ['Last 7 Days', 'Last 14 Days'];
-
+var charts = [];                    // linechart, polarchart
 
 /**
  * Open setting panel
@@ -37,11 +34,21 @@ window.onload = async function() {
 
     document.getElementById("Daily").click()
 
-    renderGraph();
+    var whitelist = await getWhitelist();
+    document.getElementById("whitelist_editor").innerHTML = whitelist.join(", ");
+    document.getElementById("whitelist_button").onclick = saveWhitelist;
+};
 
+/**
+ * generate timeSheet
+ * @param {string} status indicate daily or weekly data
+ * @see getTimeSheetData()
+ */
+async function generateTimeSheet(status) {
     var timesheet = document.getElementById('timesheet');
+    timesheet.innerHTML = null;
 
-    var timesheet_data = await getTimesheetData();
+    var timesheet_data = await getTimesheetData(status);
     timesheet_data.forEach(function(value, _index, _arr){
         var row = document.createElement('div');
         row.className = 'timesheet_row';
@@ -64,11 +71,8 @@ window.onload = async function() {
     
         timesheet.appendChild(row);
     })
+}
 
-    var whitelist = await getWhitelist();
-    document.getElementById("whitelist_editor").innerHTML = whitelist.join(", ");
-    document.getElementById("whitelist_button").onclick = saveWhitelist;
-};
 
 /**
  * Save the whitelist to Chrome storage, and update the visual indication
@@ -115,7 +119,7 @@ function generateStatistics(titleString, totalTime, timeDiff, domain) {
     title.innerHTML = titleString;
     title.style.fontSize = '24px';
     title.style.color = '#000000'
-    icon.src = domain === "" ? 'images/timer.svg' : 'https://www.google.com/s2/favicons?sz=64&domain_url=' + domain
+    icon.src = domain === "" ? 'images/timer.svg' : ('https://www.google.com/s2/favicons?sz=64&domain_url=' + domain)
     icon.style.width = '32px';
     icon.style.height = '32px';
 
@@ -161,6 +165,11 @@ function updateButtonStyle(event) {
     let i = dates.filter(d => d != event.target.id)[0];
     document.getElementById(i).removeAttribute('style');
 
+    let tags = document.getElementsByClassName('changeable_date_range')
+    for (let tag of tags) {
+        tag.innerHTML = event.target.id;
+    }
+
     var left = document.getElementById('left_container')
     if (left.children.length > 0) {
         left.removeChild(left.childNodes[0]);
@@ -172,8 +181,12 @@ function updateButtonStyle(event) {
 
     if (event.target.id === "Daily") {
         retrieveDailyData();
+        generateTimeSheet("Daily")
+        renderGraph("Daily")
     } else {
         retrieveWeeklyData();
+        generateTimeSheet("Weekly")
+        renderGraph("Weekly")
     }
 }
 
@@ -182,91 +195,113 @@ function updateButtonStyle(event) {
 
 /**
  * Render the Chrome usage graphs
+ * Polar Chart will be updated if already populated
+ * @param {string} status indicate daily or weekly data
  */
-async function renderGraph() {
-    range_selector = document.getElementById('date_range');
-    date_range_selection.forEach(function(value) {
-        var option = document.createElement('option');
-        option.text = value;
-        option.value = value;
-        option.style.width = 'fit';
-        range_selector.appendChild(option);
-    })
+async function renderGraph(status) {
 
-    const [lineLabels, lineDataset] = await getLineChartData();
-
-    var ctx_line = document.getElementById("lineChart");
-    var lineChart = new Chart(ctx_line, {
-                            type: 'bar',
-                            data: {
-                                labels: lineLabels,
-                                datasets: lineDataset
-                            },
-                            options: {
-                                plugins: {
-                                    legend: {
-                                        display: false
-                                    }
+    // plot linechart
+    if (charts.length === 0) {
+        const [lineLabels, lineDataset] = await getLineChartData();
+        var ctx_line = document.getElementById("lineChart");
+        var lineChart = new Chart(ctx_line, {
+                                type: 'bar',
+                                data: {
+                                    labels: lineLabels,
+                                    datasets: lineDataset
                                 },
-                                events: [],
-                                scales: {
-                                    y: {
-                                        beginAtZero: true,
-                                        max: 24,
-                                        grid: {
-                                            display: false,
-                                            drawBorder: true,
-                                            drawOnChartArea: true,
-                                            drawTicks: false,
-                                        },
-                                        ticks: {
-                                            callback: function(value, index, values) {
-                                                return value + "H"
-                                            }
+                                options: {
+                                    plugins: {
+                                        legend: {
+                                            display: false
                                         }
                                     },
-                                    x: {
-                                        grid: {
-                                            display: false,
-                                            drawBorder: true,
-                                            drawOnChartArea: true,
-                                            drawTicks: false,
+                                    events: [],
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            max: 24,
+                                            grid: {
+                                                display: false,
+                                                drawBorder: true,
+                                                drawOnChartArea: true,
+                                                drawTicks: false,
+                                            },
+                                            ticks: {
+                                                callback: function(value, index, values) {
+                                                    return value + "H"
+                                                }
+                                            }
+                                        },
+                                        x: {
+                                            grid: {
+                                                display: false,
+                                                drawBorder: true,
+                                                drawOnChartArea: true,
+                                                drawTicks: false,
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        });
-
-    const [polarLabels, polarDataset] = await getPolarChartData();
-    var ctx_polar = document.getElementById('polarChart');
-    var polarChart = new Chart(ctx_polar, {
-        type: 'polarArea',
-        data: {
-            labels: polarLabels,
-            datasets: [
-            {
-                label: 'Dataset 1',
-                data: polarDataset,
-                backgroundColor: [
-                    '#EAD367',
-                    '#D3705A',
-                    '#D8E8E2',
-                    '#C4D293',
-                    '#37554C'
+                            });
+        charts.push(lineChart);
+    }
+    
+    // plot polarChart
+    var polarChart = null;
+    const polarData = await getPolarChartData(status);
+    const sortedPolarData = Object.entries(polarData)
+                            .sort(([,a],[,b]) => b-a)
+                            .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
+    const polarLabels = Object.keys(sortedPolarData);
+    const polarDataset = Object.values(sortedPolarData);
+    const order = Array.from(Array(polarLabels.length), (_, i) => i+1).reverse()
+    if (charts.length === 2) {
+        polarChart = charts.pop();
+        // polarChart.data.datasets[0].data = polarDataset
+        polarChart.update("show");
+    } else {
+        var ctx_polar = document.getElementById('polarChart');
+        polarChart = new Chart(ctx_polar, {
+            type: 'polarArea',
+            data: {
+                labels: polarLabels,
+                datasets: [
+                {
+                    label: '',
+                    data: order,
+                    backgroundColor: [
+                        '#EAD367',
+                        '#D3705A',
+                        '#D8E8E2',
+                        '#C4D293',
+                        '#37554C'
+                    ]
+                }
                 ]
-            }
-            ]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-            legend: {
-                display: false,
-            }
-            }
-        }
-    });
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let index = context.dataIndex;
+                                let label = polarLabels[index]
+                                let data = polarDataset[index];
 
+                                return label + ": " + (data / 60).toFixed(2) + "min";
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    charts.push(polarChart);
 }
 
 /**
@@ -298,16 +333,16 @@ async function retrieveWeeklyData() {
     }
     
     weeklyTotalTimeData = await getWeeklyTotalTime(prevWeek);
-    weeklyMostFrequentTimeData = await getWeeklyMostFrequentTime(prevWeek);
+    weeklyMostFrequentTimeData = await getWeeklyMostFrequentTime();
 
     var left_container = document.getElementById('left_container');
-    let left_content = generateStatistics("Total Time", weeklyTotalTimeData[0], weeklyTotalTimeData[1]);
+    let left_content = generateStatistics("Total Time", weeklyTotalTimeData[0], weeklyTotalTimeData[1], '');
     left_container.appendChild(left_content);
     
     // Add most frequent getMostFrequentTime() in procesing.js
     mostFrequentTimeData = await getMostFrequentTime();
     var right_container = document.getElementById('right_container');
-    let right_content = generateStatistics("Most Frequent", weeklyMostFrequentTimeData[1], weeklyMostFrequentTimeData[2]);
+    let right_content = generateStatistics("Most Frequent", weeklyMostFrequentTimeData[1], weeklyMostFrequentTimeData[2], weeklyMostFrequentTimeData[0]);
     right_container.appendChild(right_content);
 }
 

@@ -155,25 +155,15 @@ async function getWeeklyTotalTime(prevWeek) {
 /**
  * Get the most frequently visited sites and the time for the past 7 days
  * 
- * @param {Array} prevWeek an array of size 7 containing date strings of past 7 days 
  * @returns an array of size 3. arr[0]: the string URL of the most frequently visited site
  *                              arr[1]: the total time spent on that site
  *                              arr[2]: dummy data that represents the time difference
  */
-async function getWeeklyMostFrequentTime(prevWeek) {
-  var maxDomain = "";
-  var maxTime = -1;
-  for await (const day of prevWeek) {
-    const todayData = await getDate(day);
-    for (var domain in todayData) {
-      if (todayData[domain] > maxTime) {
-        maxDomain = domain;
-        maxTime = todayData[domain];
-      }
-    }
-  }
+async function getWeeklyMostFrequentTime() {
+  let timeSheetData = await getTimesheetData("Weekly");
+  let obj = timeSheetData[0];
 
-  return [maxDomain, maxTime, 0];
+  return [obj['title'], obj['time'], 0];
 }
 
 /**
@@ -211,7 +201,7 @@ async function getLineChartData() {
       time += tempData[domain];
     }
 
-    copy.data[1].y = time / 3600 < 1 ? 1 : time / 3600;
+    copy.data[1].y = time / 3600 < 1 ? 0.5 : time / 3600;
 
     dataset.push(copy);
   }
@@ -226,26 +216,70 @@ async function getLineChartData() {
  * @see getCategoryList
  * @see dateString
  * @see getTimeForDay
- * @returns an array of size 2. arr[0]: the category labels
- *                              arr[1]: the dataset for every category
+ * @param {string} status indicate daily or weekly data
+ * @returns a new object with {Category: time, ...}
  */
-async function getPolarChartData() {
-  var labels = await getCategoryKeys();
-  var dataset = [];
+async function getPolarChartData(status) {
   var categories = await getCategoryList();
-  const todayString = dateString(currentDate)
-
-  for (var i = 0; i < labels.length; i++) {
-    dataset.push(0);
-
-    const domains = categories[labels[i]]
-    for (var j = 0; j < domains.length; j++) {
-      dataset[i] += await getTimeForDay(todayString, domains[j]);
+  
+  if (status === "Daily") {
+    const todayString = dateString(currentDate)
+    const domains = await getDomainsForDay(todayString)
+    return mapDomainToCategory(domains, categories);
+  } else { // status === "Weekly"
+    var prevWeek = [];
+    var dataset = {};
+    for (i = 0; i < 7; i++) {
+        prevWeek.push(dateString(getPreviousDays(i)));
     }
 
-  }
+    var list = [];
+    for (let prev of prevWeek) {      
+      const domains = await getDomainsForDay(prev)
+      list.push(mapDomainToCategory(domains, categories));
+    }
 
-  return [labels, dataset]
+    list.forEach(d => {
+      for (let [key, value] of Object.entries(d)) {
+        if (dataset.hasOwnProperty(key)) {
+          dataset[key] += value;
+        } else {
+          dataset[key] = value;
+        }
+      }
+    });
+
+    return dataset
+  }
+}
+
+/**
+ * Map domains to corresponding category based on domain filters in each category 
+ * @private
+ * @param {Array} domains list of {domain, time} pair from given time period
+ * @param {Object} categories  list of categories and corresponding filter domains
+ * 
+ * @returns a new object with {Category: time, ...}
+ */
+function mapDomainToCategory(domains, categories) {
+  var dataset = {};
+  for (let [domain, time] of Object.entries(domains)) {
+    let added = false;
+    for (let [category, list] of Object.entries(categories)) {
+      if (dataset[category] === undefined) {
+        dataset[category] = 0;
+      }
+
+      if (list.includes(domain)) {
+        added = true;
+        dataset[category] = dataset[category] + time;
+      } 
+    }
+    if (!added) {
+      dataset['Uncategorized'] += time;
+    }
+  }
+  return dataset;
 }
 
 /**
@@ -254,22 +288,52 @@ async function getPolarChartData() {
  * @see dateString
  * @see getDate
  * 
+ * @param status indicate Daily or Weekly data
  * @returns an array object containing each domain and its corresponding time spent. Example format: {domain: time}
  */
-async function getTimesheetData() {
+async function getTimesheetData(status) {
   var timesheetData = [];
-  const todayData = await getDate(dateString(currentDate))
 
-  for (var domain in todayData) {
-    var temp = {}
-    temp['title'] = domain;
-    temp['time'] = todayData[domain];
-    timesheetData.push(temp);
+  if (status === "Daily") {
+    const todayData = await getDate(dateString(currentDate))
+    for (var domain in todayData) {
+      var temp = {}
+      temp['title'] = domain;
+      temp['time'] = todayData[domain];
+      timesheetData.push(temp);
+    }
+    timesheetData.sort(function (a, b) {
+      return b.time - a.time;
+    })
+  } else {  // status === "Weekly"
+    prevWeek = [];
+    for (i = 0; i < 7; i++) {
+        prevWeek.push(dateString(getPreviousDays(i)));
+    }
+    for await (const day of prevWeek) {
+      const todayData = await getDate(day)
+      for (var domain in todayData) {
+        var found = false
+        for (var i = 0; i < timesheetData.length; i++) {  // check if the element already exists
+          let tempObj = timesheetData[i]
+          if (tempObj['title'] === domain) {
+            tempObj['time'] += todayData[domain];
+            found = true
+            break;
+          }
+        }
+        if (!found) {
+          var temp = {}
+          temp['title'] = domain;
+          temp['time'] = todayData[domain];
+          timesheetData.push(temp);
+        }
+      }
+    }
+    timesheetData.sort(function (a, b) {
+      return b.time - a.time;
+    }) 
   }
 
-  timesheetData.sort(function (a, b) {
-    return b.time - a.time;
-  })
-
-  return timesheetData;
+  return timesheetData;  
 }
