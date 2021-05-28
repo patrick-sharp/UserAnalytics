@@ -48,7 +48,13 @@ window.onload = async function() {
  * @see getTimeSheetData()
  */
 async function generateTimeSheet(status) {
-    var timesheet = document.getElementById('timesheet');
+    const prefix = "timesheet_"
+    let removed = dates.filter(d => d !== status)[0];
+    
+    document.getElementById(prefix +removed).style.display = "none";
+    document.getElementById(prefix + status).style.display = "grid";
+
+    var timesheet = document.getElementById(prefix + status);
     timesheet.innerHTML = null;
 
     var timesheet_data = await getTimesheetData(status);
@@ -193,8 +199,6 @@ function updateButtonStyle(event) {
         renderGraph("Weekly")
     }
 }
-
-
 
 
 /**
