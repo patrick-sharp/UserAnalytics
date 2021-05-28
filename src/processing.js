@@ -292,9 +292,6 @@ function mapDomainToCategory(domains, categories) {
  * @returns an array object containing each domain and its corresponding time spent. Example format: {domain: time}
  */
 async function getTimesheetData(status) {
-
-  console.log(currentDate)
-
   var timesheetData = [];
   if (status === "Daily") {
     const todayData = await getDate(dateString(currentDate))

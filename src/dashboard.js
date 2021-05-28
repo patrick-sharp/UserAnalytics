@@ -262,10 +262,17 @@ async function renderGraph(status) {
     const sortedPolarData = Object.entries(polarData)
                             .sort(([,a],[,b]) => b-a)
                             .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
-    const polarLabels = Object.keys(sortedPolarData);
+    let polarLabels = Object.keys(sortedPolarData);
+    let polarDataset = Object.values(sortedPolarData);
 
-
-    const polarDataset = Object.values(sortedPolarData);
+    // if no data, set default categories and time (0s)
+    if (polarLabels.length === 0) {
+        polarLabels = await getCategoryKeys()
+    }
+    if (polarDataset.length === 0) {
+        polarDataset = Array.from(Array(polarLabels.length), (_, i) => 0)
+    }
+    
 
     let updatePolarChartToolTip = function(context) {
         let index = context.dataIndex;
