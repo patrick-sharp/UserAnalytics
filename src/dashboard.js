@@ -1,5 +1,7 @@
 const dates = ['Daily', 'Weekly'];
 var charts = [];                    // linechart, polarchart
+var loadWeekTimeSheet = false       // true if loading weekly timesheet
+var loadDailyTimeSheet = false      // true if loading daily timesheet
 
 /**
  * Open setting panel
@@ -53,6 +55,18 @@ async function generateTimeSheet(status) {
     
     document.getElementById(prefix +removed).style.display = "none";
     document.getElementById(prefix + status).style.display = "grid";
+    if (status === "Daily") {
+        if (loadDailyTimeSheet === true) {
+            return;
+        }
+        loadDailyTimeSheet = true
+    }
+    if (status === "Weekly") {
+        if (loadWeekTimeSheet === true) {
+            return;
+        }
+        loadWeekTimeSheet = true
+    }
 
     var timesheet = document.getElementById(prefix + status);
     timesheet.innerHTML = null;
@@ -80,6 +94,11 @@ async function generateTimeSheet(status) {
         row.appendChild(time);
     
         timesheet.appendChild(row);
+    }
+    if (status === "Daily") {
+        loadDailyTimeSheet = false;
+    } else {
+        loadWeekTimeSheet = false;
     }
 }
 
