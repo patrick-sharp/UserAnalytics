@@ -1,7 +1,6 @@
 // This is for testing with CI.
 // We can't test fetch because fetch isn't available in node.
 // the process variable is only defined in node
-
 try {
   if (process === undefined) {
     throw "Not in node"
@@ -47,8 +46,8 @@ let defaultLastDomainObj = {
     domain: null,
     openedTime: Date.now(),
     lastInactiveTime: 0,
-    totalInactiveTime: 0
-  }
+    totalInactiveTime: 0,
+  },
 };
 
 /*
@@ -87,93 +86,98 @@ let defaultLastDomainObj = {
 
 /**
  * Sets the last domain key to the domain and current timestamp
- * 
+ *
  * @param {string} domain a string that represents the host name in url
  */
 function setLastDomain(domain) {
-  chrome.storage.sync.get(['lastDomain'], function(data) {
+  chrome.storage.sync.get(["lastDomain"], function (data) {
     data = data.lastDomain;
 
-    let lastDomainObj = { 
+    let lastDomainObj = {
       lastDomain: {
         domain: domain,
         openedTime: Date.now(),
         lastInactiveTime: 0,
-        totalInactiveTime: 0
-      }
+        totalInactiveTime: 0,
+      },
     };
-    chrome.storage.sync.set(lastDomainObj, function() {
+    chrome.storage.sync.set(lastDomainObj, function () {
       if (debugMode) {
-        console.log('Last domain set to: ' + domain);
+        console.log("Last domain set to: " + domain);
       }
     });
   });
 }
 
-
 /**
  * Calculates the time and add to the domain spent
- * 
+ *
  * @param {string} domain host name in url
- */ 
+ */
 function domainChanged(domain) {
-  chrome.storage.sync.get({['lastDomain']: defaultLastDomainObj}, function(data) {
-    data = data.lastDomain;
+  chrome.storage.sync.get(
+    { ["lastDomain"]: defaultLastDomainObj },
+    function (data) {
+      data = data.lastDomain;
 
-    let lastDomain = data['domain'];
-    if (domain == null || domain == lastDomain) {  // newtab or nothing changed!
-      return;
-    }
-    if (!lastDomain) {                      // on startup (potential bug, what is default of domain when not set) 
-      setLastDomain(domain);
-      return;
-    }
-
-    // calculate time spent on tab
-    const timeSpentOnDomain = ((Date.now() - data['openedTime'] - data['totalInactiveTime']) / 1000);
-    const dateString = new Date(Date.now()).toLocaleDateString();
-
-    // add data to the map
-    addElement(dateString, lastDomain, timeSpentOnDomain);
-
-    // check if the current domain is in the whitelist
-    chrome.storage.sync.get(["whitelist"], function (data) {
-      var list = data['whitelist'];
-      if (list === undefined) {
-        list = []
+      let lastDomain = data["domain"];
+      if (domain == null || domain == lastDomain) {
+        // newtab or nothing changed!
+        return;
       }
-      if (list.includes(domain)) {
-        if (debugMode) {
-          console.log("White list url found: " + domain);
-        }
-        // reset LastDomain object
-        cleanUsage();
-      } else {
-        // update the last domain
+      if (!lastDomain) {
+        // on startup (potential bug, what is default of domain when not set)
         setLastDomain(domain);
+        return;
       }
-    })
-  });
-}
 
+      // calculate time spent on tab
+      const timeSpentOnDomain =
+        (Date.now() - data["openedTime"] - data["totalInactiveTime"]) / 1000;
+      const dateString = new Date(Date.now()).toLocaleDateString();
+
+      // add data to the map
+      addElement(dateString, lastDomain, timeSpentOnDomain);
+
+      // check if the current domain is in the whitelist
+      chrome.storage.sync.get(["whitelist"], function (data) {
+        var list = data["whitelist"];
+        if (list === undefined) {
+          list = [];
+        }
+        if (list.includes(domain)) {
+          if (debugMode) {
+            console.log("White list url found: " + domain);
+          }
+          // reset LastDomain object
+          cleanUsage();
+        } else {
+          // update the last domain
+          setLastDomain(domain);
+        }
+      });
+    }
+  );
+}
 
 /**
  * Called by invoke functions in chrome when domain is changed
- * 
+ *
  * @param {string} webURL the full url of a website
- */ 
+ */
 function handleUrlChange(webURL) {
-  if (webURL == "") {   // new Tab
+  if (webURL == "") {
+    // new Tab
     return;
   }
 
   //do not track
-  chrome.storage.sync.get(["doTrack"], function(data) {
+  chrome.storage.sync.get(["doTrack"], function (data) {
     if (data["doTrack"] === undefined) {
-      setDoTrack(true)
+      setDoTrack(true);
     } else if (data["doTrack"] === false) {
       if (debugMode) {
-        console.log("doTrack is turned off.")
+        console.log("doTrack is turned off.");
       }
       return;
     }
@@ -183,7 +187,6 @@ function handleUrlChange(webURL) {
   });
 }
 
-
 /******************************************************************************
  * Access Functions for frontend
  ******************************************************************************/
@@ -192,10 +195,10 @@ function handleUrlChange(webURL) {
  * clean and reset last usage
  */
 function cleanUsage() {
-  chrome.storage.sync.set(defaultLastDomainObj, function() {});
+  chrome.storage.sync.set(defaultLastDomainObj, function () {});
   if (debugMode) {
-    chrome.storage.sync.get(['lastDomain'], function(data) {
-      console.log('LastDomain key reset');
+    chrome.storage.sync.get(["lastDomain"], function (data) {
+      console.log("LastDomain key reset");
       console.log(data);
     });
   }
@@ -207,24 +210,23 @@ function cleanUsage() {
 function clearChromeStorage() {
   chrome.storage.sync.clear(function () {
     if (debugMode) {
-      console.log('cleared chrome storage');
+      console.log("cleared chrome storage");
     }
   });
   // restore deleted categories
-  loadDefaultCategory()
+  loadDefaultCategory();
 }
-
 
 /**
  * Get `domain:time` match for a given day
- * 
+ *
  * @param date a formatted string in the form "MM/DD/YYYY"(i.e. 4/30/2021).
  * @returns a promise that includes an object(i.e. {google.com: 123}), the object might be empty
  */
 async function getDomainsForDay(date) {
   // make the chrome storage call synchronous
-  var p = new Promise(function(resolve, reject){
-    chrome.storage.sync.get([date], function(data) {
+  var p = new Promise(function (resolve, reject) {
+    chrome.storage.sync.get([date], function (data) {
       if (data[date] === undefined) {
         data = {};
       } else {
@@ -241,33 +243,35 @@ async function getDomainsForDay(date) {
  * @returns a promise that includes an object(i.e. {"Entertainment": [domain1, domain2]}), the object might be empty
  */
 async function getCategoryList() {
-  var p = new Promise(function(resolve, reject) {
+  var p = new Promise(function (resolve, reject) {
     return chrome.storage.sync.get(["category"], function (data) {
-      resolve(JSON.parse(JSON.stringify(data))['category']);
-    })
+      resolve(JSON.parse(JSON.stringify(data))["category"]);
+    });
   });
-  return await p; 
+  return await p;
 }
 
 /**
  * Retrieve Category names from Chrome storage
- * 
+ *
  * @see getCategoryList
  * @returns a list of keys that represents defined Categories
  */
 async function getCategoryKeys() {
-  return getCategoryList().then( data => {return Object.keys(data)} );
+  return getCategoryList().then((data) => {
+    return Object.keys(data);
+  });
 }
 
 /**
  * Add user-selected link to specific category to Chrome storage
- * 
+ *
  * @param {string} category user-selected category
  * @param {string} link domain URL that will added to the `category`
  */
 function addLinkToCategory(category, link) {
-  chrome.storage.sync.get(["category"], function(data) {
-    var list = data['category'][category]
+  chrome.storage.sync.get(["category"], function (data) {
+    var list = data["category"][category];
     if (list.indexOf(link) === -1) {
       list.push(link);
       chrome.storage.sync.set(data);
@@ -275,75 +279,74 @@ function addLinkToCategory(category, link) {
         console.log(link + " is saved to " + category);
       }
     }
-  })
+  });
 }
 
 /**
  * Return a Promise of a copy of the whiteList from Chrome storage
- * 
- * @returns a copy of the whitelist 
+ *
+ * @returns a copy of the whitelist
  */
 async function getWhitelist() {
-  var p = new Promise(function(resolve, reject) {
+  var p = new Promise(function (resolve, reject) {
     chrome.storage.sync.get(["whitelist"], function (data) {
-      var list = data['whitelist']
+      var list = data["whitelist"];
       if (list === undefined) {
-        list = []
+        list = [];
       }
       resolve(list);
-    })
+    });
   });
-  return await p; 
+  return await p;
 }
 
 /**
  * Update the whiteList (domains: list)
  * @param {string} domains the domain URL to be added
  */
-function updateWhitelist(domains){
-  whitelistObj = {}
-  whitelistObj["whitelist"] = domains
-  chrome.storage.sync.set(whitelistObj, function() {
+function updateWhitelist(domains) {
+  whitelistObj = {};
+  whitelistObj["whitelist"] = domains;
+  chrome.storage.sync.set(whitelistObj, function () {
     if (debugMode) {
-      console.log('Update white list: ' + domains);
+      console.log("Update white list: " + domains);
       console.log(whitelistObj);
     }
   });
 }
-
 
 /**
  * Flip doTrack variable
  */
 function toggleTracking() {
   chrome.storage.sync.get(["doTrack"], function (data) {
-    var val = data["doTrack"]
+    var val = data["doTrack"];
     if (val === undefined) {
-      setDoTrack(true)
-      val = true
+      setDoTrack(true);
+      val = true;
     }
-    setDoTrack(!val)
+    setDoTrack(!val);
     if (debugMode) {
       console.log("ToggleTracking: " + val + " => " + !val);
     }
-  })
+  });
 }
 
 /**
  * Get doTrack status (default will be set to true)
  */
 async function getTrackingStatus() {
-  var p = new Promise(function(resolve, reject) {
+  var p = new Promise(function (resolve, reject) {
     chrome.storage.sync.get(["doTrack"], function (data) {
-      var val = data["doTrack"]
+      var val = data["doTrack"];
       if (val === undefined) {
-        setDoTrack(true)
-        val = true
+        setDoTrack(true);
+        val = true;
       }
       resolve(val);
-    })
+    });
   });
-  return await p; 
+  return await p;
 }
 
 /**
@@ -351,14 +354,14 @@ async function getTrackingStatus() {
  * @param {boolean} track the status for doTrack
  */
 function setDoTrack(track) {
-  let doTrackObj = {}
+  let doTrackObj = {};
   doTrackObj["doTrack"] = track;
   if (track === false) {
-    cleanUsage();  // reset LastDomain object
+    cleanUsage(); // reset LastDomain object
   }
-  chrome.storage.sync.set(doTrackObj, function(){
+  chrome.storage.sync.set(doTrackObj, function () {
     if (debugMode) {
-      console.log("Setting: doTrack is set to " + track)
+      console.log("Setting: doTrack is set to " + track);
     }
   });
 }
@@ -367,24 +370,26 @@ function setDoTrack(track) {
  * Call when the user is not in chrome (chrome is not in focus)
  */
 function chromeInactive() {
-  // set lastInactiveTime to now  
-  chrome.storage.sync.get(['lastDomain'], function(data) {
+  // set lastInactiveTime to now
+  chrome.storage.sync.get(["lastDomain"], function (data) {
     data = data.lastDomain;
     // check if lastInactiveTime was already set
-    if (!data || data['lastInactiveTime'] > 0) {
+    if (!data || data["lastInactiveTime"] > 0) {
       return;
     }
-    let lastDomainObj = { 
+    let lastDomainObj = {
       lastDomain: {
-        domain: data['domain'],
-        openedTime: data['openedTime'],
+        domain: data["domain"],
+        openedTime: data["openedTime"],
         lastInactiveTime: Date.now(),
-        totalInactiveTime: data['totalInactiveTime'] ? data['totalInactiveTime'] : 0
-      }
+        totalInactiveTime: data["totalInactiveTime"]
+          ? data["totalInactiveTime"]
+          : 0,
+      },
     };
-    chrome.storage.sync.set(lastDomainObj, function() {
+    chrome.storage.sync.set(lastDomainObj, function () {
       if (debugMode) {
-        console.log('chrome inactive, lastActiveTime set');
+        console.log("chrome inactive, lastActiveTime set");
       }
     });
   });
@@ -395,52 +400,61 @@ function chromeInactive() {
  */
 function chromeActive() {
   // update totalInactiveTime
-  chrome.storage.sync.get(['lastDomain'], function(data) {
+  chrome.storage.sync.get(["lastDomain"], function (data) {
     data = data.lastDomain;
-    if (!data || !data['lastInactiveTime'] || data['lastInactiveTime'] === 0) {
+    if (!data || !data["lastInactiveTime"] || data["lastInactiveTime"] === 0) {
       return;
     }
-    let inactiveTime = Date.now() - data['lastInactiveTime'];
-    let lastDomainObj = { 
+    let inactiveTime = Date.now() - data["lastInactiveTime"];
+    let lastDomainObj = {
       lastDomain: {
-        domain: data['domain'],
-        openedTime: data['openedTime'],
+        domain: data["domain"],
+        openedTime: data["openedTime"],
         lastInactiveTime: 0,
-        totalInactiveTime: data['totalInactiveTime'] ? data['totalInactiveTime'] + inactiveTime : inactiveTime
-      }
+        totalInactiveTime: data["totalInactiveTime"]
+          ? data["totalInactiveTime"] + inactiveTime
+          : inactiveTime,
+      },
     };
-    chrome.storage.sync.set(lastDomainObj, function() {
+    chrome.storage.sync.set(lastDomainObj, function () {
       if (debugMode) {
-        console.log('chrome active, totalInactiveTime updated');
+        console.log("chrome active, totalInactiveTime updated");
       }
     });
   });
 }
 
-
 /*
  * Default Favicon images from google and statvoo
  * https://stackoverflow.com/questions/5119041/how-can-i-get-a-web-sites-favicon
  */
-let googleFaviconFetchDefaultUrl = fetch(`https://care37-cors-anywhere.herokuapp.com/https://www.google.com/s2/favicons?domain=null.com.com.com.com`).then(res => {
-  return res.blob();
-}).then(img => {
-  return readFileAsDataURL(img);
-}).then(url => { 
-  return url;
-});
+let googleFaviconFetchDefaultUrl = fetch(
+  `https://care37-cors-anywhere.herokuapp.com/https://www.google.com/s2/favicons?domain=null.com.com.com.com`
+)
+  .then((res) => {
+    return res.blob();
+  })
+  .then((img) => {
+    return readFileAsDataURL(img);
+  })
+  .then((url) => {
+    return url;
+  });
 
 // get a url of the favicon for a given domain
 async function getFavicon(domain) {
-
-  let googleRes = await fetch(`https://care37-cors-anywhere.herokuapp.com/https://www.google.com/s2/favicons?sz=128&domain=${domain}`);
+  let googleRes = await fetch(
+    `https://care37-cors-anywhere.herokuapp.com/https://www.google.com/s2/favicons?sz=128&domain=${domain}`
+  );
   let img = await googleRes.blob();
   let url = await readFileAsDataURL(img);
   googleFaviconFetchDefaultUrl = await googleFaviconFetchDefaultUrl;
 
   // if the favicon doesn't exist fetch from another domain
   if (url === googleFaviconFetchDefaultUrl) {
-    let duckduckgoRes = await fetch(`https://care37-cors-anywhere.herokuapp.com/https://icons.duckduckgo.com/ip3/${domain}.ico`);
+    let duckduckgoRes = await fetch(
+      `https://care37-cors-anywhere.herokuapp.com/https://icons.duckduckgo.com/ip3/${domain}.ico`
+    );
     img = await duckduckgoRes.blob();
     url = await readFileAsDataURL(img);
   }
@@ -448,14 +462,13 @@ async function getFavicon(domain) {
   return url;
 }
 
-// convert the image blob data from a request to a local base64 url so we can compare them 
+// convert the image blob data from a request to a local base64 url so we can compare them
 async function readFileAsDataURL(file) {
   let result_base64 = await new Promise((resolve) => {
     let fileReader = new FileReader();
     fileReader.onload = (e) => resolve(fileReader.result);
     fileReader.readAsDataURL(file);
   });
-
   return result_base64;
 }
 
@@ -465,31 +478,29 @@ async function readFileAsDataURL(file) {
 /*
  * load default category to chromeStorage
  */
-function loadDefaultCategory(){
-  fetch('category.json')
-  .then(response => response.json())
-  .then(jsonData => {
-    let category = {};
-    category["category"] = jsonData;
-    chrome.storage.sync.set(
-      category, function() {
+function loadDefaultCategory() {
+  fetch("category.json")
+    .then((response) => response.json())
+    .then((jsonData) => {
+      let category = {};
+      category["category"] = jsonData;
+      chrome.storage.sync.set(category, function () {
         if (debugMode) {
           console.log("categories loaded successfully");
         }
-      }
-    )
-  });
+      });
+    });
 }
 
 /**
  * Add time data to map. If already exists, append time
- * 
+ *
  * @param {string} date    the date to be added to
  * @param {string} domain  the domain name to be added
  * @param {string} seconds the amount of time, in second, to be added
  */
 function addElement(date, domain, seconds) {
-  chrome.storage.sync.get([date], function(data) {
+  chrome.storage.sync.get([date], function (data) {
     if (data[date] === undefined) {
       data[date] = {};
     }
@@ -500,9 +511,9 @@ function addElement(date, domain, seconds) {
     data[domain] = data[domain] + seconds;
     let dataObj = {};
     dataObj[date] = data;
-    chrome.storage.sync.set(dataObj, function() {
+    chrome.storage.sync.set(dataObj, function () {
       if (debugMode) {
-        console.log('Added: ' + domain + "(" + seconds + "s)");
+        console.log("Added: " + domain + "(" + seconds + "s)");
         console.log(dataObj);
       }
     });
@@ -511,12 +522,12 @@ function addElement(date, domain, seconds) {
 
 /**
  * Remove time data from the map
- * 
+ *
  * @param {string} date   the date string that data will be removed from
  * @param {string} domain the domain that will be removed
  */
 function removeElement(date, domain) {
-  chrome.storage.sync.get([date], function(data) {
+  chrome.storage.sync.get([date], function (data) {
     if (data[date] === undefined) {
       return;
     }
@@ -528,15 +539,14 @@ function removeElement(date, domain) {
     let dataObj = {};
     dataObj[date] = data;
 
-    chrome.storage.sync.set(dataObj, function() {
+    chrome.storage.sync.set(dataObj, function () {
       if (debugMode) {
-        console.log('Deleted: ' + domain);
+        console.log("Deleted: " + domain);
         console.log(dataObj);
       }
     });
   });
 }
-
 
 /*
  * Remove date from the map
@@ -544,26 +554,25 @@ function removeElement(date, domain) {
 
 /**
  * Remove date from the map
- *  
+ *
  * @param {string} date the date string that will be removed
  */
 function removeDate(date) {
-  chrome.storage.sync.remove(date, function(data) {
+  chrome.storage.sync.remove(date, function (data) {
     if (debugMode) {
-      console.log('Deleted: ' + date);
+      console.log("Deleted: " + date);
       console.log(data);
     }
   });
 }
-
 
 /**
  * Get a copy of the map
  */
 async function getMap() {
   // make the chrome storage call synchronous
-  var p = new Promise(function(resolve, reject){
-    chrome.storage.sync.get(null, function(data) {
+  var p = new Promise(function (resolve, reject) {
+    chrome.storage.sync.get(null, function (data) {
       resolve(data);
     });
   });
@@ -571,7 +580,7 @@ async function getMap() {
 }
 
 // So node can import, but the file doesn't throw error when imported with importScripts in background.js
-if (typeof exports !== 'undefined') {
+if (typeof exports !== "undefined") {
   exports.setLastDomain = setLastDomain;
   exports.domainChanged = domainChanged;
   exports.handleUrlChange = handleUrlChange;
@@ -596,9 +605,9 @@ if (typeof exports !== 'undefined') {
 }
 
 // create a mock of the chrome API that works similarly to the real one so we can test it.
-// If we're running these tests with node, chrome will be undefined. That means we can 
+// If we're running these tests with node, chrome will be undefined. That means we can
 // define a mock api that mimics the function of the parts of the chrome API we use.
-if (typeof chrome === 'undefined') {
+if (typeof chrome === "undefined") {
   // this serves as a mock of the key-value storage of chrome's localstorage
   var TESTING_localStorage = {};
   var chrome = {
@@ -606,37 +615,43 @@ if (typeof chrome === 'undefined') {
     // We implement mocks of those functions here.
     storage: {
       sync: {
-        set: function(arg, callback) {
-          if (typeof arg === 'object') {
+        set: function (arg, callback) {
+          if (typeof arg === "object") {
             const key = Object.keys(arg)[0];
             TESTING_localStorage[key] = arg[key];
           } else {
-            throw 'Error: arg is not object';
+            throw "Error: arg is not object";
           }
           callback();
         },
-        get: function(arg, callback) {
+        get: function (arg, callback) {
           if (Array.isArray(arg)) {
             const key = arg[0];
-            const result = TESTING_localStorage[key] === undefined ? {} : TESTING_localStorage[key];
+            const result =
+              TESTING_localStorage[key] === undefined
+                ? {}
+                : { [key]: TESTING_localStorage[key] };
             callback(result);
-          } else if (typeof arg === 'object') {
+          } else if (typeof arg === "object") {
             const key = Object.keys(arg)[0];
-            const result = TESTING_localStorage[key] === undefined ? arg[key] : {[key]: TESTING_localStorage[key]};
+            const result =
+              TESTING_localStorage[key] === undefined
+                ? arg[key]
+                : { [key]: TESTING_localStorage[key] };
             callback(result);
           } else {
-            throw 'Error: arg is not array or object';
+            throw "Error: arg is not array or object";
           }
         },
-        clear: function(callback) {
+        clear: function (callback) {
           for (let key of Object.keys(TESTING_localStorage)) {
             delete TESTING_localStorage[key];
           }
           callback();
-        }
-      }
+        },
+      },
     },
-  }
+  };
   exports.chrome = chrome;
   exports.TESTING_localStorage = TESTING_localStorage;
 }
