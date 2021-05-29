@@ -1,13 +1,4 @@
-const {
-  chrome,
-  TESTING_localStorage,
-  setLastDomain,
-  domainChanged,
-  clearChromeStorage,
-  handleUrlChange,
-  cleanUsage,
-  getDomainsForDay,
-} = require("../src/middleware.js");
+const { chrome, TESTING_localStorage, setLastDomain, domainChanged, clearChromeStorage } = require('../src/middleware.js');
 
 // Every function in this array is a test.
 // If the test passes, the function returns true.
@@ -15,126 +6,96 @@ const {
 const testFunctions = [
   // setLastDomain
   function test1() {
-    setLastDomain("google.com");
+    setLastDomain('google.com');
     return (
-      Object.keys(TESTING_localStorage).includes("lastDomain") &&
-      TESTING_localStorage["lastDomain"].domain === "google.com" &&
-      TESTING_localStorage["lastDomain"].openedTime <= Date.now()
+      Object.keys(TESTING_localStorage).includes('lastDomain')
+      && TESTING_localStorage['lastDomain'].domain === 'google.com'
+      && TESTING_localStorage['lastDomain'].openedTime <= Date.now()
     );
   },
   function test2() {
-    setLastDomain("bing.com");
+    setLastDomain('bing.com');
     return (
-      Object.keys(TESTING_localStorage).includes("lastDomain") &&
-      TESTING_localStorage["lastDomain"].domain === "bing.com" &&
-      TESTING_localStorage["lastDomain"].openedTime <= Date.now()
+      Object.keys(TESTING_localStorage).includes('lastDomain')
+      && TESTING_localStorage['lastDomain'].domain === 'bing.com'
+      && TESTING_localStorage['lastDomain'].openedTime <= Date.now()
     );
   },
   function test3() {
-    setLastDomain("google.com");
-    setLastDomain("bing.com");
-    setLastDomain("facebook.com");
-    setLastDomain("example.com");
+    setLastDomain('google.com');
+    setLastDomain('bing.com');
+    setLastDomain('facebook.com');
+    setLastDomain('example.com');
     return (
-      Object.keys(TESTING_localStorage).includes("lastDomain") &&
-      TESTING_localStorage["lastDomain"].domain === "example.com" &&
-      TESTING_localStorage["lastDomain"].openedTime <= Date.now()
+      Object.keys(TESTING_localStorage).includes('lastDomain')
+      && TESTING_localStorage['lastDomain'].domain === 'example.com'
+      && TESTING_localStorage['lastDomain'].openedTime <= Date.now()
     );
-  },
-  // clearChromeStorage
-  async function test4() {
-    clearChromeStorage();
-    return Object.keys(TESTING_localStorage).length === 0;
   },
   // // domainChanged
-  async function test5() {
+  async function test4() {
     clearChromeStorage();
-    setLastDomain("google.com");
-    await new Promise((r) => setTimeout(r, 500));
-    domainChanged("facebook.com");
-    const dateString = getDateString();
+    setLastDomain('google.com');
+    await new Promise(r => setTimeout(r, 500));
+    domainChanged('facebook.com');
+    const dateString = new Date(Date.now()).toLocaleDateString();
     return (
-      TESTING_localStorage.hasOwnProperty(dateString) &&
-      checkDomainInStorage(TESTING_localStorage, "google.com", 500, dateString)
+      TESTING_localStorage.hasOwnProperty(dateString)
+      && checkDomainInStorage(TESTING_localStorage, 'google.com', 500, dateString)
     );
   },
-  async function test6() {
+  async function test5() {
     const time = 200;
     clearChromeStorage();
-    setLastDomain("google.com");
-    await new Promise((r) => setTimeout(r, time));
-    domainChanged("example.com");
+    setLastDomain('google.com');
+    await new Promise(r => setTimeout(r, time));
+    domainChanged('example.com');
     dateString = getDateString();
-    let didTestPass = TESTING_localStorage.hasOwnProperty(dateString);
-    didTestPass =
-      didTestPass &&
-      checkDomainInStorage(
-        TESTING_localStorage,
-        "google.com",
-        time,
-        dateString
-      );
-    await new Promise((r) => setTimeout(r, time));
-    domainChanged("facebook.com");
-    didTestPass =
-      didTestPass &&
-      checkDomainInStorage(
-        TESTING_localStorage,
-        "example.com",
-        time,
-        dateString
-      );
-    await new Promise((r) => setTimeout(r, time));
-    domainChanged("bing.com");
-    didTestPass =
-      didTestPass &&
-      checkDomainInStorage(
-        TESTING_localStorage,
-        "facebook.com",
-        time,
-        dateString
-      ) &&
-      TESTING_localStorage["lastDomain"].domain === "bing.com";
+    let didTestPass = TESTING_localStorage.hasOwnProperty(dateString)
+    didTestPass = didTestPass && checkDomainInStorage(TESTING_localStorage, 'google.com', time, dateString);
+    await new Promise(r => setTimeout(r, time));
+    domainChanged('facebook.com');
+    didTestPass = didTestPass && checkDomainInStorage(TESTING_localStorage, 'example.com', time, dateString);
+    await new Promise(r => setTimeout(r, time));
+    domainChanged('bing.com');
+    didTestPass = didTestPass && checkDomainInStorage(TESTING_localStorage, 'facebook.com', time, dateString)
+                              && TESTING_localStorage['lastDomain'].domain === 'bing.com';
     return didTestPass;
   },
+  // async function test6() {
+  //   const domains = ['facebook.com', 'bing.com', 'example.com', 'reddit.com', 'youtube.com', 'skillshare.com']
+  //   // const domains = ['google.com', 'facebook.com', 'bing.com', 'example.com'];
+  //   let time = 40;
+  //   clearChromeStorage();
+  //   setLastDomain('google.com');
+  //   // console.log(TESTING_localStorage);
+  //   for (let domain of domains) {
+  //     domainChanged(domain);
+  //     time += 10;
+  //     await new Promise(r => setTimeout(r, time));
+  //     console.log('ITER', TESTING_localStorage)
+  //   }
+  //   const dateString = getDateString();
+  //   console.log(TESTING_localStorage);
+  //   let didTestPass = TESTING_localStorage.hasOwnProperty(dateString);
+  //   time = 40;
+  //   for (let domain of domains) {
+  //     time += 10;
+  //     didTestPass = didTestPass && checkDomainInStorage(TESTING_localStorage, domain, time, dateString);
+  //   }
+  //   didTestPass = didTestPass && TESTING_localStorage.lastDomain.domain === 'skillshare.com';
+  //   return didTestPass;
+  // }
   // handleUrlChange
-  async function test7() {
-    clearChromeStorage();
-    handleUrlChange("");
-    return Object.keys(TESTING_localStorage).length === 0;
-  },
-  async function test8() {
-    clearChromeStorage();
-    setLastDomain("google.com");
-    handleUrlChange("https://www.facebook.com");
-    const dateString = getDateString();
-    return (
-      TESTING_localStorage.hasOwnProperty(dateString) &&
-      checkDomainInStorage(TESTING_localStorage, "google.com", 0, dateString)
-    );
-  },
   // cleanUsage
-  async function test9() {
-    cleanUsage();
-    const ld = TESTING_localStorage.lastDomain;
-    return (
-      ld.domain === null &&
-      ld.lastInactiveTime === 0 &&
-      ld.totalInactiveTime === 0
-    );
-  },
+  // clearChromeStorage
   // getDomainsForDay
-  async function test10() {
-    clearChromeStorage();
-    setLastDomain("google.com");
-    handleUrlChange("https://www.twitter.com");
-    handleUrlChange("https://www.example.com");
-    const dateString = getDateString();
-    const domains = await getDomainsForDay(dateString);
-    console.log(TESTING_localStorage);
-    console.log(domains);
-    return domains["google.com"] !== undefined && domains["twitter.com"] !== undefined;
-  },
+  // getTimeForDay
+  // getTimeForWeek
+  // addElement
+  // removeElement
+  // removeDate
+  // getMap
 ];
 
 function getDateString() {
@@ -146,11 +107,11 @@ function getDateString() {
 // This checks whether or not the given domain is in storage
 function checkDomainInStorage(TESTING_localStorage, domain, time, dateString) {
   return (
-    typeof TESTING_localStorage[dateString] === "object" &&
-    TESTING_localStorage[dateString][domain] !== undefined &&
-    TESTING_localStorage[dateString][domain] >= time / 1000 &&
-    TESTING_localStorage[dateString][domain] <= (time + 300) / 1000
-  );
+    typeof TESTING_localStorage[dateString] === 'object'
+    && TESTING_localStorage[dateString][domain] !== undefined
+    && TESTING_localStorage[dateString][domain] >= time / 1000
+    && TESTING_localStorage[dateString][domain] <= (time + 300) / 1000
+  )
 }
 
 // Run all the tests and print a message about whether they passed or failed.
@@ -165,26 +126,26 @@ async function runTests() {
       const testResult = await testFunctions[i]();
       if (testResult) {
         numTestsPassed++;
-        message = `Test ${i + 1} passed`;
+        message = `Test ${i+1} passed`;
       } else {
-        message = `Test ${i + 1} failed`;
+        message = `Test ${i+1} failed`;
       }
-    } catch (error) {
-      message = `Test ${i + 1} failed with exception:\n${error}`;
+    } catch(error) {
+      message = `Test ${i+1} failed with exception:\n${error}`;
     }
     console.log(message);
   }
   const fractionOfTestsPassed = `${numTestsPassed}/${testFunctions.length} tests passed`;
-  const equals = "=".repeat(fractionOfTestsPassed.length);
-  console.log(
-    "\n" + equals + "\n" + fractionOfTestsPassed + "\n" + equals + "\n"
-  );
+  const equals = '='.repeat(fractionOfTestsPassed.length);
+  console.log('\n' + equals + '\n' + fractionOfTestsPassed + '\n' + equals + '\n');
 
-  return numTestsPassed == testFunctions.length;
+  return numTestsPassed == testFunctions.length
 }
 
-runTests().then((res) => {
+runTests().then(res => {
   if (!res) {
-    throw "One or more tests failed, see program output for more information";
+    throw 'One or more tests failed, see program output for more information';
   }
-});
+})
+
+
