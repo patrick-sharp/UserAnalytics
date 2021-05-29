@@ -48,10 +48,10 @@ Please format any code or console output with three ticks ``` above and below. -
 - [x] Update extension popup UI.
 - [x] Missing title for the right chart.
 - [X] Change "Most frequent weekly" to expected behavior
-- [ ] Correct other category to "uncategorized" category, needs correction in data processing layer
-- [ ] The category chart needs unit when hovering. Categories should be displayed according to the order in descending order and the colors should match categories.
-- [ ] Do not track UserAnalytic dashboard, chrome://*, and new tab.
-- [ ] Better favicon fetching
+- [x] The category chart needs unit when hovering. Categories should be displayed according to the order in descending order and the colors should match categories.
+- [x] Correct other category to "uncategorized" category, needs correction in data processing layer
+- [x] Do not track UserAnalytic dashboard, chrome://*, and new tab.
+- [x] Better favicon fetching
 - [ ] Add ability to view and modify categories in setting
 - [ ] Delete data older than 7 days
 
