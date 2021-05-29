@@ -162,6 +162,9 @@ async function getWeeklyTotalTime(prevWeek) {
 async function getWeeklyMostFrequentTime() {
   let timeSheetData = await getTimesheetData("Weekly");
   let obj = timeSheetData[0];
+  if (obj === undefined) {  // no data in the timeSheet
+    return ["", 0, 0]
+  }
 
   return [obj['title'], obj['time'], 0];
 }
