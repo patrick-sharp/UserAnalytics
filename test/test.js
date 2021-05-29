@@ -7,6 +7,8 @@ const {
   handleUrlChange,
   cleanUsage,
   getDomainsForDay,
+  addLinkToCategory,
+  loadDefaultCategory,
 } = require("../src/middleware.js");
 
 // Every function in this array is a test.
@@ -41,12 +43,18 @@ const testFunctions = [
       TESTING_localStorage["lastDomain"].openedTime <= Date.now()
     );
   },
-  // clearChromeStorage
+  // clearChromeStorage and loadDefaultCategory
   async function test4() {
     clearChromeStorage();
-    return Object.keys(TESTING_localStorage).length === 0;
+    await new Promise((r) => setTimeout(r, 50));
+    return TESTING_localStorage.category
+        && Array.isArray(TESTING_localStorage.category.Entertainment)
+        && Array.isArray(TESTING_localStorage.category.Productivity)
+        && Array.isArray(TESTING_localStorage.category.Reading)
+        && Array.isArray(TESTING_localStorage.category.Social)
+        && Array.isArray(TESTING_localStorage.category.Uncategorized)
   },
-  // // domainChanged
+  // domainChanged
   async function test5() {
     clearChromeStorage();
     setLastDomain("google.com");
@@ -131,8 +139,6 @@ const testFunctions = [
     handleUrlChange("https://www.example.com");
     const dateString = getDateString();
     const domains = await getDomainsForDay(dateString);
-    console.log(TESTING_localStorage);
-    console.log(domains);
     return domains["google.com"] !== undefined && domains["twitter.com"] !== undefined;
   },
 ];
