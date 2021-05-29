@@ -1,7 +1,10 @@
 try {
   importScripts("./psl.min.js");
 } catch (e) {
-  var psl = require("./psl.min.js");
+  try {
+    var psl = require("./psl.min.js");
+    var categories = require("./category.json");
+  } catch(e) {}
 }
 
 // This is for testing with CI.
@@ -9,11 +12,17 @@ try {
 // instead, we can use this placeholder to ensure that the methods are
 // properly extracting the data in the results of their fetches.
 if (fetch === undefined) {
-  var fetch = () => {
+  var fetch = (arg) => {
     return new Promise((resolve, reject) => {
+      let jsonData = "[\"PLACEHOLDER_JSON\"]"
+      if (arg === 'category.json') {
+        jsonData = categories;
+      }
       resolve({
         blob: () => "PLACEHOLDER_BLOB",
-        json: () => "PLACEHOLDER_JSON",
+        json: () => new Promise((resolve, reject) => {
+          resolve(jsonData);
+        }),
       });
     });
   };
@@ -32,7 +41,7 @@ if (FileReader === undefined) {
 /******************************************************************************
  * global variables
  ******************************************************************************/
-const debugMode = true; // print message to console (service worker)
+const debugMode = false; // print message to console (service worker)
 let defaultLastDomainObj = {
   // default object if lastDomain key does not exist
   lastDomain: {
