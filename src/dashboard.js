@@ -80,6 +80,11 @@ async function generateTimeSheet(status) {
         img.style.width = '32px';
         img.style.height = '32px'
         img.src = await getFavicon(value.title);
+        if (i === 0) {      // update mostfrequent Icon
+            var icon = document.getElementById('right_container').children[0].children[1].firstChild;
+            icon.src = img.src;
+        }
+
         var title = document.createElement('span');
         title.id = 'title';
         title.innerHTML = value.title;
@@ -148,7 +153,7 @@ function generateStatistics(titleString, totalTime, timeDiff, domain) {
     title.innerHTML = titleString;
     title.style.fontSize = '24px';
     title.style.color = '#000000'
-    icon.src = domain === "" ? 'images/timer.svg' : ('https://www.google.com/s2/favicons?sz=64&domain_url=' + domain)
+    icon.src = 'images/timer.svg';      // placeholder for default image
     icon.style.width = '32px';
     icon.style.height = '32px';
 
