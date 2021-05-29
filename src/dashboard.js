@@ -1,12 +1,16 @@
 const dates = ['Daily', 'Weekly'];
 var charts = [];                    // linechart, polarchart
+var loadWeekTimeSheet = false       // true if loading weekly timesheet
+var loadDailyTimeSheet = false      // true if loading daily timesheet
 
 /**
  * Open setting panel
  */
-function openSettingPanel() {
+async function openSettingPanel() {
     document.getElementById("setting_panel").style.width = "50%";
+    document.getElementById("switch_check").checked = await getTrackingStatus(); 
 }
+
 
 /**
  * Close the setting panel
@@ -21,6 +25,7 @@ window.onload = async function() {
 
     document.getElementById("setting").addEventListener("click", openSettingPanel);
     document.getElementById("setting_close_button").addEventListener("click", closeSettingPanel);
+    document.getElementById("switch_check").addEventListener('click', toggleTracking)
 
     dates.forEach(date => {
         var button = document.createElement("button");
@@ -45,17 +50,41 @@ window.onload = async function() {
  * @see getTimeSheetData()
  */
 async function generateTimeSheet(status) {
-    var timesheet = document.getElementById('timesheet');
+    const prefix = "timesheet_"
+    let removed = dates.filter(d => d !== status)[0];
+    
+    document.getElementById(prefix +removed).style.display = "none";
+    document.getElementById(prefix + status).style.display = "grid";
+    if (status === "Daily") {
+        if (loadDailyTimeSheet === true) {
+            return;
+        }
+        loadDailyTimeSheet = true
+    }
+    if (status === "Weekly") {
+        if (loadWeekTimeSheet === true) {
+            return;
+        }
+        loadWeekTimeSheet = true
+    }
+
+    var timesheet = document.getElementById(prefix + status);
     timesheet.innerHTML = null;
 
     var timesheet_data = await getTimesheetData(status);
-    timesheet_data.forEach(async function(value, _index, _arr){
+    for (var i = 0; i < timesheet_data.length; i ++) {
+        let value = timesheet_data[i]
         var row = document.createElement('div');
         row.className = 'timesheet_row';
         var img = document.createElement('img');
         img.style.width = '32px';
         img.style.height = '32px'
         img.src = await getFavicon(value.title);
+        if (i === 0) {      // update mostfrequent Icon
+            var icon = document.getElementById('right_container').children[0].children[1].firstChild;
+            icon.src = img.src;
+        }
+
         var title = document.createElement('span');
         title.id = 'title';
         title.innerHTML = value.title;
@@ -70,7 +99,12 @@ async function generateTimeSheet(status) {
         row.appendChild(time);
     
         timesheet.appendChild(row);
-    })
+    }
+    if (status === "Daily") {
+        loadDailyTimeSheet = false;
+    } else {
+        loadWeekTimeSheet = false;
+    }
 }
 
 
@@ -119,7 +153,7 @@ function generateStatistics(titleString, totalTime, timeDiff, domain) {
     title.innerHTML = titleString;
     title.style.fontSize = '24px';
     title.style.color = '#000000'
-    icon.src = domain === "" ? 'images/timer.svg' : ('https://www.google.com/s2/favicons?sz=64&domain_url=' + domain)
+    icon.src = 'images/timer.svg';      // placeholder for default image
     icon.style.width = '32px';
     icon.style.height = '32px';
 
@@ -191,8 +225,6 @@ function updateButtonStyle(event) {
 }
 
 
-
-
 /**
  * Render the Chrome usage graphs
  * Polar Chart will be updated if already populated
@@ -250,15 +282,35 @@ async function renderGraph(status) {
     // plot polarChart
     var polarChart = null;
     const polarData = await getPolarChartData(status);
+
     const sortedPolarData = Object.entries(polarData)
                             .sort(([,a],[,b]) => b-a)
                             .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
-    const polarLabels = Object.keys(sortedPolarData);
-    const polarDataset = Object.values(sortedPolarData);
+    let polarLabels = Object.keys(sortedPolarData);
+    let polarDataset = Object.values(sortedPolarData);
+
+    // if no data, set default categories and time (0s)
+    if (polarLabels.length === 0) {
+        polarLabels = await getCategoryKeys()
+    }
+    if (polarDataset.length === 0) {
+        polarDataset = Array.from(Array(polarLabels.length), (_, i) => 0)
+    }
+    
+
+    let updatePolarChartToolTip = function(context) {
+        let index = context.dataIndex;
+    
+        let label = polarLabels[index]
+        let data = polarDataset[index];
+    
+        return label + ": " + (data / 60).toFixed(2) + "min";
+    }
+
     const order = Array.from(Array(polarLabels.length), (_, i) => i+1).reverse()
     if (charts.length === 2) {
         polarChart = charts.pop();
-        // polarChart.data.datasets[0].data = polarDataset
+        polarChart.options.plugins.tooltip.callbacks.label = updatePolarChartToolTip
         polarChart.update("show");
     } else {
         var ctx_polar = document.getElementById('polarChart');
@@ -288,13 +340,7 @@ async function renderGraph(status) {
                     },
                     tooltip: {
                         callbacks: {
-                            label: function(context) {
-                                let index = context.dataIndex;
-                                let label = polarLabels[index]
-                                let data = polarDataset[index];
-
-                                return label + ": " + (data / 60).toFixed(2) + "min";
-                            }
+                            label: updatePolarChartToolTip
                         }
                     }
                 }

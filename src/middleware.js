@@ -335,7 +335,7 @@ function chromeInactive() {
   chrome.storage.sync.get(['lastDomain'], function(data) {
     data = data.lastDomain;
     // check if lastInactiveTime was already set
-    if (data['lastInactiveTime'] > 0) {
+    if (!data || data['lastInactiveTime'] > 0) {
       return;
     }
     let lastDomainObj = { 
@@ -361,7 +361,7 @@ function chromeActive() {
   // update totalInactiveTime
   chrome.storage.sync.get(['lastDomain'], function(data) {
     data = data.lastDomain;
-    if (!data['lastInactiveTime'] || data['lastInactiveTime'] === 0) {
+    if (!data || !data['lastInactiveTime'] || data['lastInactiveTime'] === 0) {
       return;
     }
     let inactiveTime = Date.now() - data['lastInactiveTime'];

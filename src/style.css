@@ -229,7 +229,7 @@ textarea {
 }
 
 #stats_view .chart {
-    margin: 15px;
+    margin: 10px;
 }
 
 #activity_container {
@@ -343,12 +343,12 @@ textarea {
     align-items: center;
 }
 
-#timesheet {
+.timesheet {
     display: grid;
     place-items: stretch;
 }
 
-#timesheet .timesheet_row {
+.timesheet .timesheet_row {
     display: grid;
     grid-template-columns: 80px auto 150px;
     grid-template-rows: auto;
@@ -361,7 +361,7 @@ textarea {
     width: clamp(600px, 100%, 100%);
 }
 
-#timesheet img {
+.timesheet img {
     width: 32px;
     height: 32px;
     margin-left: 20px;
@@ -378,23 +378,23 @@ textarea {
     justify-self: end;
 } */
 
-#timesheet_container {
+.timesheet_container {
     margin-top: 20px;
 }
 
-#timesheet .timesheet_row #title {
+.timesheet .timesheet_row #title {
     grid-area: title;
     font-weight: normal;
     font-size: 20px;
     line-height: 36px;
 }
 
-#timesheet .timesheet_row  #time {
+.timesheet .timesheet_row  #time {
     justify-self: center; 
     grid-area: time;
 }
 
-#timesheet .timesheet_row  #time .numbers {
+.timesheet .timesheet_row  #time .numbers {
     font-size: 24px;
     line-height: 36px;
     font-weight: 700;

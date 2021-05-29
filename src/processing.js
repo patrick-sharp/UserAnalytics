@@ -293,7 +293,6 @@ function mapDomainToCategory(domains, categories) {
  */
 async function getTimesheetData(status) {
   var timesheetData = [];
-
   if (status === "Daily") {
     const todayData = await getDate(dateString(currentDate))
     for (var domain in todayData) {
