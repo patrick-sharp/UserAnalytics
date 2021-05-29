@@ -1,14 +1,49 @@
 try {
   importScripts('./psl.min.js');
 } catch (e) {
-  console.log(e);
+  try {
+    var psl = require("./psl.min.js");
+    var categories = require("./category.json");
+  } catch(e) {}
+}
+
+// This is for testing with CI.
+// We can't test fetch because fetch isn't available in node.
+// instead, we can use this placeholder to ensure that the methods are
+// properly extracting the data in the results of their fetches.
+if (fetch === undefined) {
+  var fetch = (arg) => {
+    return new Promise((resolve, reject) => {
+      let jsonData = "[\"PLACEHOLDER_JSON\"]"
+      if (arg === 'category.json') {
+        jsonData = categories;
+      }
+      resolve({
+        blob: () => "PLACEHOLDER_BLOB",
+        json: () => new Promise((resolve, reject) => {
+          resolve(jsonData);
+        }),
+      });
+    });
+  };
+}
+
+// This is for testing with CI.
+// We can't test FileReader because FileReader isn't available in node.
+if (FileReader === undefined) {
+  var FileReader = class FileReader {
+    readAsDataURL(file) {
+      return file;
+    }
+  };
 }
 
 /******************************************************************************
  * global variables
  ******************************************************************************/
-const debugMode = true;         // print message to console (service worker)  
-let defaultLastDomainObj = {    // default object if lastDomain key does not exist
+const debugMode = false; // print message to console (service worker)
+let defaultLastDomainObj = {
+  // default object if lastDomain key does not exist
   lastDomain: {
     domain: null,
     openedTime: Date.now(),
