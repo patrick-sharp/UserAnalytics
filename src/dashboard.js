@@ -8,7 +8,6 @@ var loadDailyTimeSheet = false      // true if loading daily timesheet
  */
 async function openSettingPanel() {
     document.getElementById("setting_panel").style.width = "50%";
-    document.getElementById("switch_check").checked = await getTrackingStatus(); 
 }
 
 
@@ -25,7 +24,6 @@ window.onload = async function() {
 
     document.getElementById("setting").addEventListener("click", openSettingPanel);
     document.getElementById("setting_close_button").addEventListener("click", closeSettingPanel);
-    document.getElementById("switch_check").addEventListener('click', toggleTracking)
 
     dates.forEach(date => {
         var button = document.createElement("button");
@@ -39,9 +37,19 @@ window.onload = async function() {
 
     document.getElementById("Daily").click()
 
+    document.getElementById("clear_usage_button").onclick = clearUsageData;
+
     var whitelist = await getWhitelist();
     document.getElementById("whitelist_editor").innerHTML = whitelist.join(", ");
     document.getElementById("whitelist_button").onclick = saveWhitelist;
+
+    var categories = await getCategoryList();
+    document.getElementById("entertainment_editor").innerHTML = categories["Entertainment"].join(", ");
+    document.getElementById("social_editor").innerHTML = categories["Social"].join(", ");
+    document.getElementById("reading_editor").innerHTML = categories["Reading"].join(", ");
+    document.getElementById("productivity_editor").innerHTML = categories["Productivity"].join(", ");
+    document.getElementById("uncategorized_editor").innerHTML = categories["Uncategorized"].join(", ");
+    document.getElementById("categories_button").onclick = saveCategories;
 };
 
 /**
@@ -107,6 +115,11 @@ async function generateTimeSheet(status) {
     }
 }
 
+function clearUsageData() {
+    clearChromeStorage();
+    document.getElementById("clear_usage_success_text").innerHTML = "Cleared!";
+    setTimeout(() => { document.getElementById("clear_usage_success_text").innerHTML = ""; }, 2000)
+}
 
 /**
  * Save the whitelist to Chrome storage, and update the visual indication
@@ -121,6 +134,22 @@ function saveWhitelist() {
     updateWhitelist(whitelist);
     document.getElementById("whitelist_success_text").innerHTML = "Saved!";
     setTimeout(() => { document.getElementById("whitelist_success_text").innerHTML = ""; }, 2000)
+}
+
+function saveCategories() {
+    var obj = {};
+    const names = ["Entertainment", "Social", "Reading", "Productivity", "Uncategorized"];
+    const editors = ["entertainment_editor", "social_editor", "reading_editor", "productivity_editor", "uncategorized_editor"];
+    for (var i = 0; i < names.length; i++) {
+        var category = document.getElementById(editors[i]).value.split(',');
+        for (var j = 0; j < category.length; j++) {
+            category[j] = category[j].trim();
+        }
+        obj[names[i]] = category;
+    }
+    updateCategories(obj);
+    document.getElementById("categories_success_text").innerHTML = "Saved!";
+    setTimeout(() => { document.getElementById("categories_success_text").innerHTML = ""; }, 2000)
 }
 
 /**

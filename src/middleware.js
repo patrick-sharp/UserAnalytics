@@ -277,6 +277,17 @@ function updateWhitelist(domains){
   });
 }
 
+function updateCategories(categories) {
+  categoriesObj = {};
+  categoriesObj["category"] = categories;
+  chrome.storage.sync.set(categoriesObj, function() {
+    if (debugMode) {
+      console.log('Update categories: ');
+      console.log(categoriesObj);
+    }
+  });
+}
+
 
 /**
  * Flip doTrack variable
