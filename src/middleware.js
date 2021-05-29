@@ -4,6 +4,31 @@ try {
   console.log(e);
 }
 
+// This is for testing with CI.
+// We can't test fetch because fetch isn't available in node.
+// instead, we can use this placeholder to ensure that the methods are
+// properly extracting the data in the results of their fetches.
+if (fetch === undefined) {
+  var fetch = () => {
+    return new Promise((resolve, reject) => {
+      resolve({
+        blob: () => "PLACEHOLDER_BLOB",
+        json: () => "PLACEHOLDER_JSON"
+      });
+    })
+  }
+}
+
+// This is for testing with CI.
+// We can't test FileReader because FileReader isn't available in node.
+if (FileReader === undefined) {
+  var FileReader = class FileReader {
+    readAsDataURL(file) {
+      return file;
+    }
+  }
+}
+
 /******************************************************************************
  * global variables
  ******************************************************************************/
@@ -421,7 +446,6 @@ async function readFileAsDataURL(file) {
     fileReader.onload = (e) => resolve(fileReader.result);
     fileReader.readAsDataURL(file);
   });
-
   return result_base64;
 }
 
