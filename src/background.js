@@ -21,17 +21,7 @@ chrome.runtime.onInstalled.addListener(async () => {
   let url = chrome.runtime.getURL("dashboard.html");
 
   // fetch preset category json file async.
-  fetch('category.json')
-  .then(response => response.json())
-  .then(jsonData => {
-    let category = {};
-    category["category"] = jsonData;
-    chrome.storage.sync.set(
-      category, function() {
-        console.log("categories loaded successfully");
-      }
-    )
-  });
+  loadDefaultCategory();
 
   fetch('mock.json')
   .then(response => response.json())

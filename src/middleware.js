@@ -176,6 +176,8 @@ function clearChromeStorage() {
       console.log('cleared chrome storage');
     }
   });
+  // restore deleted categories
+  loadDefaultCategory()
 }
 
 
@@ -426,7 +428,24 @@ async function readFileAsDataURL(file) {
 /******************************************************************************
  * Util functions (can be used for testing, use at your own risks)
  ******************************************************************************/
-
+/*
+ * load default category to chromeStorage
+ */
+function loadDefaultCategory(){
+  fetch('category.json')
+  .then(response => response.json())
+  .then(jsonData => {
+    let category = {};
+    category["category"] = jsonData;
+    chrome.storage.sync.set(
+      category, function() {
+        if (debugMode) {
+          console.log("categories loaded successfully");
+        }
+      }
+    )
+  });
+}
 
 /**
  * Add time data to map. If already exists, append time
@@ -539,6 +558,7 @@ if (typeof exports !== 'undefined') {
   exports.updateWhitelist = updateWhitelist;
   exports.toggleTracking = toggleTracking;
   exports.getTrackingStatus = getTrackingStatus;
+  exports.loadDefaultCategory = loadDefaultCategory;
 }
 
 // create a mock of the chrome API that works similarly to the real one so we can test it.
