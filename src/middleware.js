@@ -570,6 +570,7 @@ if (typeof exports !== 'undefined') {
   exports.toggleTracking = toggleTracking;
   exports.getTrackingStatus = getTrackingStatus;
   exports.loadDefaultCategory = loadDefaultCategory;
+  exports.updateCategories = updateCategories;
 }
 
 // create a mock of the chrome API that works similarly to the real one so we can test it.
