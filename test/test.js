@@ -1,4 +1,15 @@
-const { chrome, TESTING_localStorage, setLastDomain, domainChanged, clearChromeStorage } = require('../src/middleware.js');
+const {
+  chrome,
+  TESTING_localStorage,
+  setLastDomain,
+  domainChanged,
+  clearChromeStorage,
+  handleUrlChange,
+  cleanUsage,
+  getDomainsForDay,
+  addLinkToCategory,
+  loadDefaultCategory,
+} = require("../src/middleware.js");
 
 // Every function in this array is a test.
 // If the test passes, the function returns true.
@@ -32,8 +43,19 @@ const testFunctions = [
       && TESTING_localStorage['lastDomain'].openedTime <= Date.now()
     );
   },
-  // // domainChanged
+  // clearChromeStorage and loadDefaultCategory
   async function test4() {
+    clearChromeStorage();
+    await new Promise((r) => setTimeout(r, 50));
+    return TESTING_localStorage.category
+        && Array.isArray(TESTING_localStorage.category.Entertainment)
+        && Array.isArray(TESTING_localStorage.category.Productivity)
+        && Array.isArray(TESTING_localStorage.category.Reading)
+        && Array.isArray(TESTING_localStorage.category.Social)
+        && Array.isArray(TESTING_localStorage.category.Uncategorized)
+  },
+  // domainChanged
+  async function test5() {
     clearChromeStorage();
     setLastDomain('google.com');
     await new Promise(r => setTimeout(r, 500));
@@ -90,12 +112,15 @@ const testFunctions = [
   // cleanUsage
   // clearChromeStorage
   // getDomainsForDay
-  // getTimeForDay
-  // getTimeForWeek
-  // addElement
-  // removeElement
-  // removeDate
-  // getMap
+  async function test10() {
+    clearChromeStorage();
+    setLastDomain("google.com");
+    handleUrlChange("https://www.twitter.com");
+    handleUrlChange("https://www.example.com");
+    const dateString = getDateString();
+    const domains = await getDomainsForDay(dateString);
+    return domains["google.com"] !== undefined && domains["twitter.com"] !== undefined;
+  },
 ];
 
 function getDateString() {
