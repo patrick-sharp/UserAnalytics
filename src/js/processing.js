@@ -43,13 +43,17 @@ function dateString(dateObj) {
 /**
  * Return a Date object `prev` number of days before today
  * 
- * @param {number} prev 
+ * @param {number} prev number of previous days, 1 if yesterday
+ * @param {string} date dateString, default null
  * @returns a Date object `prev` number of days before today
  */
-function getPreviousDays(prev) {
-  const today = new Date()
-  const prevDay = new Date(today)
-  
+function getPreviousDays(prev, today=null) {
+  if (today === null) {
+    today = new Date();
+  } else {
+    today = new Date(today)
+  }
+  const prevDay = new Date(today);
   return new Date(prevDay.setDate(today.getDate() - prev));
 }
 
@@ -88,13 +92,15 @@ async function getTimeForWeek(dates, domain) {
 
 /**
  * Uses the current date to find total seconds spent on Chrome today as well as the difference from yesterday
+ * @param {string} date dateString, default null(today)
  * @returns A size 2 array, first index the total second spent on Chrome today, 
  *          second index the difference in seconds, today - yesterday.
  */
-async function getTotalTime() {
-  const todayString = dateString(currentDate);
-  const yesterdayString = dateString(getPreviousDays(1));
-
+async function getTotalTime(todayString=null) {
+  if (todayString === null) {
+    todayString = dateString(currentDate)
+  }
+  const yesterdayString = dateString(getPreviousDays(1, todayString));
   const todayData = await getDate(todayString);
   const yesterdayData = await getDate(yesterdayString);
 
@@ -115,14 +121,16 @@ async function getTotalTime() {
 /**
  * Get the amount of time for the most frequently visited site
  * 
+ * @param {string} todayString dateString, default null
  * @see getTimeForDay
  * @returns an array of size 3. arr[0]: the URL of the most frequently visited domain; 
  *                              arr[1]: the amount of time spent on the domain; 
  *                              arr[2]: the time different in second compared to yesterday
  */
-async function getMostFrequentTime() {
-  const todayString = dateString(currentDate);
-
+async function getMostFrequentTime(todayString=null) {
+  if (todayString === null) {
+    todayString = dateString(currentDate);
+  }
   const todayData = await getDate(todayString);
 
   var maxDomain = "";
@@ -135,7 +143,7 @@ async function getMostFrequentTime() {
     }
   }
 
-  var yesterdayTime = await getTimeForDay(dateString(getPreviousDays(1)), maxDomain);
+  var yesterdayTime = await getTimeForDay(dateString(getPreviousDays(1, todayString)), maxDomain);
 
   return [maxDomain, maxTime, maxTime - yesterdayTime];
 }
@@ -229,13 +237,16 @@ async function getLineChartData() {
  * @see dateString
  * @see getTimeForDay
  * @param {string} status indicate daily or weekly data
+ * @param {string} todayString dateString, default null
  * @returns a new object with {Category: time, ...}
  */
-async function getPolarChartData(status) {
+async function getPolarChartData(status, todayString=null) {
   var categories = await getCategoryList();
   
   if (status === "Daily") {
-    const todayString = dateString(currentDate)
+    if (todayString === null) {
+      todayString = dateString(currentDate);
+    }
     const domains = await getDomainsForDay(todayString)
     return mapDomainToCategory(domains, categories);
   } else { // status === "Weekly"
@@ -300,13 +311,17 @@ function mapDomainToCategory(domains, categories) {
  * @see dateString
  * @see getDate
  * 
- * @param status indicate Daily or Weekly data
+ * @param {String} status indicate Daily or Weekly data
+ * @param {string} date   dateString, default null
  * @returns an array object containing each domain and its corresponding time spent. Example format: {domain: time}
  */
-async function getTimesheetData(status) {
+async function getTimesheetData(status, date=null) {
   var timesheetData = [];
   if (status === "Daily") {
-    const todayData = await getDate(dateString(currentDate))
+    if (date === null) {
+      date = dateString(currentDate)
+    }
+    const todayData = await getDate(date)
     for (var domain in todayData) {
       var temp = {}
       temp['title'] = domain;
