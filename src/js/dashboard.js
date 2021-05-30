@@ -2,6 +2,7 @@ const dates = ['Daily', 'Weekly'];
 var charts = [];                    // linechart, polarchart
 var loadWeekTimeSheet = false       // true if loading weekly timesheet
 var loadDailyTimeSheet = false      // true if loading daily timesheet
+var picker = null; // calendar picker instance
 
 /**
  * Open setting panel
@@ -34,8 +35,24 @@ window.onload = async function() {
     
         button.addEventListener('click', event => updateButtonStyle(event))
         let a = document.getElementById('selector');
-        a.appendChild(button);
+
+        if (date === "Daily") {
+            var calendar_container = document.createElement('div');
+            calendar_container.id = "calendar_container";
+            var calendar_img = document.createElement('img');
+            calendar_img.id = "calendar_selector";
+            calendar_img.src = 'assets/images/calendar.svg';
+            calendar_img.style.width = '28px';
+            calendar_img.style.height = '28px';
+            calendar_container.appendChild(button);
+            calendar_container.appendChild(calendar_img);
+            a.append(calendar_container);
+        } else {
+            a.appendChild(button);
+        }
     })
+
+    setupCalendarSelector();
 
     document.getElementById("Daily").click()
 
@@ -43,6 +60,27 @@ window.onload = async function() {
     document.getElementById("whitelist_editor").innerHTML = whitelist.join(", ");
     document.getElementById("whitelist_button").onclick = saveWhitelist;
 };
+
+/**
+ * Set up a calendar selector
+ */
+function setupCalendarSelector() {
+    var calendarRange = [];
+    for (let i = 0; i < 7; i++) {
+        calendarRange.push(calendarDateString(getPreviousDays(i)));
+    }
+
+    picker = flatpickr("#calendar_selector", {
+        defaultDate: calendarDateString(new Date()),
+        enable: calendarRange
+    });
+
+    picker.config.onChange.push(function(selectedDate) {
+        selectedDateString = dateString(selectedDate[0]);
+        // TODO: add functions to update data in top statistics, polar chart and timesheet
+    });
+
+}
 
 /**
  * generate timeSheet
@@ -153,7 +191,7 @@ function generateStatistics(titleString, totalTime, timeDiff, domain) {
     title.innerHTML = titleString;
     title.style.fontSize = '24px';
     title.style.color = '#000000'
-    icon.src = 'images/timer.svg';      // placeholder for default image
+    icon.src = 'assets/images/timer.svg';      // placeholder for default image
     icon.style.width = '32px';
     icon.style.height = '32px';
 
@@ -217,10 +255,13 @@ function updateButtonStyle(event) {
         retrieveDailyData();
         generateTimeSheet("Daily")
         renderGraph("Daily")
+        document.getElementById('calendar_selector').style.display = 'block';
     } else {
         retrieveWeeklyData();
         generateTimeSheet("Weekly")
         renderGraph("Weekly")
+        document.getElementById('calendar_selector').style.display = 'none';
+        picker.setDate(calendarDateString(new Date()));
     }
 }
 

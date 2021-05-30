@@ -187,6 +187,12 @@ textarea {
     justify-content: center;
 }
 
+#calendar_container {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+}
+
 #date_selector button {
     height: 37px; 
     width: 104px; 

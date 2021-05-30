@@ -32,6 +32,15 @@ function dateString(dateObj) {
 }
 
 /**
+ * formate a date object to corresponding date string in YYYY-MM-DD format
+ * @param {Date} dateObj 
+ * @returns a string representation of the date object
+ */
+ function calendarDateString(dateObj) {
+  return dateObj.getFullYear() + "-" + String(dateObj.getMonth() + 1) + "-" + dateObj.getDate();
+}
+
+/**
  * Return a Date object `prev` number of days before today
  * 
  * @param {number} prev 

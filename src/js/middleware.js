@@ -5,8 +5,8 @@ try {
   if (process === undefined) {
     throw "Not in node"
   }
-  global.psl = require("./psl.min.js");
-  global.categories = require("./category.json");
+  global.psl = require("../psl.min.js");
+  global.categories = require("../category.json");
 
   global.FileReader = class FileReader {
     readAsDataURL(file) {
@@ -31,7 +31,7 @@ try {
 } catch(e) {}
 
 try {
-  importScripts("./psl.min.js");
+  importScripts("../psl.min.js");
 } catch (e) {
 
 }
@@ -479,7 +479,7 @@ async function readFileAsDataURL(file) {
  * load default category to chromeStorage
  */
 function loadDefaultCategory() {
-  fetch("category.json")
+  fetch("../category.json")
     .then((response) => response.json())
     .then((jsonData) => {
       let category = {};
