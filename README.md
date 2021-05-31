@@ -54,6 +54,6 @@ Please format any code or console output with three ticks ``` above and below. -
 - [x] Correct other category to "uncategorized" category, needs correction in data processing layer
 - [x] Do not track UserAnalytic dashboard, chrome://*, and new tab.
 - [x] Better favicon fetching
-- [ ] Add ability to view and modify categories in setting
+- [x] Add ability to view and modify categories in setting
 - [ ] Delete data older than 7 days
 
