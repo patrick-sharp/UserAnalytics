@@ -188,6 +188,8 @@ async function runTests() {
 
 runTests().then((res) => {
   if (!res) {
-    throw "One or more tests failed, see program output for more information";
+    // throw "One or more tests failed, see program output for more information";
+    // console.log("One or more tests failed, see program output for more information\n");
+    process.exit(1);
   }
 });
