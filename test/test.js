@@ -6,7 +6,10 @@ const {
   handleUrlChange,
   cleanUsage,
   getDomainsForDay,
+  getCategoryList,
 } = require("../src/js/middleware.js");
+
+const categories = require("../src/category.json");
 
 // Every function in this array is a test.
 // If the test passes, the function returns true.
@@ -44,12 +47,14 @@ const testFunctions = [
   async function test4() {
     clearChromeStorage();
     await new Promise((r) => setTimeout(r, 50));
-    return TESTING_localStorage.category
-        && Array.isArray(TESTING_localStorage.category.Entertainment)
-        && Array.isArray(TESTING_localStorage.category.Productivity)
-        && Array.isArray(TESTING_localStorage.category.Reading)
-        && Array.isArray(TESTING_localStorage.category.Social)
-        && Array.isArray(TESTING_localStorage.category.Uncategorized)
+    return (
+      TESTING_localStorage.category &&
+      Array.isArray(TESTING_localStorage.category.Entertainment) &&
+      Array.isArray(TESTING_localStorage.category.Productivity) &&
+      Array.isArray(TESTING_localStorage.category.Reading) &&
+      Array.isArray(TESTING_localStorage.category.Social) &&
+      Array.isArray(TESTING_localStorage.category.Uncategorized)
+    );
   },
   // domainChanged
   async function test5() {
@@ -136,7 +141,25 @@ const testFunctions = [
     handleUrlChange("https://www.example.com");
     const dateString = getDateString();
     const domains = await getDomainsForDay(dateString);
-    return domains["google.com"] !== undefined && domains["twitter.com"] !== undefined;
+    return (
+      domains["google.com"] !== undefined &&
+      domains["twitter.com"] !== undefined
+    );
+  },
+  // getCategoryList
+  async function test11() {
+    const categoryList = await getCategoryList();
+    for (let key of Object.keys(categories)) {
+      if (!Array.isArray(categoryList[key])) {
+        return false;
+      }
+      for (let website of categories[key]) {
+        if (!categoryList[key].includes(website)) {
+          return false;
+        }
+      }
+    }
+    return true;
   },
 ];
 
