@@ -16,6 +16,7 @@ const {
   updateWhitelist,
   getWhitelist,
   toggleTracking,
+  getTrackingStatus,
 } = require("../src/js/middleware.js");
 
 const categories = require("../src/category.json");
@@ -313,6 +314,31 @@ const testFunctions = [
     toggleTracking();
     toggleTracking();
     return TESTING_localStorage.doTrack;
+  },
+  // getTrackingStatus
+  async function test24() {
+    clearChromeStorage();
+    handleUrlChange("https://www.example.com");
+    await new Promise((r) => setTimeout(r, 100));
+    return await getTrackingStatus();
+  },
+  async function test25() {
+    clearChromeStorage();
+    handleUrlChange("https://www.example.com");
+    await new Promise((r) => setTimeout(r, 100));
+    if (!(await getTrackingStatus())) {
+      return false;
+    }
+    toggleTracking();
+    return !(await getTrackingStatus());
+  },
+  async function test26() {
+    clearChromeStorage();
+    handleUrlChange("https://www.example.com");
+    await new Promise((r) => setTimeout(r, 100));
+    toggleTracking();
+    toggleTracking();
+    return (await getTrackingStatus());
   },
 ];
 
