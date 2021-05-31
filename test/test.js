@@ -15,6 +15,7 @@ const {
   chromeActive,
   updateWhitelist,
   getWhitelist,
+  toggleTracking,
 } = require("../src/js/middleware.js");
 
 const categories = require("../src/category.json");
@@ -274,7 +275,7 @@ const testFunctions = [
     );
   },
   // getWhitelist
-  async function test19() {
+  async function test20() {
     clearChromeStorage();
     const domains = ['google.com', 'example.com', 'facebook.com'];
     updateWhitelist(domains);
@@ -284,6 +285,34 @@ const testFunctions = [
       && whitelist[1] === domains[1]
       && whitelist[2] === domains[2]
     );
+  },
+  // toggleTracking
+  async function test21() {
+    clearChromeStorage();
+    handleUrlChange("https://www.example.com");
+    await new Promise((r) => setTimeout(r, 100));
+    return TESTING_localStorage.doTrack;
+  },
+  async function test22() {
+    clearChromeStorage();
+    handleUrlChange("https://www.example.com");
+    await new Promise((r) => setTimeout(r, 100));
+    if (!TESTING_localStorage.doTrack) {
+      return false;
+    }
+    toggleTracking();
+    return !TESTING_localStorage.doTrack;
+  },
+  async function test23() {
+    clearChromeStorage();
+    handleUrlChange("https://www.example.com");
+    await new Promise((r) => setTimeout(r, 100));
+    if (!TESTING_localStorage.doTrack) {
+      return false;
+    }
+    toggleTracking();
+    toggleTracking();
+    return TESTING_localStorage.doTrack;
   },
 ];
 
