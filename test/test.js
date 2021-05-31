@@ -10,6 +10,9 @@ const {
   getCategoryKeys,
   addLinkToCategory,
   removeDate,
+  getMap,
+  chromeInactive,
+  chromeActive,
 } = require("../src/js/middleware.js");
 
 const categories = require("../src/category.json");
@@ -210,7 +213,52 @@ const testFunctions = [
     const dateString = getDateString();
     removeDate(dateString);
     return !TESTING_localStorage.hasOwnProperty(dateString);
-  }
+  },
+  // getMap
+  // async function test__() {
+  //   setLastDomain('example.com');
+  //   handleUrlChange('https://www.google.com');
+  //   const map = await getMap();
+  //   return (
+  //     map.hasOwnProperty('category')
+  //     && map.hasOwnProperty(getDateString())
+  //     && map.hasOwnProperty('doTrack')
+  //     && map.hasOwnProperty('lastDomain')
+  //   );
+  // },
+  // chromeInactive
+  async function test16() {
+    clearChromeStorage();
+    setLastDomain('example.com');
+    handleUrlChange('https://www.google.com');
+    chromeInactive();
+    return Math.abs(TESTING_localStorage.lastDomain.lastInactiveTime - Date.now()) < 50;
+  },
+  // chromeActive
+  async function test17() {
+    clearChromeStorage();
+    setLastDomain('example.com');
+    handleUrlChange('https://www.google.com');
+    chromeInactive();
+    await new Promise((r) => setTimeout(r, 100));
+    chromeActive();
+    return Math.abs(TESTING_localStorage.lastDomain.totalInactiveTime - 100) < 50;
+  },
+  async function test18() {
+    clearChromeStorage();
+    setLastDomain('example.com');
+    handleUrlChange('https://www.google.com');
+    chromeInactive();
+    await new Promise((r) => setTimeout(r, 100));
+    chromeActive();
+    await new Promise((r) => setTimeout(r, 100));
+    chromeInactive();
+    await new Promise((r) => setTimeout(r, 100));
+    chromeActive();
+    return (
+      Math.abs(TESTING_localStorage.lastDomain.totalInactiveTime - 200) < 50
+    );
+  },
 ];
 
 function getDateString() {

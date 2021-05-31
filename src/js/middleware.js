@@ -635,7 +635,9 @@ if (typeof chrome === "undefined") {
           callback && callback();
         },
         get: function (arg, callback) {
-          if (Array.isArray(arg)) {
+          if (arg === null || arg === undefined) {
+            return null;
+          } else if (Array.isArray(arg)) {
             const key = arg[0];
             const result =
               TESTING_localStorage[key] === undefined
