@@ -315,6 +315,17 @@ function updateWhitelist(domains) {
   });
 }
 
+function updateCategories(categories) {
+  categoriesObj = {};
+  categoriesObj["category"] = categories;
+  chrome.storage.sync.set(categoriesObj, function() {
+    if (debugMode) {
+      console.log('Update categories: ');
+      console.log(categoriesObj);
+    }
+  });
+}
+
 /**
  * Flip doTrack variable
  */
@@ -602,6 +613,7 @@ if (typeof exports !== "undefined") {
   exports.toggleTracking = toggleTracking;
   exports.getTrackingStatus = getTrackingStatus;
   exports.loadDefaultCategory = loadDefaultCategory;
+  exports.updateCategories = updateCategories;
 }
 
 // create a mock of the chrome API that works similarly to the real one so we can test it.

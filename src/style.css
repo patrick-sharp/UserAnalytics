@@ -158,28 +158,30 @@ textarea {
     margin-right: 20px;
 }
 
-#whitelist_button {
+.setting_button {
     width: 50px;
     text-align: center;
     color: white;
     background-color:#00754a;
+    float: right;
 }
 
-#whitelist_button:hover {
+.setting_button:hover {
     color: white;
     background-color:#5AC43B;
 }
 
-#whitelist_button:active {
+.setting_button:active {
     color: black;
     background-color:gray;
 }
 
-#whitelist_success_text {
+.success_text {
     color:#00754a;
     text-align: center;
     font-size: 15px;
 }
+
 
 #date_selector {
     display: flex;
