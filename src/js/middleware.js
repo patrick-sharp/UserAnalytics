@@ -689,6 +689,11 @@ if (typeof chrome === "undefined") {
           }
           callback && callback();
         },
+        remove: function (key, callback) {
+          const data = { [key]: TESTING_localStorage.key }
+          delete TESTING_localStorage[key];
+          callback && callback(data);
+        }
       },
     },
   };
