@@ -14,6 +14,7 @@ const {
   chromeInactive,
   chromeActive,
   updateWhitelist,
+  getWhitelist,
 } = require("../src/js/middleware.js");
 
 const categories = require("../src/category.json");
@@ -271,7 +272,19 @@ const testFunctions = [
       && TESTING_localStorage.whitelist[1] === domains[1]
       && TESTING_localStorage.whitelist[2] === domains[2]
     );
-  }
+  },
+  // getWhitelist
+  async function test19() {
+    clearChromeStorage();
+    const domains = ['google.com', 'example.com', 'facebook.com'];
+    updateWhitelist(domains);
+    const whitelist = await getWhitelist();
+    return (
+      whitelist[0] === domains[0]
+      && whitelist[1] === domains[1]
+      && whitelist[2] === domains[2]
+    );
+  },
 ];
 
 function getDateString() {
