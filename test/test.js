@@ -9,6 +9,7 @@ const {
   getCategoryList,
   getCategoryKeys,
   addLinkToCategory,
+  removeDate,
 } = require("../src/js/middleware.js");
 
 const categories = require("../src/category.json");
@@ -201,6 +202,14 @@ const testFunctions = [
     addLinkToCategory('Entertainment', 'getpocket.com');
     const categoryList = await getCategoryList();
     return categoryList.Entertainment.includes('getpocket.com');
+  },
+  // removeDate
+  async function test15() {
+    setLastDomain('example.com');
+    handleUrlChange('https://www.google.com');
+    const dateString = getDateString();
+    removeDate(dateString);
+    return !TESTING_localStorage.hasOwnProperty(dateString);
   }
 ];
 
