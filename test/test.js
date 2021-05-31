@@ -13,6 +13,7 @@ const {
   getMap,
   chromeInactive,
   chromeActive,
+  updateWhitelist,
 } = require("../src/js/middleware.js");
 
 const categories = require("../src/category.json");
@@ -259,6 +260,18 @@ const testFunctions = [
       Math.abs(TESTING_localStorage.lastDomain.totalInactiveTime - 200) < 50
     );
   },
+  // updateWhitelist
+  async function test19() {
+    clearChromeStorage();
+    const domains = ['google.com', 'example.com', 'facebook.com'];
+    updateWhitelist(domains);
+    return (
+      TESTING_localStorage.whitelist
+      && TESTING_localStorage.whitelist[0] === domains[0]
+      && TESTING_localStorage.whitelist[1] === domains[1]
+      && TESTING_localStorage.whitelist[2] === domains[2]
+    );
+  }
 ];
 
 function getDateString() {
