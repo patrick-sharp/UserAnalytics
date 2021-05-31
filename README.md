@@ -2,6 +2,8 @@
 
 UserAnalytics is a chrome extension which tracks how much time a user spends on different websites and visualizes the data for the user.
 
+Please check on the <a href="https://github.com/patrick-sharp/UserAnalytics/blob/main/src/README.md">Developer Doc</a> for further information.
+
 ## Install & Run UserAnalytics
 1. Clone this repository to your machine.
 2. Navigate to chrome://extensions in google chrome. You can also access this page by clicking on the Chrome menu on the top right side of the Omnibox, hovering over **More Tools** and selecting **Extensions**.
