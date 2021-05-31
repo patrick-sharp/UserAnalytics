@@ -1,5 +1,5 @@
 try {
-  importScripts('./middleware.js');
+  importScripts('./js/middleware.js');
 } catch (e) {
   console.error(e);
 }

@@ -2,12 +2,16 @@ const dates = ['Daily', 'Weekly'];
 var charts = [];                    // linechart, polarchart
 var loadWeekTimeSheet = false       // true if loading weekly timesheet
 var loadDailyTimeSheet = false      // true if loading daily timesheet
+var picker = null;                  // calendar picker instance
 
 /**
  * Open setting panel
  */
-async function openSettingPanel() {
-    document.getElementById("setting_panel").style.width = "50%";
+function openSettingPanel() {
+    let setting_panel = document.getElementById("setting_panel");
+    setting_panel.classList.add('halfscreen');
+    setting_panel.classList.add('fullscreen');    
+    document.getElementById('main').style.marginLeft = "50%";
 }
 
 
@@ -15,7 +19,12 @@ async function openSettingPanel() {
  * Close the setting panel
  */
 function closeSettingPanel() {
-    document.getElementById("setting_panel").style.width = "0";
+    let setting_panel = document.getElementById("setting_panel");
+    setting_panel.style.width = "0";
+    setting_panel.classList.remove('halfscreen');
+    setting_panel.classList.remove('fullscreen');
+    document.getElementById('main').style.marginLeft = "150px";
+
     document.body.style.backgroundColor = '#F2F0EB'
 }
 
@@ -32,8 +41,24 @@ window.onload = async function() {
     
         button.addEventListener('click', event => updateButtonStyle(event))
         let a = document.getElementById('selector');
-        a.appendChild(button);
+
+        if (date === "Daily") {
+            var calendar_container = document.createElement('div');
+            calendar_container.id = "calendar_container";
+            var calendar_img = document.createElement('img');
+            calendar_img.id = "calendar_selector";
+            calendar_img.src = 'assets/images/calendar.svg';
+            calendar_img.style.width = '28px';
+            calendar_img.style.height = '28px';
+            calendar_container.appendChild(button);
+            calendar_container.appendChild(calendar_img);
+            a.append(calendar_container);
+        } else {
+            a.appendChild(button);
+        }
     })
+
+    setupCalendarSelector();
 
     document.getElementById("Daily").click()
 
@@ -53,11 +78,35 @@ window.onload = async function() {
 };
 
 /**
+ * Set up a calendar selector
+ */
+function setupCalendarSelector() {
+    var calendarRange = [];
+    for (let i = 0; i < 7; i++) {
+        calendarRange.push(calendarDateString(getPreviousDays(i)));
+    }
+
+    picker = flatpickr("#calendar_selector", {
+        defaultDate: calendarDateString(new Date()),
+        enable: calendarRange
+    });
+
+    picker.config.onChange.push(function(selectedDate) {
+        selectedDateString = dateString(selectedDate[0]);
+        retrieveDailyData(selectedDateString);
+        generateTimeSheet("Daily", selectedDateString);
+        renderGraph("Daily", selectedDateString);
+    });
+
+}
+
+/**
  * generate timeSheet
  * @param {string} status indicate daily or weekly data
+ * @param {string} date dateString, default null
  * @see getTimeSheetData()
  */
-async function generateTimeSheet(status) {
+async function generateTimeSheet(status, date=null) {
     const prefix = "timesheet_"
     let removed = dates.filter(d => d !== status)[0];
     
@@ -79,7 +128,7 @@ async function generateTimeSheet(status) {
     var timesheet = document.getElementById(prefix + status);
     timesheet.innerHTML = null;
 
-    var timesheet_data = await getTimesheetData(status);
+    var timesheet_data = await getTimesheetData(status, date);
     for (var i = 0; i < timesheet_data.length; i ++) {
         let value = timesheet_data[i]
         var row = document.createElement('div');
@@ -182,7 +231,7 @@ function generateStatistics(titleString, totalTime, timeDiff, domain) {
     title.innerHTML = titleString;
     title.style.fontSize = '24px';
     title.style.color = '#000000'
-    icon.src = 'images/timer.svg';      // placeholder for default image
+    icon.src = 'assets/images/timer.svg';      // placeholder for default image
     icon.style.width = '32px';
     icon.style.height = '32px';
 
@@ -246,10 +295,13 @@ function updateButtonStyle(event) {
         retrieveDailyData();
         generateTimeSheet("Daily")
         renderGraph("Daily")
+        document.getElementById('calendar_selector').style.display = 'block';
     } else {
         retrieveWeeklyData();
         generateTimeSheet("Weekly")
         renderGraph("Weekly")
+        document.getElementById('calendar_selector').style.display = 'none';
+        picker.setDate(calendarDateString(new Date()));
     }
 }
 
@@ -258,8 +310,9 @@ function updateButtonStyle(event) {
  * Render the Chrome usage graphs
  * Polar Chart will be updated if already populated
  * @param {string} status indicate daily or weekly data
+ * @param {string} date   dateString, default null
  */
-async function renderGraph(status) {
+async function renderGraph(status, date=null) {
 
     // plot linechart
     if (charts.length === 0) {
@@ -310,7 +363,7 @@ async function renderGraph(status) {
     
     // plot polarChart
     var polarChart = null;
-    const polarData = await getPolarChartData(status);
+    const polarData = await getPolarChartData(status, date);
 
     const sortedPolarData = Object.entries(polarData)
                             .sort(([,a],[,b]) => b-a)
@@ -381,17 +434,23 @@ async function renderGraph(status) {
 
 /**
  * Retrieve Daily usage data from Chrome storage
- * 
+ * @param {string} date dateString, default null
  * @see generateStatistics
  */
-async function retrieveDailyData() {
-    totalTimeData = await getTotalTime();
+async function retrieveDailyData(date=null) {
+    totalTimeData = await getTotalTime(date);
     var left_container = document.getElementById('left_container');
+    if (left_container.children.length > 0) {
+        left_container.removeChild(left_container.childNodes[0]);
+    }
     let left_content = generateStatistics("Total Time", totalTimeData[0], totalTimeData[1], '');
     left_container.appendChild(left_content);
     
-    mostFrequentTimeData = await getMostFrequentTime();
+    mostFrequentTimeData = await getMostFrequentTime(date);
     var right_container = document.getElementById('right_container');
+    if (right_container.children.length > 0) {
+        right_container.removeChild(right_container.childNodes[0]);
+    }
     let right_content = generateStatistics("Most Frequent", mostFrequentTimeData[1], mostFrequentTimeData[2], mostFrequentTimeData[0]);
     right_container.appendChild(right_content);
 }
@@ -459,15 +518,3 @@ function formatTimeToMinute(second) {
     return formattedString + minute + "min";
 }
 
-/**
- * Return a Date object `prev` number of days before today
- * 
- * @param {number} prev 
- * @returns a Date object `prev` number of days before today
- */
-function getPreviousDays(prev) {
-    const today = new Date()
-    const yesterday = new Date(today)
-    
-    return new Date(yesterday.setDate(today.getDate() - prev));
-}

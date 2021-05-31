@@ -6,7 +6,7 @@ const {
   handleUrlChange,
   cleanUsage,
   getDomainsForDay,
-} = require("../src/middleware.js");
+} = require("../src/js/middleware.js");
 
 // Every function in this array is a test.
 // If the test passes, the function returns true.
