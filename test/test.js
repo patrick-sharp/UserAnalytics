@@ -181,6 +181,17 @@ const testFunctions = [
       }
     }
     return true;
+  },
+  // cleanUsage
+  async function test13() {
+    cleanUsage();
+    return (
+      TESTING_localStorage.lastDomain
+      && TESTING_localStorage.lastDomain.domain === null
+      && typeof TESTING_localStorage.lastDomain.openedTime === 'number'
+      && TESTING_localStorage.lastDomain.lastInactiveTime === 0
+      && TESTING_localStorage.lastDomain.totalInactiveTime === 0
+    )
   }
 ];
 
