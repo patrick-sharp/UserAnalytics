@@ -7,6 +7,7 @@ const {
   cleanUsage,
   getDomainsForDay,
   getCategoryList,
+  getCategoryKeys,
 } = require("../src/js/middleware.js");
 
 const categories = require("../src/category.json");
@@ -161,6 +162,26 @@ const testFunctions = [
     }
     return true;
   },
+  // getCategoryKeys
+  async function test12() {
+    const expectedKeys = [
+      'Entertainment',
+      'Social',
+      'Reading',
+      'Productivity',
+      'Uncategorized'
+    ];
+    const actualKeys = await getCategoryKeys();
+    if (!Array.isArray(actualKeys)) {
+      return false;
+    }
+    for (let category of expectedKeys) {
+      if (!actualKeys.includes(category)) {
+        return false;
+      }
+    }
+    return true;
+  }
 ];
 
 function getDateString() {
