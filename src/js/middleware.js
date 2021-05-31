@@ -3,7 +3,7 @@
 // the process variable is only defined in node
 try {
   if (process === undefined) {
-    throw "Not in node"
+    throw "Not in node";
   }
   global.psl = require("../psl.min.js");
   global.categories = require("../category.json");
@@ -15,20 +15,21 @@ try {
   };
   global.fetch = (arg) => {
     return new Promise((resolve, reject) => {
-      let jsonData = "[\"PLACEHOLDER_JSON\"]"
-      if (arg.includes('category.json')) {
+      let jsonData = '["PLACEHOLDER_JSON"]';
+      if (arg.includes("category.json")) {
         jsonData = categories;
       }
       resolve({
         blob: () => "PLACEHOLDER_BLOB",
-        json: () => new Promise((resolve, reject) => {
-          resolve(jsonData);
-        }),
+        json: () =>
+          new Promise((resolve, reject) => {
+            resolve(jsonData);
+          }),
       });
     });
   };
-  console.log("Mock Chrome environment for Node initialized.")
-} catch(e) {}
+  console.log("Mock Chrome environment for Node initialized.");
+} catch (e) {}
 
 try {
   importScripts("../psl.min.js");
@@ -316,9 +317,9 @@ function updateWhitelist(domains) {
 function updateCategories(categories) {
   categoriesObj = {};
   categoriesObj["category"] = categories;
-  chrome.storage.sync.set(categoriesObj, function() {
+  chrome.storage.sync.set(categoriesObj, function () {
     if (debugMode) {
-      console.log('Update categories: ');
+      console.log("Update categories: ");
       console.log(categoriesObj);
     }
   });
