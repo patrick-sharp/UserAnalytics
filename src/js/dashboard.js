@@ -9,6 +9,7 @@ var picker = null;                  // calendar picker instance
  */
 function openSettingPanel() {
     let setting_panel = document.getElementById("setting_panel");
+    setting_panel.removeAttribute('style');
     setting_panel.classList.add('halfscreen');
     setting_panel.classList.add('fullscreen');    
     document.getElementById('main').style.marginLeft = "50%";
@@ -21,8 +22,6 @@ function openSettingPanel() {
 function closeSettingPanel() {
     let setting_panel = document.getElementById("setting_panel");
     setting_panel.style.width = "0";
-    setting_panel.classList.remove('halfscreen');
-    setting_panel.classList.remove('fullscreen');
     document.getElementById('main').style.marginLeft = "150px";
 
     document.body.style.backgroundColor = '#F2F0EB'
