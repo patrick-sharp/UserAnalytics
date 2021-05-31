@@ -17,6 +17,7 @@ const {
   getWhitelist,
   toggleTracking,
   getTrackingStatus,
+  updateCategories,
 } = require("../src/js/middleware.js");
 
 const categories = require("../src/category.json");
@@ -291,13 +292,13 @@ const testFunctions = [
   async function test21() {
     clearChromeStorage();
     handleUrlChange("https://www.example.com");
-    await new Promise((r) => setTimeout(r, 100));
+    await new Promise((r) => setTimeout(r, 25));
     return TESTING_localStorage.doTrack;
   },
   async function test22() {
     clearChromeStorage();
     handleUrlChange("https://www.example.com");
-    await new Promise((r) => setTimeout(r, 100));
+    await new Promise((r) => setTimeout(r, 25));
     if (!TESTING_localStorage.doTrack) {
       return false;
     }
@@ -307,7 +308,7 @@ const testFunctions = [
   async function test23() {
     clearChromeStorage();
     handleUrlChange("https://www.example.com");
-    await new Promise((r) => setTimeout(r, 100));
+    await new Promise((r) => setTimeout(r, 25));
     if (!TESTING_localStorage.doTrack) {
       return false;
     }
@@ -319,13 +320,13 @@ const testFunctions = [
   async function test24() {
     clearChromeStorage();
     handleUrlChange("https://www.example.com");
-    await new Promise((r) => setTimeout(r, 100));
+    await new Promise((r) => setTimeout(r, 25));
     return await getTrackingStatus();
   },
   async function test25() {
     clearChromeStorage();
     handleUrlChange("https://www.example.com");
-    await new Promise((r) => setTimeout(r, 100));
+    await new Promise((r) => setTimeout(r, 25));
     if (!(await getTrackingStatus())) {
       return false;
     }
@@ -335,10 +336,44 @@ const testFunctions = [
   async function test26() {
     clearChromeStorage();
     handleUrlChange("https://www.example.com");
-    await new Promise((r) => setTimeout(r, 100));
+    await new Promise((r) => setTimeout(r, 25));
     toggleTracking();
     toggleTracking();
     return (await getTrackingStatus());
+  },
+  // updateCategories
+  async function test27() {
+    clearChromeStorage();
+    await new Promise((r) => setTimeout(r, 25));
+    categories.Entertainment.push('example.com');
+    await updateCategories(categories);
+    return TESTING_localStorage.category.Entertainment.includes('example.com');
+  },
+  async function test28() {
+    clearChromeStorage();
+    await new Promise((r) => setTimeout(r, 25));
+    categories.Productivity.push('example.com');
+    await updateCategories(categories);
+    return TESTING_localStorage.category.Productivity.includes('example.com');
+  },
+  async function test29() {
+    clearChromeStorage();
+    await new Promise((r) => setTimeout(r, 25));
+    categories.Productivity = [];
+    await updateCategories(categories);
+    return (
+      !TESTING_localStorage.category.Productivity.includes('example.com')
+      && !TESTING_localStorage.category.Productivity.includes('w3schools.com')
+      && !TESTING_localStorage.category.Productivity.includes('mail.google.com')
+      && !TESTING_localStorage.category.Productivity.includes('github.com')
+      && !TESTING_localStorage.category.Productivity.includes('stackoverflow.com')
+    );
+  },
+  async function test30() {
+    clearChromeStorage();
+    await new Promise((r) => setTimeout(r, 25));
+    await updateCategories({});
+    return (Object.keys(TESTING_localStorage.category).length === 0);
   },
 ];
 
