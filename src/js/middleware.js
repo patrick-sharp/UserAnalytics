@@ -604,7 +604,6 @@ if (typeof exports !== "undefined") {
   exports.removeElement = removeElement;
   exports.removeDate = removeDate;
   exports.getMap = getMap;
-  exports.handleUrlChange = handleUrlChange;
   exports.chromeActive = chromeActive;
   exports.chromeInactive = chromeInactive;
   exports.getWhitelist = getWhitelist;
