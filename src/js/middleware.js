@@ -16,7 +16,7 @@ try {
   global.fetch = (arg) => {
     return new Promise((resolve, reject) => {
       let jsonData = "[\"PLACEHOLDER_JSON\"]"
-      if (arg === 'category.json') {
+      if (arg.includes('category.json')) {
         jsonData = categories;
       }
       resolve({
@@ -32,14 +32,12 @@ try {
 
 try {
   importScripts("../psl.min.js");
-} catch (e) {
-
-}
+} catch (e) {}
 
 /******************************************************************************
  * global variables
  ******************************************************************************/
-const debugMode = true; // print message to console (service worker)
+const debugMode = false; // print message to console (service worker)
 let defaultLastDomainObj = {
   // default object if lastDomain key does not exist
   lastDomain: {
