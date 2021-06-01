@@ -662,23 +662,23 @@ if (typeof chrome === "undefined") {
           } else {
             throw "Error: arg is not object";
           }
-          callback();
+          callback && callback();
         },
         get: function (arg, callback) {
           if (Array.isArray(arg)) {
             const key = arg[0];
             const result =
               TESTING_localStorage[key] === undefined
-              ? {}
-              : { [key]: TESTING_localStorage[key] };
-            callback(result);
+                ? {}
+                : { [key]: TESTING_localStorage[key] };
+            callback && callback(result);
           } else if (typeof arg === "object") {
             const key = Object.keys(arg)[0];
             const result =
               TESTING_localStorage[key] === undefined
-              ? arg[key]
-              : { [key]: TESTING_localStorage[key] };
-            callback(result);
+                ? arg[key]
+                : { [key]: TESTING_localStorage[key] };
+            callback && callback(result);
           } else {
             throw "Error: arg is not array or object";
           }
@@ -687,7 +687,7 @@ if (typeof chrome === "undefined") {
           for (let key of Object.keys(TESTING_localStorage)) {
             delete TESTING_localStorage[key];
           }
-          callback();
+          callback && callback();
         },
       },
     },

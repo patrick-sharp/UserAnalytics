@@ -8,6 +8,7 @@ const {
   getDomainsForDay,
   getCategoryList,
   getCategoryKeys,
+  addLinkToCategory,
 } = require("../src/js/middleware.js");
 
 const categories = require("../src/category.json");
@@ -192,6 +193,14 @@ const testFunctions = [
       && TESTING_localStorage.lastDomain.lastInactiveTime === 0
       && TESTING_localStorage.lastDomain.totalInactiveTime === 0
     )
+  },
+  // addLinkToCategory
+  async function test14() {
+    clearChromeStorage();
+    await new Promise((r) => setTimeout(r, 50));
+    addLinkToCategory('Entertainment', 'getpocket.com');
+    const categoryList = await getCategoryList();
+    return categoryList.Entertainment.includes('getpocket.com');
   }
 ];
 
