@@ -1,5 +1,5 @@
 try {
-  importScripts('./js/middleware.js');
+  importScripts("./js/middleware.js");
 } catch (e) {
   console.error(e);
 }
@@ -14,7 +14,6 @@ try {
 //
 // See https://developer.chrome.com/docs/extensions/reference/events/ for additional details.
 chrome.runtime.onInstalled.addListener(async () => {
-
   // While we could have used `let url = "hello.html"`, using runtime.getURL is a bit more robust as
   // it returns a full URL rather than just a path that Chrome needs to be resolved contextually at
   // runtime.
@@ -23,16 +22,13 @@ chrome.runtime.onInstalled.addListener(async () => {
   // fetch preset category json file async.
   loadDefaultCategory();
 
-  fetch('mock.json')
-  .then(response => response.json())
-  .then(jsonData => {
-    chrome.storage.sync.set(
-      jsonData, function() {
+  fetch("mock.json")
+    .then((response) => response.json())
+    .then((jsonData) => {
+      chrome.storage.sync.set(jsonData, function () {
         console.log("Mock data loaded");
-      }
-    )
-  });
-
+      });
+    });
 
   // Open a new tab pointing at our page's URL using JavaScript's object initializer shorthand.
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#new_notations_in_ecmascript_2015
@@ -51,20 +47,18 @@ chrome.runtime.onInstalled.addListener(async () => {
   console.log(`Created tab ${tab.id}`);
 });
 
-
 /**********************************************************************
- * 
+ *
  * Main Code starts here!
- * 
+ *
  **********************************************************************/
 
 /***************************************
  * Invokers: will be called by chrome
  ***************************************/
 // invoked when active tab is changed (including creating a new tab)
-chrome.tabs.onActivated.addListener(function(activeInfo) {
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-
+chrome.tabs.onActivated.addListener(function (activeInfo) {
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     // since only one tab should be active and in the current window at once
     // the return variable should only have one entry
     var activeTab = tabs[0];
@@ -74,11 +68,10 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
   });
 });
 
-
 // invoked when the current active tab changes new url
 chrome.tabs.onUpdated.addListener((tabId, change, tab) => {
   if (tab.active && change.url) {
-    handleUrlChange(change.url)
+    handleUrlChange(change.url);
   }
 });
 
@@ -86,22 +79,21 @@ chrome.tabs.onUpdated.addListener((tabId, change, tab) => {
 const dayInMilliseconds = 1000 * 60 * 60 * 24;
 setInterval(cleanOldData, dayInMilliseconds);
 
-
 // check if chrome is in focus every second
-setInterval(checkBrowserFocus, 1000);  
+setInterval(checkBrowserFocus, 1000);
 
 /**
  * Check whether Chrome is in focus
- * 
+ *
  * @see chromeActive
  * @see chromeInactive
  */
-function checkBrowserFocus(){
-  chrome.windows.getCurrent(function(browser){
+function checkBrowserFocus() {
+  chrome.windows.getCurrent(function (browser) {
     if (browser.focused) {
-      chromeActive(); 
+      chromeActive();
     } else {
-      chromeInactive(); 
+      chromeInactive();
     }
-  })
+  });
 }

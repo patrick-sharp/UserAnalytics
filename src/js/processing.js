@@ -7,7 +7,7 @@ var currentDate = new Date();
 
 /**
  * Get the time data from specific date
- * 
+ *
  * @param {string} date the date string the data will be retrieved from
  * @returns a JSON object that contains the data from specified `date`
  */
@@ -24,34 +24,46 @@ async function getDate(date) {
 
 /**
  * formate a date object to corresponding date string in MM/DD/YYYY format
- * @param {Date} dateObj 
+ * @param {Date} dateObj
  * @returns a string representation of the date object
  */
 function dateString(dateObj) {
-  return String(dateObj.getMonth() + 1) + "/" + dateObj.getDate() + "/" + dateObj.getFullYear();
+  return (
+    String(dateObj.getMonth() + 1) +
+    "/" +
+    dateObj.getDate() +
+    "/" +
+    dateObj.getFullYear()
+  );
 }
 
 /**
  * formate a date object to corresponding date string in YYYY-MM-DD format
- * @param {Date} dateObj 
+ * @param {Date} dateObj
  * @returns a string representation of the date object
  */
- function calendarDateString(dateObj) {
-  return dateObj.getFullYear() + "-" + String(dateObj.getMonth() + 1) + "-" + dateObj.getDate();
+function calendarDateString(dateObj) {
+  return (
+    dateObj.getFullYear() +
+    "-" +
+    String(dateObj.getMonth() + 1) +
+    "-" +
+    dateObj.getDate()
+  );
 }
 
 /**
  * Return a Date object `prev` number of days before today
- * 
+ *
  * @param {number} prev number of previous days, 1 if yesterday
  * @param {string} date dateString, default null
  * @returns a Date object `prev` number of days before today
  */
-function getPreviousDays(prev, today=null) {
+function getPreviousDays(prev, today = null) {
   if (today === null) {
     today = new Date();
   } else {
-    today = new Date(today)
+    today = new Date(today);
   }
   const prevDay = new Date(today);
   return new Date(prevDay.setDate(today.getDate() - prev));
@@ -84,7 +96,7 @@ async function getTimeForDay(date, domain) {
  */
 async function getTimeForWeek(dates, domain) {
   var totalTime = 0;
-  for (var i = 0; i < dates.length; i ++) {
+  for (var i = 0; i < dates.length; i++) {
     totalTime += await getTimeForDay(dates[i], domain);
   }
   return totalTime;
@@ -93,17 +105,16 @@ async function getTimeForWeek(dates, domain) {
 /**
  * Uses the current date to find total seconds spent on Chrome today as well as the difference from yesterday
  * @param {string} date dateString, default null(today)
- * @returns A size 2 array, first index the total second spent on Chrome today, 
+ * @returns A size 2 array, first index the total second spent on Chrome today,
  *          second index the difference in seconds, today - yesterday.
  */
-async function getTotalTime(todayString=null) {
+async function getTotalTime(todayString = null) {
   if (todayString === null) {
-    todayString = dateString(currentDate)
+    todayString = dateString(currentDate);
   }
   const yesterdayString = dateString(getPreviousDays(1, todayString));
   const todayData = await getDate(todayString);
   const yesterdayData = await getDate(yesterdayString);
-
 
   var todayTime = 0;
   var yesterdayTime = 0;
@@ -120,14 +131,14 @@ async function getTotalTime(todayString=null) {
 
 /**
  * Get the amount of time for the most frequently visited site
- * 
+ *
  * @param {string} todayString dateString, default null
  * @see getTimeForDay
- * @returns an array of size 3. arr[0]: the URL of the most frequently visited domain; 
- *                              arr[1]: the amount of time spent on the domain; 
+ * @returns an array of size 3. arr[0]: the URL of the most frequently visited domain;
+ *                              arr[1]: the amount of time spent on the domain;
  *                              arr[2]: the time different in second compared to yesterday
  */
-async function getMostFrequentTime(todayString=null) {
+async function getMostFrequentTime(todayString = null) {
   if (todayString === null) {
     todayString = dateString(currentDate);
   }
@@ -143,14 +154,17 @@ async function getMostFrequentTime(todayString=null) {
     }
   }
 
-  var yesterdayTime = await getTimeForDay(dateString(getPreviousDays(1, todayString)), maxDomain);
+  var yesterdayTime = await getTimeForDay(
+    dateString(getPreviousDays(1, todayString)),
+    maxDomain
+  );
 
   return [maxDomain, maxTime, maxTime - yesterdayTime];
 }
 
 /**
  * get the weekly data for the past week
- * 
+ *
  * @param {Array} prevWeek an array of size 7 containing date strings of past 7 days
  * @returns an array size of 2. arr[0]: the total amount of time spent on chrome for the past 7 days
  *                              arr[1]: dummy data that represents the time difference
@@ -160,7 +174,7 @@ async function getWeeklyTotalTime(prevWeek) {
 
   for await (const date of prevWeek) {
     let data = await getDate(date);
-    let sum = Object.values(data).reduce(function(accumulator, currentValue) {
+    let sum = Object.values(data).reduce(function (accumulator, currentValue) {
       return accumulator + currentValue;
     }, 0);
     total += sum;
@@ -171,7 +185,7 @@ async function getWeeklyTotalTime(prevWeek) {
 
 /**
  * Get the most frequently visited sites and the time for the past 7 days
- * 
+ *
  * @returns an array of size 3. arr[0]: the string URL of the most frequently visited site
  *                              arr[1]: the total time spent on that site
  *                              arr[2]: dummy data that represents the time difference
@@ -179,42 +193,46 @@ async function getWeeklyTotalTime(prevWeek) {
 async function getWeeklyMostFrequentTime() {
   let timeSheetData = await getTimesheetData("Weekly");
   let obj = timeSheetData[0];
-  if (obj === undefined) {  // no data in the timeSheet
-    return ["", 0, 0]
+  if (obj === undefined) {
+    // no data in the timeSheet
+    return ["", 0, 0];
   }
 
-  return [obj['title'], obj['time'], 0];
+  return [obj["title"], obj["time"], 0];
 }
 
 /**
  * Prepare data for the linear chart in the dashboard
- * 
+ *
  * @see dateString
  * @see getPreviousDays
  * @see getDate
  * @returns an array of size 2; arr[0]: the date labels for the past 7 days
- *                              arr[1]: the dataset for the past 7 days 
+ *                              arr[1]: the dataset for the past 7 days
  */
 async function getLineChartData() {
   var labels = [];
   var dataset = [];
 
   const templateData = {
-    data: [{x: 1, y: 24}, {x: 1, y: 10}],
-    backgroundColor: ['#CFF0C4', '#5AC43B'],
+    data: [
+      { x: 1, y: 24 },
+      { x: 1, y: 10 },
+    ],
+    backgroundColor: ["#CFF0C4", "#5AC43B"],
     borderRadius: 16,
     barThickness: 24,
-    grouped: false
-  }
+    grouped: false,
+  };
 
   for (i = 1; i <= 7; i++) {
-    labels.push(dateString(getPreviousDays(7-i)));
+    labels.push(dateString(getPreviousDays(7 - i)));
 
     var copy = JSON.parse(JSON.stringify(templateData));
-    copy.data[0].x = labels[i-1];
-    copy.data[1].x = labels[i-1];
+    copy.data[0].x = labels[i - 1];
+    copy.data[1].x = labels[i - 1];
 
-    const tempData = await getDate(labels[i-1]);
+    const tempData = await getDate(labels[i - 1]);
     var time = 0;
 
     for (var domain in tempData) {
@@ -226,12 +244,12 @@ async function getLineChartData() {
     dataset.push(copy);
   }
 
-  return [labels, dataset]
+  return [labels, dataset];
 }
 
 /**
  * Prepare category data for the polar chart in the dashboard
- * 
+ *
  * @see getCategoryKeys
  * @see getCategoryList
  * @see dateString
@@ -240,29 +258,30 @@ async function getLineChartData() {
  * @param {string} todayString dateString, default null
  * @returns a new object with {Category: time, ...}
  */
-async function getPolarChartData(status, todayString=null) {
+async function getPolarChartData(status, todayString = null) {
   var categories = await getCategoryList();
-  
+
   if (status === "Daily") {
     if (todayString === null) {
       todayString = dateString(currentDate);
     }
-    const domains = await getDomainsForDay(todayString)
+    const domains = await getDomainsForDay(todayString);
     return mapDomainToCategory(domains, categories);
-  } else { // status === "Weekly"
+  } else {
+    // status === "Weekly"
     var prevWeek = [];
     var dataset = {};
     for (i = 0; i < 7; i++) {
-        prevWeek.push(dateString(getPreviousDays(i)));
+      prevWeek.push(dateString(getPreviousDays(i)));
     }
 
     var list = [];
-    for (let prev of prevWeek) {      
-      const domains = await getDomainsForDay(prev)
+    for (let prev of prevWeek) {
+      const domains = await getDomainsForDay(prev);
       list.push(mapDomainToCategory(domains, categories));
     }
 
-    list.forEach(d => {
+    list.forEach((d) => {
       for (let [key, value] of Object.entries(d)) {
         if (dataset.hasOwnProperty(key)) {
           dataset[key] += value;
@@ -272,16 +291,16 @@ async function getPolarChartData(status, todayString=null) {
       }
     });
 
-    return dataset
+    return dataset;
   }
 }
 
 /**
- * Map domains to corresponding category based on domain filters in each category 
+ * Map domains to corresponding category based on domain filters in each category
  * @private
  * @param {Array} domains list of {domain, time} pair from given time period
  * @param {Object} categories  list of categories and corresponding filter domains
- * 
+ *
  * @returns a new object with {Category: time, ...}
  */
 function mapDomainToCategory(domains, categories) {
@@ -296,10 +315,10 @@ function mapDomainToCategory(domains, categories) {
       if (list.includes(domain)) {
         added = true;
         dataset[category] = dataset[category] + time;
-      } 
+      }
     }
     if (!added) {
-      dataset['Uncategorized'] += time;
+      dataset["Uncategorized"] += time;
     }
   }
   return dataset;
@@ -307,59 +326,61 @@ function mapDomainToCategory(domains, categories) {
 
 /**
  * Prepare data for each domain visited for the past day
- * 
+ *
  * @see dateString
  * @see getDate
- * 
+ *
  * @param {String} status indicate Daily or Weekly data
  * @param {string} date   dateString, default null
  * @returns an array object containing each domain and its corresponding time spent. Example format: {domain: time}
  */
-async function getTimesheetData(status, date=null) {
+async function getTimesheetData(status, date = null) {
   var timesheetData = [];
   if (status === "Daily") {
     if (date === null) {
-      date = dateString(currentDate)
+      date = dateString(currentDate);
     }
-    const todayData = await getDate(date)
+    const todayData = await getDate(date);
     for (var domain in todayData) {
-      var temp = {}
-      temp['title'] = domain;
-      temp['time'] = todayData[domain];
+      var temp = {};
+      temp["title"] = domain;
+      temp["time"] = todayData[domain];
       timesheetData.push(temp);
     }
     timesheetData.sort(function (a, b) {
       return b.time - a.time;
-    })
-  } else {  // status === "Weekly"
+    });
+  } else {
+    // status === "Weekly"
     prevWeek = [];
     for (i = 0; i < 7; i++) {
-        prevWeek.push(dateString(getPreviousDays(i)));
+      prevWeek.push(dateString(getPreviousDays(i)));
     }
     for await (const day of prevWeek) {
-      const todayData = await getDate(day)
+      const todayData = await getDate(day);
       for (var domain in todayData) {
-        var found = false
-        for (var i = 0; i < timesheetData.length; i++) {  // check if the element already exists
-          let tempObj = timesheetData[i]
-          if (tempObj['title'] === domain) {
-            tempObj['time'] += todayData[domain];
-            found = true
+        var found = false;
+        for (var i = 0; i < timesheetData.length; i++) {
+          // check if the element already exists
+          let tempObj = timesheetData[i];
+          if (tempObj["title"] === domain) {
+            tempObj["time"] += todayData[domain];
+            found = true;
             break;
           }
         }
         if (!found) {
-          var temp = {}
-          temp['title'] = domain;
-          temp['time'] = todayData[domain];
+          var temp = {};
+          temp["title"] = domain;
+          temp["time"] = todayData[domain];
           timesheetData.push(temp);
         }
       }
     }
     timesheetData.sort(function (a, b) {
       return b.time - a.time;
-    }) 
+    });
   }
 
-  return timesheetData;  
+  return timesheetData;
 }

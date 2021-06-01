@@ -1,37 +1,38 @@
-window.onload = async function() {
-
+window.onload = async function () {
   // retrieve category keys from Chrome storage
-  getCategoryKeys().then(data => {
+  getCategoryKeys().then((data) => {
     var selector = document.getElementById("category_selector");
-    data.forEach(category => {
+    data.forEach((category) => {
       var option = document.createElement("option");
       option.text = category;
       option.value = category;
-      option.style.width = 'fit';
+      option.style.width = "fit";
       selector.appendChild(option);
-    })
+    });
   });
 
-  // add `click` event listener to DOM 
-  document.getElementById("save").addEventListener('click', function() {
-    let selector = document.getElementById('category_selector');
+  // add `click` event listener to DOM
+  document.getElementById("save").addEventListener("click", function () {
+    let selector = document.getElementById("category_selector");
     let index = selector.selectedIndex;
     let item = selector.options[index].value;
     let url = document.getElementById("url").innerHTML;
     if (url !== "Nothing to save") {
       alert("Added " + url + " to " + item + ".");
-      addLinkToCategory(item,url);
+      addLinkToCategory(item, url);
     }
-  })
-  
+  });
+
   document.getElementById("trackingToggle").checked = await getTrackingStatus();
   changeOnOffText();
 
-  document.getElementById("trackingToggle").addEventListener('change', function() {
-    changeOnOffText();
-    toggleTracking();
-  })
-}
+  document
+    .getElementById("trackingToggle")
+    .addEventListener("change", function () {
+      changeOnOffText();
+      toggleTracking();
+    });
+};
 
 function changeOnOffText() {
   if (document.getElementById("trackingToggle").checked) {
@@ -48,31 +49,32 @@ function changeOnOffText() {
 /**
  * Add `DOMContentLoaded` listener
  */
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener("DOMContentLoaded", function () {
   var links = document.getElementsByTagName("a");
   for (var i = 0; i < links.length; i++) {
     (function () {
       var ln = links[i];
       var location = ln.href;
       ln.onclick = function () {
-        chrome.tabs.create({active: true, url: location});
+        chrome.tabs.create({ active: true, url: location });
       };
     })();
   }
 });
 
 // check the current active url every 1 second
-window.setInterval(checkBrowserFocus, 1000);  
+window.setInterval(checkBrowserFocus, 1000);
 
 /**
  * Check the currently visited domain site and update the domain name in popup
  */
-function checkBrowserFocus(){
-  chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
+function checkBrowserFocus() {
+  chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
     if (tabs[0]) {
-      const url = new URL(tabs[0].url)
+      const url = new URL(tabs[0].url);
       const formattedURL = psl.get(url.hostname);
-      document.getElementById("url").innerHTML = formattedURL === null ? "Nothing to save" : formattedURL;
+      document.getElementById("url").innerHTML =
+        formattedURL === null ? "Nothing to save" : formattedURL;
     }
   });
 }

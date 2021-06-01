@@ -1,25 +1,24 @@
-
 const testFunctions = [
   // Test if chart dependencies exist
   function test1() {
-    return (Chart !== undefined);
+    return Chart !== undefined;
   },
   // Test if main_stats exists
   function test2() {
-    return document.getElementById('main_stats') !== null;
+    return document.getElementById("main_stats") !== null;
   },
   function test3() {
-    return document.getElementById('display') !== null;
+    return document.getElementById("display") !== null;
   },
   function test4() {
-    return document.getElementById('left_container') !== null;
+    return document.getElementById("left_container") !== null;
   },
   function test5() {
-    return document.getElementById('right_container') !== null;
+    return document.getElementById("right_container") !== null;
   },
   function test6() {
-    const chart = document.getElementById('polarChart');
-    return chart.tagName === 'CANVAS';
+    const chart = document.getElementById("polarChart");
+    return chart.tagName === "CANVAS";
   },
 ];
 
@@ -34,24 +33,24 @@ function runTests() {
     try {
       if (testFunctions[i]()) {
         numTestsPassed++;
-        message = `Test ${i+1} passed`;
+        message = `Test ${i + 1} passed`;
       } else {
-        message = `Test ${i+1} failed`;
+        message = `Test ${i + 1} failed`;
         console.log(message);
       }
-    } catch(error) {
-      message = `Test ${i+1} failed with exception:\n${error}`;
+    } catch (error) {
+      message = `Test ${i + 1} failed with exception:\n${error}`;
     }
-    // console.log(message);
+    console.log(message);
   }
-  // console.log(`${numTestsPassed}/${testFunctions.length} tests passed`);
-  
+  console.log(`${numTestsPassed}/${testFunctions.length} tests passed`);
+
   if (numTestsPassed < testFunctions.length) {
-    alert("One or more tests did not pass. See the console for details.")
+    alert("One or more tests did not pass. See the console for details.");
   }
 }
 
-// const body = document.getElementsByTagName("body")[0];
-// body.addEventListener("load", runTests, false);
-
-runTests();
+const doRunTests = false;
+if (doRunTests) {
+  runTests();
+}

@@ -175,11 +175,11 @@ const testFunctions = [
   // getCategoryKeys
   async function test12() {
     const expectedKeys = [
-      'Entertainment',
-      'Social',
-      'Reading',
-      'Productivity',
-      'Uncategorized'
+      "Entertainment",
+      "Social",
+      "Reading",
+      "Productivity",
+      "Uncategorized",
     ];
     const actualKeys = await getCategoryKeys();
     if (!Array.isArray(actualKeys)) {
@@ -196,25 +196,25 @@ const testFunctions = [
   async function test13() {
     cleanUsage();
     return (
-      TESTING_localStorage.lastDomain
-      && TESTING_localStorage.lastDomain.domain === null
-      && typeof TESTING_localStorage.lastDomain.openedTime === 'number'
-      && TESTING_localStorage.lastDomain.lastInactiveTime === 0
-      && TESTING_localStorage.lastDomain.totalInactiveTime === 0
-    )
+      TESTING_localStorage.lastDomain &&
+      TESTING_localStorage.lastDomain.domain === null &&
+      typeof TESTING_localStorage.lastDomain.openedTime === "number" &&
+      TESTING_localStorage.lastDomain.lastInactiveTime === 0 &&
+      TESTING_localStorage.lastDomain.totalInactiveTime === 0
+    );
   },
   // addLinkToCategory
   async function test14() {
     clearChromeStorage();
     await new Promise((r) => setTimeout(r, 50));
-    addLinkToCategory('Entertainment', 'getpocket.com');
+    addLinkToCategory("Entertainment", "getpocket.com");
     const categoryList = await getCategoryList();
-    return categoryList.Entertainment.includes('getpocket.com');
+    return categoryList.Entertainment.includes("getpocket.com");
   },
   // removeDate
   async function test15() {
-    setLastDomain('example.com');
-    handleUrlChange('https://www.google.com');
+    setLastDomain("example.com");
+    handleUrlChange("https://www.google.com");
     const dateString = getDateString();
     removeDate(dateString);
     return !TESTING_localStorage.hasOwnProperty(dateString);
@@ -234,25 +234,30 @@ const testFunctions = [
   // chromeInactive
   async function test16() {
     clearChromeStorage();
-    setLastDomain('example.com');
-    handleUrlChange('https://www.google.com');
+    setLastDomain("example.com");
+    handleUrlChange("https://www.google.com");
     chromeInactive();
-    return Math.abs(TESTING_localStorage.lastDomain.lastInactiveTime - Date.now()) < 50;
+    return (
+      Math.abs(TESTING_localStorage.lastDomain.lastInactiveTime - Date.now()) <
+      50
+    );
   },
   // chromeActive
   async function test17() {
     clearChromeStorage();
-    setLastDomain('example.com');
-    handleUrlChange('https://www.google.com');
+    setLastDomain("example.com");
+    handleUrlChange("https://www.google.com");
     chromeInactive();
     await new Promise((r) => setTimeout(r, 100));
     chromeActive();
-    return Math.abs(TESTING_localStorage.lastDomain.totalInactiveTime - 100) < 50;
+    return (
+      Math.abs(TESTING_localStorage.lastDomain.totalInactiveTime - 100) < 50
+    );
   },
   async function test18() {
     clearChromeStorage();
-    setLastDomain('example.com');
-    handleUrlChange('https://www.google.com');
+    setLastDomain("example.com");
+    handleUrlChange("https://www.google.com");
     chromeInactive();
     await new Promise((r) => setTimeout(r, 100));
     chromeActive();
@@ -267,25 +272,25 @@ const testFunctions = [
   // updateWhitelist
   async function test19() {
     clearChromeStorage();
-    const domains = ['google.com', 'example.com', 'facebook.com'];
+    const domains = ["google.com", "example.com", "facebook.com"];
     updateWhitelist(domains);
     return (
-      TESTING_localStorage.whitelist
-      && TESTING_localStorage.whitelist[0] === domains[0]
-      && TESTING_localStorage.whitelist[1] === domains[1]
-      && TESTING_localStorage.whitelist[2] === domains[2]
+      TESTING_localStorage.whitelist &&
+      TESTING_localStorage.whitelist[0] === domains[0] &&
+      TESTING_localStorage.whitelist[1] === domains[1] &&
+      TESTING_localStorage.whitelist[2] === domains[2]
     );
   },
   // getWhitelist
   async function test20() {
     clearChromeStorage();
-    const domains = ['google.com', 'example.com', 'facebook.com'];
+    const domains = ["google.com", "example.com", "facebook.com"];
     updateWhitelist(domains);
     const whitelist = await getWhitelist();
     return (
-      whitelist[0] === domains[0]
-      && whitelist[1] === domains[1]
-      && whitelist[2] === domains[2]
+      whitelist[0] === domains[0] &&
+      whitelist[1] === domains[1] &&
+      whitelist[2] === domains[2]
     );
   },
   // toggleTracking
@@ -339,22 +344,22 @@ const testFunctions = [
     await new Promise((r) => setTimeout(r, 25));
     toggleTracking();
     toggleTracking();
-    return (await getTrackingStatus());
+    return await getTrackingStatus();
   },
   // updateCategories
   async function test27() {
     clearChromeStorage();
     await new Promise((r) => setTimeout(r, 25));
-    categories.Entertainment.push('example.com');
+    categories.Entertainment.push("example.com");
     await updateCategories(categories);
-    return TESTING_localStorage.category.Entertainment.includes('example.com');
+    return TESTING_localStorage.category.Entertainment.includes("example.com");
   },
   async function test28() {
     clearChromeStorage();
     await new Promise((r) => setTimeout(r, 25));
-    categories.Productivity.push('example.com');
+    categories.Productivity.push("example.com");
     await updateCategories(categories);
-    return TESTING_localStorage.category.Productivity.includes('example.com');
+    return TESTING_localStorage.category.Productivity.includes("example.com");
   },
   async function test29() {
     clearChromeStorage();
@@ -362,18 +367,18 @@ const testFunctions = [
     categories.Productivity = [];
     await updateCategories(categories);
     return (
-      !TESTING_localStorage.category.Productivity.includes('example.com')
-      && !TESTING_localStorage.category.Productivity.includes('w3schools.com')
-      && !TESTING_localStorage.category.Productivity.includes('mail.google.com')
-      && !TESTING_localStorage.category.Productivity.includes('github.com')
-      && !TESTING_localStorage.category.Productivity.includes('stackoverflow.com')
+      !TESTING_localStorage.category.Productivity.includes("example.com") &&
+      !TESTING_localStorage.category.Productivity.includes("w3schools.com") &&
+      !TESTING_localStorage.category.Productivity.includes("mail.google.com") &&
+      !TESTING_localStorage.category.Productivity.includes("github.com") &&
+      !TESTING_localStorage.category.Productivity.includes("stackoverflow.com")
     );
   },
   async function test30() {
     clearChromeStorage();
     await new Promise((r) => setTimeout(r, 25));
     await updateCategories({});
-    return (Object.keys(TESTING_localStorage.category).length === 0);
+    return Object.keys(TESTING_localStorage.category).length === 0;
   },
 ];
 

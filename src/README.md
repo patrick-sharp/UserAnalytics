@@ -8,7 +8,9 @@ Clone this repository to your local machine to access the source code. You may a
 This folder contains the main Chrome extension and developer documentation. Any functioal changes should be here. Upload this folder to Google Chrome to install UserAnalytics.
 
 ### test
-This folder cotains all the unit tests for both frontend and backend featurese of UserAnalytics.
+This folder cotains all the unit tests for our middleware functions.
+To run them, navigate to this folder in a terminal and run  
+`node test.js`
 
 ### Reports
 This folder is for weekly CSE 403 status reports. It contains a markdown template file for future status reports.
@@ -17,7 +19,7 @@ This folder is for weekly CSE 403 status reports. It contains a markdown templat
 - The system will be automatically built when Chrome loads the folder. 
 - Note that 'manifest.json' contains the set-up information for chrome extensions.
 - Pushing code to the ‘main’ branch of our GitHub repository or opening a pull request to the ‘main’ branch will trigger a CI build. CI testing can also be manually triggered from GitHub’s actions tab.
-- To run UI tests, there is a javascript file in the `src` diectory called `dashboard_test.js`. If this file is included via script tag at the bottom of the `dashboard.html` (also in the `src` directory), UI tests will automatically be run when you open up the dashboard while using the extension.
+- To run UI tests, there is a javascript file in the `src` diectory called `dashboard_test.js`. If this file is included via script tag at the bottom of the `dashboard.html` (also in the `src` directory), UI tests will automatically be run when you open up the dashboard while using the extension if the variable `doRunTests` at the bottom of the file is set to true. It is false by default, so if you want to run those tests, set it to true.
 
 ## How to add new tests
 You can add new tests for the middleware functions by going into the file `test.js` in the `test` folder. This file contains an array at the top called `testFunctions`. Each function in this file is a test for our middleware functions (found in `src/middleware.js`). Each one of these functions returns true if the test passes, and false if it fails. The tests in the file are run automatically by a GitHub action when main is pushed to, or when a pull request to main is opened.

@@ -1,38 +1,36 @@
 {
-    "Entertainment": [
-        "netflix.com",
-        "hulu.com",
-        "youtube.com",
-        "twitch.tv",
-        "disneyplus.com",
-        "hbo.com",
-        "hbomax.com"
-    ],
-    "Social": [
-        "facebook.com",
-        "discord.com",
-        "instagram.com",
-        "quora.com",
-        "reddit.com",
-        "messenger.com"
-    ],
-    "Reading": [
-        "google.com",
-        "yahoo.com",
-        "nytimes.com",
-        "cnn.com",
-        "foxnews.com",
-        "washingtonpost.com",
-        "theverge.com",
-        "vox.com"
-    ],
-    "Productivity": [
-        "stackoverflow.com",
-        "github.com",
-        "w3schools.com",
-        "mail.google.com"
-    ],
-    "Uncategorized":[
-        "newtab"
-    ]
+  "Entertainment": [
+    "netflix.com",
+    "hulu.com",
+    "youtube.com",
+    "twitch.tv",
+    "disneyplus.com",
+    "hbo.com",
+    "hbomax.com"
+  ],
+  "Social": [
+    "facebook.com",
+    "discord.com",
+    "instagram.com",
+    "quora.com",
+    "reddit.com",
+    "messenger.com"
+  ],
+  "Reading": [
+    "google.com",
+    "yahoo.com",
+    "nytimes.com",
+    "cnn.com",
+    "foxnews.com",
+    "washingtonpost.com",
+    "theverge.com",
+    "vox.com"
+  ],
+  "Productivity": [
+    "stackoverflow.com",
+    "github.com",
+    "w3schools.com",
+    "mail.google.com"
+  ],
+  "Uncategorized": ["newtab"]
 }
