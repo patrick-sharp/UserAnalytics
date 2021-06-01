@@ -487,7 +487,6 @@ function cleanOldData() {
   // get all the existing keys
   chrome.storage.sync.get(null, function(items) {
     let allKeys = Object.keys(items);
-    console.log(allKeys);
 
     // find the date keys that are older than a week
     let oldDates = [];
@@ -498,17 +497,19 @@ function cleanOldData() {
         return;
       }
       let oneWeekAgo = new Date();
-      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 8);
 
       if (dateKey < oneWeekAgo) {
         let dateString = new Date(dateKey).toLocaleDateString();
         oldDates.push(dateString); 
       }
     });
+
+    if (debugMode) {
+      console.log("Removed dates: " + oldDates);
+    }
     // remove oldDates from our list of keys
-    chrome.storage.sync.remove(oldDates, function(items) {
-      console.log(items);
-    });
+    chrome.storage.sync.remove(oldDates, function(items) {});
   });
 }
 
