@@ -82,6 +82,10 @@ chrome.tabs.onUpdated.addListener((tabId, change, tab) => {
   }
 });
 
+// clean date more than a week old from chrome
+const dayInMilliseconds = 1000 * 60 * 60 * 24;
+setInterval(cleanOldData, dayInMilliseconds);
+
 
 // check if chrome is in focus every second
 setInterval(checkBrowserFocus, 1000);  

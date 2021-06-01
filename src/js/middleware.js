@@ -394,8 +394,8 @@ function chromeInactive() {
         openedTime: data["openedTime"],
         lastInactiveTime: Date.now(),
         totalInactiveTime: data["totalInactiveTime"]
-          ? data["totalInactiveTime"]
-          : 0,
+        ? data["totalInactiveTime"]
+        : 0,
       },
     };
     chrome.storage.sync.set(lastDomainObj, function () {
@@ -423,8 +423,8 @@ function chromeActive() {
         openedTime: data["openedTime"],
         lastInactiveTime: 0,
         totalInactiveTime: data["totalInactiveTime"]
-          ? data["totalInactiveTime"] + inactiveTime
-          : inactiveTime,
+        ? data["totalInactiveTime"] + inactiveTime
+        : inactiveTime,
       },
     };
     chrome.storage.sync.set(lastDomainObj, function () {
@@ -481,6 +481,36 @@ async function readFileAsDataURL(file) {
     fileReader.readAsDataURL(file);
   });
   return result_base64;
+}
+
+function cleanOldData() {
+  // get all the existing keys
+  chrome.storage.sync.get(null, function(items) {
+    let allKeys = Object.keys(items);
+
+    // find the date keys that are older than a week
+    let oldDates = [];
+    allKeys.forEach(key => {
+      let dateKey = Date.parse(key);
+      // skip keys that aren't real dates
+      if (isNaN(dateKey)) {
+        return;
+      }
+      let oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 8);
+
+      if (dateKey < oneWeekAgo) {
+        let dateString = new Date(dateKey).toLocaleDateString();
+        oldDates.push(dateString); 
+      }
+    });
+
+    if (debugMode) {
+      console.log("Removed dates: " + oldDates);
+    }
+    // remove oldDates from our list of keys
+    chrome.storage.sync.remove(oldDates, function(items) {});
+  });
 }
 
 /******************************************************************************
@@ -641,15 +671,15 @@ if (typeof chrome === "undefined") {
             const key = arg[0];
             const result =
               TESTING_localStorage[key] === undefined
-                ? {}
-                : { [key]: TESTING_localStorage[key] };
+              ? {}
+              : { [key]: TESTING_localStorage[key] };
             callback(result);
           } else if (typeof arg === "object") {
             const key = Object.keys(arg)[0];
             const result =
               TESTING_localStorage[key] === undefined
-                ? arg[key]
-                : { [key]: TESTING_localStorage[key] };
+              ? arg[key]
+              : { [key]: TESTING_localStorage[key] };
             callback(result);
           } else {
             throw "Error: arg is not array or object";
