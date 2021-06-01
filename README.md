@@ -55,5 +55,5 @@ Please format any code or console output with three ticks ``` above and below. -
 - [x] Do not track UserAnalytic dashboard, chrome://*, and new tab.
 - [x] Better favicon fetching
 - [x] Add ability to view and modify categories in setting
-- [ ] Delete data older than 7 days
+- [x] Delete data older than 7 days
 
