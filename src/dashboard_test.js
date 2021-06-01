@@ -37,13 +37,14 @@ function runTests() {
         message = `Test ${i+1} passed`;
       } else {
         message = `Test ${i+1} failed`;
+        console.log(message);
       }
     } catch(error) {
       message = `Test ${i+1} failed with exception:\n${error}`;
     }
-    console.log(message);
+    // console.log(message);
   }
-  console.log(`${numTestsPassed}/${testFunctions.length} tests passed`);
+  // console.log(`${numTestsPassed}/${testFunctions.length} tests passed`);
   
   if (numTestsPassed < testFunctions.length) {
     alert("One or more tests did not pass. See the console for details.")
