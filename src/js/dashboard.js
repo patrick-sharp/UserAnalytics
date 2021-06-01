@@ -3,6 +3,7 @@ var charts = [];                    // linechart, polarchart
 var loadWeekTimeSheet = false       // true if loading weekly timesheet
 var loadDailyTimeSheet = false      // true if loading daily timesheet
 var picker = null;                  // calendar picker instance
+var pickerDate = null;              // selected calender date
 
 /**
  * Open setting panel
@@ -89,12 +90,20 @@ function setupCalendarSelector() {
         defaultDate: calendarDateString(new Date()),
         enable: calendarRange
     });
+    pickerDate = calendarDateString(new Date());
 
-    picker.config.onChange.push(function(selectedDate) {
+    picker.config.onChange.push(function(selectedDate, datestr) {
         selectedDateString = dateString(selectedDate[0]);
+        // loading old timesheet, reset current request.
+        if (loadDailyTimeSheet) {
+            alert("Timesheet for " + pickerDate + " loading, please try again later.");
+            picker.setDate(pickerDate);
+            return;
+        }
         retrieveDailyData(selectedDateString);
         generateTimeSheet("Daily", selectedDateString);
         renderGraph("Daily", selectedDateString);
+        pickerDate = datestr;
     });
 
 }
@@ -300,7 +309,10 @@ function updateButtonStyle(event) {
         generateTimeSheet("Weekly")
         renderGraph("Weekly")
         document.getElementById('calendar_selector').style.display = 'none';
+        
+        // reset Calender
         picker.setDate(calendarDateString(new Date()));
+        pickerDate = calendarDateString(new Date())
     }
 }
 
