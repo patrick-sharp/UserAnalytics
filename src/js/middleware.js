@@ -3,7 +3,7 @@
 // the process variable is only defined in node
 try {
   if (process === undefined) {
-    throw "Not in node"
+    throw "Not in node";
   }
   global.psl = require("../psl.min.js");
   global.categories = require("../category.json");
@@ -15,31 +15,30 @@ try {
   };
   global.fetch = (arg) => {
     return new Promise((resolve, reject) => {
-      let jsonData = "[\"PLACEHOLDER_JSON\"]"
-      if (arg === 'category.json') {
+      let jsonData = '["PLACEHOLDER_JSON"]';
+      if (arg.includes("category.json")) {
         jsonData = categories;
       }
       resolve({
         blob: () => "PLACEHOLDER_BLOB",
-        json: () => new Promise((resolve, reject) => {
-          resolve(jsonData);
-        }),
+        json: () =>
+          new Promise((resolve, reject) => {
+            resolve(jsonData);
+          }),
       });
     });
   };
-  console.log("Mock Chrome environment for Node initialized.")
-} catch(e) {}
+  console.log("Mock Chrome environment for Node initialized.");
+} catch (e) {}
 
 try {
   importScripts("../psl.min.js");
-} catch (e) {
-
-}
+} catch (e) {}
 
 /******************************************************************************
  * global variables
  ******************************************************************************/
-const debugMode = true; // print message to console (service worker)
+const debugMode = false; // print message to console (service worker)
 let defaultLastDomainObj = {
   // default object if lastDomain key does not exist
   lastDomain: {
@@ -318,9 +317,9 @@ function updateWhitelist(domains) {
 function updateCategories(categories) {
   categoriesObj = {};
   categoriesObj["category"] = categories;
-  chrome.storage.sync.set(categoriesObj, function() {
+  chrome.storage.sync.set(categoriesObj, function () {
     if (debugMode) {
-      console.log('Update categories: ');
+      console.log("Update categories: ");
       console.log(categoriesObj);
     }
   });
@@ -635,7 +634,6 @@ if (typeof exports !== "undefined") {
   exports.removeElement = removeElement;
   exports.removeDate = removeDate;
   exports.getMap = getMap;
-  exports.handleUrlChange = handleUrlChange;
   exports.chromeActive = chromeActive;
   exports.chromeInactive = chromeInactive;
   exports.getWhitelist = getWhitelist;
@@ -664,23 +662,25 @@ if (typeof chrome === "undefined") {
           } else {
             throw "Error: arg is not object";
           }
-          callback();
+          callback && callback();
         },
         get: function (arg, callback) {
-          if (Array.isArray(arg)) {
+          if (arg === null || arg === undefined) {
+            return null;
+          } else if (Array.isArray(arg)) {
             const key = arg[0];
             const result =
               TESTING_localStorage[key] === undefined
-              ? {}
-              : { [key]: TESTING_localStorage[key] };
-            callback(result);
+                ? {}
+                : { [key]: TESTING_localStorage[key] };
+            callback && callback(result);
           } else if (typeof arg === "object") {
             const key = Object.keys(arg)[0];
             const result =
               TESTING_localStorage[key] === undefined
-              ? arg[key]
-              : { [key]: TESTING_localStorage[key] };
-            callback(result);
+                ? arg[key]
+                : { [key]: TESTING_localStorage[key] };
+            callback && callback(result);
           } else {
             throw "Error: arg is not array or object";
           }
@@ -689,8 +689,13 @@ if (typeof chrome === "undefined") {
           for (let key of Object.keys(TESTING_localStorage)) {
             delete TESTING_localStorage[key];
           }
-          callback();
+          callback && callback();
         },
+        remove: function (key, callback) {
+          const data = { [key]: TESTING_localStorage.key }
+          delete TESTING_localStorage[key];
+          callback && callback(data);
+        }
       },
     },
   };
